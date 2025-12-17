@@ -1,0 +1,159 @@
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+import javax.swing.JPasswordField;
+import javax.swing.JOptionPane;
+import javax.swing.BorderFactory;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.awt.FlowLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+/**
+ * AFSLoginFrame - GUI Login frame for the application
+ */
+public class AFSLoginFrame extends JFrame {
+    private SystemManager systemManager;
+    private JTextField usernameField;
+    private JPasswordField passwordField;
+    private JLabel statusLabel;
+    
+    public AFSLoginFrame() {
+        this.systemManager = new SystemManager();
+        initializeFrame();
+    }
+    
+    private void initializeFrame() {
+        setTitle("Assessment Feedback System - Login");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(500, 400);
+        setLocationRelativeTo(null);
+        setResizable(false);
+        
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBackground(new Color(240, 240, 240));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        // Header Panel
+        JPanel headerPanel = new JPanel();
+        headerPanel.setBackground(new Color(25, 118, 210));
+        JLabel titleLabel = new JLabel("ASSESSMENT FEEDBACK SYSTEM");
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        headerPanel.add(titleLabel);
+        
+        // Login Panel
+        JPanel loginPanel = new JPanel(new GridLayout(4, 2, 10, 15));
+        loginPanel.setBackground(new Color(240, 240, 240));
+        loginPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        JLabel usernameLabel = new JLabel("Username:");
+        usernameLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        usernameField = new JTextField();
+        usernameField.setFont(new Font("Arial", Font.PLAIN, 12));
+        
+        JLabel passwordLabel = new JLabel("Password:");
+        passwordLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        passwordField = new JPasswordField();
+        passwordField.setFont(new Font("Arial", Font.PLAIN, 12));
+        
+        loginPanel.add(usernameLabel);
+        loginPanel.add(usernameField);
+        loginPanel.add(passwordLabel);
+        loginPanel.add(passwordField);
+        
+        // Button Panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        buttonPanel.setBackground(new Color(240, 240, 240));
+        
+        JButton loginButton = new JButton("Login");
+        loginButton.setPreferredSize(new Dimension(120, 40));
+        loginButton.setFont(new Font("Arial", Font.BOLD, 12));
+        loginButton.setBackground(new Color(25, 118, 210));
+        loginButton.setForeground(Color.WHITE);
+        loginButton.setOpaque(true);
+        loginButton.setContentAreaFilled(true);
+        loginButton.setBorderPainted(false);
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleLogin();
+            }
+        });
+        
+        JButton registerButton = new JButton("Register");
+        registerButton.setPreferredSize(new Dimension(120, 40));
+        registerButton.setFont(new Font("Arial", Font.BOLD, 12));
+        registerButton.setBackground(new Color(56, 142, 60));
+        registerButton.setForeground(Color.WHITE);
+        registerButton.setOpaque(true);
+        registerButton.setContentAreaFilled(true);
+        registerButton.setBorderPainted(false);
+        registerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openRegistrationFrame();
+            }
+        });
+        
+        buttonPanel.add(loginButton);
+        buttonPanel.add(registerButton);
+        
+        // Status Label
+        statusLabel = new JLabel("");
+        statusLabel.setForeground(Color.RED);
+        statusLabel.setFont(new Font("Arial", Font.PLAIN, 11));
+        
+        // Combine panels
+        mainPanel.add(headerPanel, BorderLayout.NORTH);
+        mainPanel.add(loginPanel, BorderLayout.CENTER);
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.setBackground(new Color(240, 240, 240));
+        bottomPanel.add(statusLabel, BorderLayout.NORTH);
+        bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+        
+        add(mainPanel);
+    }
+    
+    private void handleLogin() {
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+        
+        if (username.isEmpty() || password.isEmpty()) {
+            statusLabel.setText("Please enter both username and password");
+            return;
+        }
+        
+        User user = systemManager.authenticateUser(username, password);
+        if (user != null) {
+            openDashboard(user);
+            this.dispose();
+        } else {
+            statusLabel.setText("Invalid username or password!");
+            passwordField.setText("");
+        }
+    }
+    
+    private void openRegistrationFrame() {
+        new AFSRegistrationFrame(systemManager).setVisible(true);
+    }
+    
+    private void openDashboard(User user) {
+        if (user instanceof AdminStaff) {
+            new AdminDashboard(systemManager, (AdminStaff) user).setVisible(true);
+        } else if (user instanceof AcademicLeader) {
+            new AcademicLeaderDashboard(systemManager, (AcademicLeader) user).setVisible(true);
+        } else if (user instanceof Lecturer) {
+            new LecturerDashboard(systemManager, (Lecturer) user).setVisible(true);
+        } else if (user instanceof Student) {
+            new StudentDashboard(systemManager, (Student) user).setVisible(true);
+        }
+    }
+}
