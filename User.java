@@ -31,13 +31,6 @@ public abstract class User implements Serializable {
     }
 
     public abstract void displayMenu();
-
-    /**
-     * Abstract method - each user type must implement this
-     * Handles what happens when user chooses a menu option
-     *
-     * @param action The menu choice (like "1" for first option)
-     */
     public abstract void handleAction(String action);
 
     // ===== GETTER METHODS =====
