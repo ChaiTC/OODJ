@@ -3,9 +3,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Assessment class - represents an assessment instance
- */
+
 public class Assessment implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -15,11 +13,10 @@ public class Assessment implements Serializable {
     private Module module;
     private Lecturer createdBy;
     private Date createdDate;
-    private Date dueDate;
-    private Map<String, Double> studentMarks; // StudentID -> Marks
+    private Date dueDate; 
+    private Map<String, Double> studentMarks; 
     
-    public Assessment(String assessmentID, String assessmentName, AssessmentType assessmentType,
-                      Module module, Lecturer createdBy, Date dueDate) {
+    public Assessment(String assessmentID, String assessmentName, AssessmentType assessmentType, Module module, Lecturer createdBy, Date dueDate) {
         this.assessmentID = assessmentID;
         this.assessmentName = assessmentName;
         this.assessmentType = assessmentType;

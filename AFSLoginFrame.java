@@ -15,9 +15,6 @@ import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-/**
- * AFSLoginFrame - GUI Login frame for the application
- */
 public class AFSLoginFrame extends JFrame {
     private SystemManager systemManager;
     private JTextField usernameField;
