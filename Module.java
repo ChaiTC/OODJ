@@ -1,8 +1,5 @@
 import java.io.Serializable;
 
-/**
- * Module class - represents an academic module/course
- */
 public class Module implements Serializable {
     private static final long serialVersionUID = 1L;
     
