@@ -270,6 +270,7 @@ class AdminDashboard extends JFrame {
         JPasswordField password = new JPasswordField();
         JTextField email = new JTextField();
         JTextField fullname = new JTextField();
+        JTextField phone = new JTextField();
         JComboBox<String> departmentBox = new JComboBox<>(new String[]{"IT", "Business", "Engineering", "Administration"});
         JTextField staffIdField = new JTextField();
         staffIdField.setEditable(false); // Auto-generated
@@ -285,6 +286,8 @@ class AdminDashboard extends JFrame {
         formPanel.add(createLabeledRow("Email:", email));
         formPanel.add(Box.createVerticalStrut(6));
         formPanel.add(createLabeledRow("Full name:", fullname));
+        formPanel.add(Box.createVerticalStrut(6));
+        formPanel.add(createLabeledRow("Phone Number:", phone));
         formPanel.add(Box.createVerticalStrut(6));
         formPanel.add(createLabeledRow("Department:", departmentBox));
         formPanel.add(Box.createVerticalStrut(6));
@@ -307,6 +310,7 @@ class AdminDashboard extends JFrame {
                 password.setText("");
                 email.setText("");
                 fullname.setText("");
+                phone.setText("");
                 // Update department options for default user type (Student)
                 departmentBox.removeAllItems();
                 departmentBox.addItem("IT");
@@ -341,6 +345,7 @@ class AdminDashboard extends JFrame {
                     userIdField.setText(u.getUserID());
                     departmentBox.setSelectedItem("IT"); // Default for students
                     staffIdField.setText("N/A");
+                    phone.setText(u.getPhoneNumber());
                 } else if (u instanceof Lecturer) {
                     typeBox.setSelectedItem("Lecturer");
                     Lecturer lec = (Lecturer) u;
@@ -359,12 +364,14 @@ class AdminDashboard extends JFrame {
                     userIdField.setText(u.getUserID());
                     departmentBox.setSelectedItem(staff.getDepartment());
                     staffIdField.setText(staff.getStaffID());
+                    phone.setText(u.getPhoneNumber());
                 }
                 
                 username.setText(u.getUsername());
                 password.setText(""); // Don't show password
                 email.setText(u.getEmail());
                 fullname.setText(u.getFullName());
+                phone.setText(u.getPhoneNumber());
                 
                 formPanel.setVisible(true);
                 saveBtn.setText("Update");
@@ -398,6 +405,7 @@ class AdminDashboard extends JFrame {
                 String pass = new String(password.getPassword());
                 String mail = email.getText().trim();
                 String name = fullname.getText().trim();
+                String phoneStr = phone.getText().trim();
                 String dept = (String)departmentBox.getSelectedItem();
                 
                 if (usern.isEmpty() || name.isEmpty()) { 
@@ -422,6 +430,14 @@ class AdminDashboard extends JFrame {
                     JOptionPane.showMessageDialog(AdminDashboard.this, "Please enter a valid email address (must contain @ and domain)");
                     return;
                 }
+
+                        // Phone validation (optional) - allow digits, spaces, + and -; length between 7 and 20
+                        if (phoneStr != null && !phoneStr.isEmpty()) {
+                            if (!phoneStr.matches("^[+]?[-\\d\\s]{7,20}$")) {
+                                JOptionPane.showMessageDialog(AdminDashboard.this, "Please enter a valid phone number (digits, spaces, + or -; 7-20 characters)");
+                                return;
+                            }
+                        }
                 
                 try {
                     if ("Create".equals(saveBtn.getText())) {
@@ -430,19 +446,19 @@ class AdminDashboard extends JFrame {
                         userIdField.setText(userId);
                         
                         if (type.equals("Student")) {
-                            newUser = new Student(userId, usern, pass, mail, name, "N/A", userId, "2024");
+                            newUser = new Student(userId, usern, pass, mail, name, phoneStr.isEmpty()?"N/A":phoneStr, userId, "2024");
                         } else if (type.equals("Lecturer")) {
                             String staffId = systemManager.generateStaffID();
                             staffIdField.setText(staffId);
-                            newUser = new Lecturer(userId, usern, pass, mail, name, "N/A", staffId, dept);
+                            newUser = new Lecturer(userId, usern, pass, mail, name, phoneStr.isEmpty()?"N/A":phoneStr, staffId, dept);
                         } else if (type.equals("Academic Leader")) {
                             String staffId = systemManager.generateStaffID();
                             staffIdField.setText(staffId);
-                            newUser = new AcademicLeader(userId, usern, pass, mail, name, "N/A", dept, staffId);
+                            newUser = new AcademicLeader(userId, usern, pass, mail, name, phoneStr.isEmpty()?"N/A":phoneStr, dept, staffId);
                         } else {
                             String staffId = systemManager.generateStaffID();
                             staffIdField.setText(staffId);
-                            newUser = new AdminStaff(userId, usern, pass, mail, name, "N/A", dept, staffId);
+                            newUser = new AdminStaff(userId, usern, pass, mail, name, phoneStr.isEmpty()?"N/A":phoneStr, dept, staffId);
                         }
                         if (systemManager.registerUser(newUser)) {
                             JOptionPane.showMessageDialog(AdminDashboard.this, "User created successfully!\n\nUser ID: " + userId + "\nStaff ID: " + (type.equals("Student") ? "N/A" : staffIdField.getText()));
@@ -471,6 +487,7 @@ class AdminDashboard extends JFrame {
                         }
                         u.setEmail(mail);
                         u.setFullName(name);
+                        u.setPhoneNumber(phoneStr);
                         
                         // Update department and staff ID for staff types
                         if (u instanceof Lecturer) {
@@ -533,6 +550,18 @@ class AdminDashboard extends JFrame {
         
         contentPanel.add(mainPanel, BorderLayout.CENTER);
     }
+
+    // Helper to create a horizontal labeled row: label on left, component on right
+    private JPanel createFieldRow(String labelText, JComponent comp) {
+        JPanel row = new JPanel(new BorderLayout(8, 0));
+        row.setOpaque(false);
+        JLabel lbl = new JLabel(labelText);
+        lbl.setPreferredSize(new Dimension(140, 24));
+        lbl.setHorizontalAlignment(SwingConstants.LEFT);
+        row.add(lbl, BorderLayout.WEST);
+        row.add(comp, BorderLayout.CENTER);
+        return row;
+    }
     
     private void showLecturerAssignment(JPanel contentPanel) {
         JPanel mainPanel = new JPanel(new BorderLayout());
@@ -555,8 +584,9 @@ class AdminDashboard extends JFrame {
         JTable table = new JTable(data, cols);
         JScrollPane scroll = new JScrollPane(table);
         
-        // Assignment form
-        JPanel formPanel = new JPanel(new GridLayout(0, 2, 10, 10));
+        // Assignment form (label and field on same line)
+        JPanel formPanel = new JPanel();
+        formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
         formPanel.setBorder(BorderFactory.createTitledBorder("Assign Lecturer to Module"));
         
         java.util.List<Module> modules = systemManager.getAllModules();
@@ -580,10 +610,8 @@ class AdminDashboard extends JFrame {
             }
         }
         
-        formPanel.add(new JLabel("Select Module:"));
-        formPanel.add(moduleBox);
-        formPanel.add(new JLabel("Select Lecturer:"));
-        formPanel.add(lecturerBox);
+        formPanel.add(createFieldRow("Select Module:", moduleBox));
+        formPanel.add(createFieldRow("Select Lecturer:", lecturerBox));
         
         JButton assignBtn = new JButton("Assign Lecturer");
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

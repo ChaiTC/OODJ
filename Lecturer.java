@@ -294,7 +294,8 @@ class LecturerDashboard extends JFrame {
     }
     
     private void showKeyInMarks(JPanel contentPanel) {
-        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         
         // Populate students and assessments from systemManager
@@ -310,16 +311,14 @@ class LecturerDashboard extends JFrame {
         JTextField marksField = new JTextField();
         JTextField remarksField = new JTextField();
         
-        panel.add(new JLabel("Student:"));
-        panel.add(studentCombo);
-        panel.add(new JLabel("Assessment:"));
-        panel.add(assessmentCombo);
-        panel.add(new JLabel("Marks Obtained:"));
-        panel.add(marksField);
-        panel.add(new JLabel("Remarks:"));
-        panel.add(remarksField);
-        
+        panel.add(createFieldRow("Student:", studentCombo));
+        panel.add(createFieldRow("Assessment:", assessmentCombo));
+        panel.add(createFieldRow("Marks Obtained:", marksField));
+        panel.add(createFieldRow("Remarks:", remarksField));
+
+        JPanel btnHolder = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton submitBtn = new JButton("Submit Marks");
+        btnHolder.add(submitBtn);
         submitBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -327,9 +326,20 @@ class LecturerDashboard extends JFrame {
             }
         });
         
-        panel.add(submitBtn);
-        
+        panel.add(btnHolder);
         contentPanel.add(panel, BorderLayout.CENTER);
+    }
+
+    // Helper to create a horizontal labeled row: label on left, component on right
+    private JPanel createFieldRow(String labelText, JComponent comp) {
+        JPanel row = new JPanel(new BorderLayout(8, 0));
+        row.setOpaque(false);
+        JLabel lbl = new JLabel(labelText);
+        lbl.setPreferredSize(new Dimension(140, 24));
+        lbl.setHorizontalAlignment(SwingConstants.LEFT);
+        row.add(lbl, BorderLayout.WEST);
+        row.add(comp, BorderLayout.CENTER);
+        return row;
     }
     
     private void showProvideFeedback(JPanel contentPanel) {

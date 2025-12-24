@@ -6,6 +6,9 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JOptionPane;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JComponent;
+import javax.swing.BoxLayout;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.FlowLayout;
@@ -45,25 +48,25 @@ public class AFSLoginFrame extends JFrame {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
         headerPanel.add(titleLabel);
         
-        // Login Panel
-        JPanel loginPanel = new JPanel(new GridLayout(4, 2, 10, 15));
+        // Login Panel — use labeled rows so label and field sit on the same line
+        JPanel loginPanel = new JPanel();
+        loginPanel.setLayout(new BoxLayout(loginPanel, BoxLayout.Y_AXIS));
         loginPanel.setBackground(new Color(240, 240, 240));
         loginPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
-        JLabel usernameLabel = new JLabel("Username:");
-        usernameLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+
         usernameField = new JTextField();
         usernameField.setFont(new Font("Arial", Font.PLAIN, 12));
-        
-        JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        usernameField.setPreferredSize(new Dimension(240, 28));
+        usernameField.setMaximumSize(new Dimension(240, 28));
+
         passwordField = new JPasswordField();
         passwordField.setFont(new Font("Arial", Font.PLAIN, 12));
-        
-        loginPanel.add(usernameLabel);
-        loginPanel.add(usernameField);
-        loginPanel.add(passwordLabel);
-        loginPanel.add(passwordField);
+        passwordField.setPreferredSize(new Dimension(240, 28));
+        passwordField.setMaximumSize(new Dimension(240, 28));
+
+        loginPanel.add(createFieldRow("Username:", usernameField));
+        loginPanel.add(Box.createVerticalStrut(8));
+        loginPanel.add(createFieldRow("Password:", passwordField));
         
         // Button Panel
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
@@ -140,6 +143,20 @@ public class AFSLoginFrame extends JFrame {
     
     private void openRegistrationFrame() {
         new AFSRegistrationFrame(systemManager).setVisible(true);
+    }
+
+    // Helper to create a horizontal labeled row: label on left, component on right
+    private JPanel createFieldRow(String labelText, JComponent field) {
+        JPanel rowPanel = new JPanel(new BorderLayout(5, 0));
+        rowPanel.setBackground(new Color(240, 240, 240));
+
+        JLabel label = new JLabel(labelText);
+        label.setPreferredSize(new Dimension(120, 25));
+        label.setFont(new Font("Arial", Font.PLAIN, 12));
+        rowPanel.add(label, BorderLayout.WEST);
+        rowPanel.add(field, BorderLayout.CENTER);
+
+        return rowPanel;
     }
     
     private void openDashboard(User user) {

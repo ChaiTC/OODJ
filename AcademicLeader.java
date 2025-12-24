@@ -246,22 +246,19 @@ class AcademicLeaderDashboard extends JFrame {
     }
     
     private void showModuleManagement(JPanel contentPanel) {
-        JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        
+
         JTextField moduleCodeField = new JTextField();
         JTextField moduleNameField = new JTextField();
         JTextField creditsField = new JTextField("3");
         JTextField departmentField = new JTextField(leader.getDepartment());
-        
-        panel.add(new JLabel("Module Code:"));
-        panel.add(moduleCodeField);
-        panel.add(new JLabel("Module Name:"));
-        panel.add(moduleNameField);
-        panel.add(new JLabel("Credits:"));
-        panel.add(creditsField);
-        panel.add(new JLabel("Department:"));
-        panel.add(departmentField);
+
+        panel.add(createLabeledRow("Module Code:", moduleCodeField));
+        panel.add(createLabeledRow("Module Name:", moduleNameField));
+        panel.add(createLabeledRow("Credits:", creditsField));
+        panel.add(createLabeledRow("Department:", departmentField));
         
         JButton createBtn = new JButton("Create Module");
         createBtn.addActionListener(new ActionListener() {
@@ -290,9 +287,10 @@ class AcademicLeaderDashboard extends JFrame {
     }
     
     private void showAssignLecturers(JPanel contentPanel) {
-        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
-        
+
         java.util.List<Module> modulesList = systemManager.getAllModules();
         String[] modulesArr = modulesList.stream().map(m -> m.getModuleCode() + " - " + m.getModuleName()).toArray(String[]::new);
         if (modulesArr.length == 0) modulesArr = new String[]{"No modules available"};
@@ -302,14 +300,10 @@ class AcademicLeaderDashboard extends JFrame {
         String[] lecturers = lecturerUsers.stream().map(u -> u.getUserID() + " - " + u.getFullName()).toArray(String[]::new);
         if (lecturers.length == 0) lecturers = new String[]{"No lecturers available"};
         JComboBox<String> lecturerCombo = new JComboBox<>(lecturers);
-        
-        panel.add(new JLabel("Select Module:"));
-        panel.add(moduleCombo);
-        panel.add(new JLabel("Select Lecturer:"));
-        panel.add(lecturerCombo);
-        panel.add(new JLabel(""));
-        panel.add(new JLabel(""));
-        
+
+        panel.add(createLabeledRow("Select Module:", moduleCombo));
+        panel.add(createLabeledRow("Select Lecturer:", lecturerCombo));
+
         JButton assignBtn = new JButton("Assign Lecturer");
         assignBtn.addActionListener(new ActionListener() {
             @Override
