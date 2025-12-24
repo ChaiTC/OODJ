@@ -37,7 +37,6 @@ import java.util.List;
  */
 public class AdminStaff extends User {
     private static final long serialVersionUID = 1L;
-    
     private String department;
     private String staffID;
     
@@ -253,9 +252,11 @@ class AdminDashboard extends JFrame {
         JButton createBtn = new JButton("Create User");
         JButton editBtn = new JButton("Edit User");
         JButton deleteBtn = new JButton("Delete User");
+        JButton toggleFormBtn = new JButton("Show Form");
         buttonBar.add(createBtn);
         buttonBar.add(editBtn);
         buttonBar.add(deleteBtn);
+        buttonBar.add(toggleFormBtn);
         
         // Form panel (initially hidden)
         JPanel formPanel = new JPanel();
@@ -300,7 +301,13 @@ class AdminDashboard extends JFrame {
         formBtnPanel.add(saveBtn);
         formBtnPanel.add(cancelBtn);
         formPanel.add(formBtnPanel);
-        
+
+        // Place table and form in BorderLayout for flexibility
+        mainPanel.add(buttonBar, BorderLayout.NORTH);
+        mainPanel.add(scroll, BorderLayout.CENTER);
+        // Form will be added to SOUTH when shown
+        contentPanel.add(mainPanel, BorderLayout.CENTER);
+
         createBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -320,6 +327,8 @@ class AdminDashboard extends JFrame {
                 staffIdField.setText("");
                 formPanel.setVisible(true);
                 saveBtn.setText("Create");
+                mainPanel.add(formPanel, BorderLayout.SOUTH);
+                toggleFormBtn.setText("Hide Form");
                 contentPanel.revalidate();
             }
         });
@@ -375,6 +384,8 @@ class AdminDashboard extends JFrame {
                 
                 formPanel.setVisible(true);
                 saveBtn.setText("Update");
+                mainPanel.add(formPanel, BorderLayout.SOUTH);
+                toggleFormBtn.setText("Hide Form");
                 contentPanel.revalidate();
             }
         });
@@ -463,18 +474,18 @@ class AdminDashboard extends JFrame {
                         if (systemManager.registerUser(newUser)) {
                             JOptionPane.showMessageDialog(AdminDashboard.this, "User created successfully!\n\nUser ID: " + userId + "\nStaff ID: " + (type.equals("Student") ? "N/A" : staffIdField.getText()));
                             formPanel.setVisible(false);
-                            showUserManagement(contentPanel); // Refresh
+                            mainPanel.remove(formPanel);
+                            toggleFormBtn.setText("Show Form");
+                            showUserManagement(contentPanel); 
                         } else {
                             JOptionPane.showMessageDialog(AdminDashboard.this, "Username already exists");
                         }
                     } else {
-                        // Update existing user
                         int r = table.getSelectedRow();
                         String userId = (String)table.getValueAt(r,0);
                         User u = systemManager.findUserByID(userId);
                         u.setUsername(usern);
                         if (!pass.isEmpty()) {
-                            // Validate password for updates too
                             if (pass.length() < 8) {
                                 JOptionPane.showMessageDialog(AdminDashboard.this, "Password must be at least 8 characters long");
                                 return;
@@ -501,6 +512,8 @@ class AdminDashboard extends JFrame {
                         systemManager.updateUser(u);
                         JOptionPane.showMessageDialog(AdminDashboard.this, "User updated successfully!");
                         formPanel.setVisible(false);
+                        mainPanel.remove(formPanel);
+                        toggleFormBtn.setText("Hide Form");
                         showUserManagement(contentPanel); // Refresh
                     }
                 } catch (Exception ex) {
@@ -540,18 +553,33 @@ class AdminDashboard extends JFrame {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 formPanel.setVisible(false);
+                mainPanel.remove(formPanel);
+                toggleFormBtn.setText("Show Form");
                 contentPanel.revalidate();
+                contentPanel.repaint();
             }
         });
         
-        mainPanel.add(scroll, BorderLayout.CENTER);
-        mainPanel.add(buttonBar, BorderLayout.NORTH);
-        mainPanel.add(formPanel, BorderLayout.SOUTH);
+        toggleFormBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (formPanel.isVisible()) {
+                    formPanel.setVisible(false);
+                    mainPanel.remove(formPanel);
+                    toggleFormBtn.setText("Show Form");
+                } else {
+                    formPanel.setVisible(true);
+                    mainPanel.add(formPanel, BorderLayout.SOUTH);
+                    toggleFormBtn.setText("Hide Form");
+                }
+                contentPanel.revalidate();
+                contentPanel.repaint();
+            }
+        });
         
-        contentPanel.add(mainPanel, BorderLayout.CENTER);
+        
     }
 
-    // Helper to create a horizontal labeled row: label on left, component on right
     private JPanel createFieldRow(String labelText, JComponent comp) {
         JPanel row = new JPanel(new BorderLayout(8, 0));
         row.setOpaque(false);
