@@ -1,0 +1,6 @@
+*.class
+# OS files
+.DS_Store
+# IDE / build
+/.idea/
+*.iml
