@@ -62,7 +62,11 @@ public class SystemManager {
 
         // Load feedback data
         feedbackList = FileManager.loadAllFeedback();
-
+        // Load grading system if exists
+        GradingSystem loadedGrading = FileManager.loadGradingSystem();
+        if (loadedGrading != null) {
+            this.gradingSystem = loadedGrading;
+        }
         System.out.println("✅ All data loaded successfully!");
     }
     

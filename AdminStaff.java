@@ -30,11 +30,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- * AdminStaff class - handles administrative functions
- * Responsibilities: User management, grading system configuration, class/module creation
- */
 public class AdminStaff extends User {
     private static final long serialVersionUID = 1L;
     private String department;
@@ -787,6 +784,9 @@ class AdminDashboard extends JFrame {
                         "✓ Grading system updated successfully!",
                         "Success", JOptionPane.INFORMATION_MESSAGE);
 
+                    // Save to file
+                    FileManager.saveGradingSystem(gradingSystem);
+
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(AdminDashboard.this,
                         "Error: Please enter valid numbers for percentages.",
@@ -815,15 +815,53 @@ class AdminDashboard extends JFrame {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        JTextField moduleField = new JTextField("CS101");
-        JTextField classNameField = new JTextField("Section A");
-        JTextField semesterField = new JTextField("2024-1");
+        // Get modules and lecturers
+        List<Module> modules = systemManager.getAllModules();
+        List<User> users = systemManager.getAllUsers();
+        List<Lecturer> lecturers = new ArrayList<>();
+        for (User u : users) {
+            if ("LECTURER".equals(u.getRole())) {
+                lecturers.add((Lecturer) u);
+            }
+        }
 
-        panel.add(createLabeledRow("Module Code:", moduleField));
+        JComboBox<Module> moduleCombo = new JComboBox<>(modules.toArray(new Module[0]));
+        moduleCombo.setRenderer(new javax.swing.DefaultListCellRenderer() {
+            @Override
+            public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Module) {
+                    setText(((Module) value).getModuleCode() + " - " + ((Module) value).getModuleName());
+                }
+                return this;
+            }
+        });
+
+        JComboBox<Lecturer> lecturerCombo = new JComboBox<>(lecturers.toArray(new Lecturer[0]));
+        lecturerCombo.setRenderer(new javax.swing.DefaultListCellRenderer() {
+            @Override
+            public java.awt.Component getListCellRendererComponent(javax.swing.JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Lecturer) {
+                    setText(((Lecturer) value).getFullName());
+                }
+                return this;
+            }
+        });
+
+        JTextField classNameField = new JTextField();
+        JTextField semesterField = new JTextField();
+        JTextField capacityField = new JTextField();
+
+        panel.add(createLabeledRow("Module:", moduleCombo));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(createLabeledRow("Lecturer:", lecturerCombo));
         panel.add(Box.createVerticalStrut(6));
         panel.add(createLabeledRow("Class Name:", classNameField));
         panel.add(Box.createVerticalStrut(6));
         panel.add(createLabeledRow("Semester:", semesterField));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(createLabeledRow("Capacity:", capacityField));
         panel.add(Box.createVerticalStrut(8));
 
         JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -832,11 +870,45 @@ class AdminDashboard extends JFrame {
         createBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                Module selectedModule = (Module) moduleCombo.getSelectedItem();
+                Lecturer selectedLecturer = (Lecturer) lecturerCombo.getSelectedItem();
+                String className = classNameField.getText().trim();
+                String semester = semesterField.getText().trim();
+                String capacityText = capacityField.getText().trim();
+
+                if (selectedModule == null || selectedLecturer == null || className.isEmpty() || semester.isEmpty() || capacityText.isEmpty()) {
+                    JOptionPane.showMessageDialog(AdminDashboard.this, "Please fill all fields!");
+                    return;
+                }
+
+                int capacity;
+                try {
+                    capacity = Integer.parseInt(capacityText);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(AdminDashboard.this, "Capacity must be a number!");
+                    return;
+                }
+
+                // Generate classID
+                int classCount = systemManager.getAllClasses().size() + 1;
+                String classID = "CLS" + String.format("%03d", classCount);
+
+                ClassModule newClass = new ClassModule(classID, className, selectedModule, selectedLecturer, semester, capacity);
+                systemManager.createClass(newClass);
+
                 JOptionPane.showMessageDialog(AdminDashboard.this, 
-                    "✓ Class created!\n\n" +
-                    "Module: " + moduleField.getText() + "\n" +
-                    "Class: " + classNameField.getText() + "\n" +
-                    "Semester: " + semesterField.getText());
+                    "✓ Class created successfully!\n\n" +
+                    "Class ID: " + classID + "\n" +
+                    "Module: " + selectedModule.getModuleCode() + "\n" +
+                    "Class: " + className + "\n" +
+                    "Lecturer: " + selectedLecturer.getFullName() + "\n" +
+                    "Semester: " + semester + "\n" +
+                    "Capacity: " + capacity);
+
+                // Clear fields
+                classNameField.setText("");
+                semesterField.setText("");
+                capacityField.setText("");
             }
         });
 

@@ -32,6 +32,7 @@ public class FileManager {
     private static final String CLASSES_FILE = "data/classes.txt";   // Class sections
     private static final String ASSESSMENTS_FILE = "data/assessments.txt"; // Assignments/tests
     private static final String FEEDBACK_FILE = "data/feedback.txt"; // Feedback
+    private static final String GRADING_FILE = "data/grading.txt";   // Grading system
 
     // Static block - runs once when class is first loaded
     static {
@@ -287,6 +288,21 @@ public class FileManager {
                feedback.getSuggestedMarks();
     }
     
+    private static String serializeGradingSystem(GradingSystem gradingSystem) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(gradingSystem.getSystemID()).append("|")
+          .append(gradingSystem.getSystemName()).append("|")
+          .append(gradingSystem.getPassingPercentage());
+        for (GradingScale grade : gradingSystem.getGrades()) {
+            sb.append("|").append(grade.getGradeID()).append(",")
+              .append(grade.getGradeLetter()).append(",")
+              .append(grade.getMinPercentage()).append(",")
+              .append(grade.getMaxPercentage()).append(",")
+              .append(grade.getDescription());
+        }
+        return sb.toString();
+    }
+    
     // Deserialization methods
     private static User deserializeUser(String data) {
         String[] parts = data.split("\\|");
@@ -348,6 +364,31 @@ public class FileManager {
         return new Feedback(parts[0], parts[1], parts[2], parts[3], 
                            parts[4], Double.parseDouble(parts[5]));
     }
+    
+    private static GradingSystem deserializeGradingSystem(String data) {
+        String[] parts = data.split("\\|");
+        if (parts.length < 3) return null;
+        
+        String systemID = parts[0];
+        String systemName = parts[1];
+        double passingPercentage = Double.parseDouble(parts[2]);
+        
+        GradingSystem gs = new GradingSystem(systemID, systemName, passingPercentage);
+        gs.getGrades().clear(); // Clear default grades
+        
+        for (int i = 3; i < parts.length; i++) {
+            String[] gradeParts = parts[i].split(",");
+            if (gradeParts.length >= 5) {
+                String gradeID = gradeParts[0];
+                String gradeLetter = gradeParts[1];
+                double min = Double.parseDouble(gradeParts[2]);
+                double max = Double.parseDouble(gradeParts[3]);
+                String desc = gradeParts[4];
+                gs.getGrades().add(new GradingScale(gradeID, gradeLetter, min, max, desc));
+            }
+        }
+        return gs;
+    }
 
     private static String serializeClass(ClassModule cls) {
         // Format: classID|className|moduleID|lecturerID|semester|capacity|studentIDs(comma)
@@ -408,6 +449,36 @@ public class FileManager {
     }
     
     /**
+     * Save grading system to file
+     */
+    public static void saveGradingSystem(GradingSystem gradingSystem) {
+        try (FileWriter fw = new FileWriter(GRADING_FILE, false); // overwrite
+             BufferedWriter bw = new BufferedWriter(fw)) {
+            bw.write(serializeGradingSystem(gradingSystem));
+            System.out.println("✅ Grading system saved successfully!");
+        } catch (IOException e) {
+            System.err.println("❌ Error saving grading system: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Load grading system from file
+     */
+    public static GradingSystem loadGradingSystem() {
+        try (BufferedReader br = new BufferedReader(new FileReader(GRADING_FILE))) {
+            String line = br.readLine();
+            if (line != null && !line.trim().isEmpty()) {
+                return deserializeGradingSystem(line);
+            }
+        } catch (FileNotFoundException e) {
+            // File doesn't exist, return null
+        } catch (IOException e) {
+            System.err.println("❌ Error loading grading system: " + e.getMessage());
+        }
+        return null; // Return null if not found or error
+    }
+    
+    /**
      * Clear all files - for system reset
      */
     public static void clearAllData() {
@@ -416,6 +487,7 @@ public class FileManager {
             new FileWriter(MODULES_FILE).close();
             new FileWriter(ASSESSMENTS_FILE).close();
             new FileWriter(FEEDBACK_FILE).close();
+            new FileWriter(GRADING_FILE).close();
             System.out.println("All data cleared!");
         } catch (IOException e) {
             System.err.println("Error clearing data: " + e.getMessage());
