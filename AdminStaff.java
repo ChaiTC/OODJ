@@ -249,11 +249,9 @@ class AdminDashboard extends JFrame {
         JButton createBtn = new JButton("Create User");
         JButton editBtn = new JButton("Edit User");
         JButton deleteBtn = new JButton("Delete User");
-        JButton toggleFormBtn = new JButton("Show Form");
         buttonBar.add(createBtn);
         buttonBar.add(editBtn);
         buttonBar.add(deleteBtn);
-        buttonBar.add(toggleFormBtn);
         
         // Form panel (initially hidden)
         JPanel formPanel = new JPanel();
@@ -325,7 +323,6 @@ class AdminDashboard extends JFrame {
                 formPanel.setVisible(true);
                 saveBtn.setText("Create");
                 mainPanel.add(formPanel, BorderLayout.SOUTH);
-                toggleFormBtn.setText("Hide Form");
                 contentPanel.revalidate();
             }
         });
@@ -382,7 +379,6 @@ class AdminDashboard extends JFrame {
                 formPanel.setVisible(true);
                 saveBtn.setText("Update");
                 mainPanel.add(formPanel, BorderLayout.SOUTH);
-                toggleFormBtn.setText("Hide Form");
                 contentPanel.revalidate();
             }
         });
@@ -400,7 +396,10 @@ class AdminDashboard extends JFrame {
                 if (yn == JOptionPane.YES_OPTION) {
                     systemManager.deleteUser(userId);
                     JOptionPane.showMessageDialog(AdminDashboard.this, "User deleted successfully!");
-                    showUserManagement(contentPanel); // Refresh
+                    contentPanel.removeAll();
+                    showUserManagement(contentPanel);
+                    contentPanel.revalidate();
+                    contentPanel.repaint();
                 }
             }
         });
@@ -472,8 +471,10 @@ class AdminDashboard extends JFrame {
                             JOptionPane.showMessageDialog(AdminDashboard.this, "User created successfully!\n\nUser ID: " + userId + "\nStaff ID: " + (type.equals("Student") ? "N/A" : staffIdField.getText()));
                             formPanel.setVisible(false);
                             mainPanel.remove(formPanel);
-                            toggleFormBtn.setText("Show Form");
-                            showUserManagement(contentPanel); 
+                            contentPanel.removeAll();
+                            showUserManagement(contentPanel);
+                            contentPanel.revalidate();
+                            contentPanel.repaint(); 
                         } else {
                             JOptionPane.showMessageDialog(AdminDashboard.this, "Username already exists");
                         }
@@ -510,8 +511,10 @@ class AdminDashboard extends JFrame {
                         JOptionPane.showMessageDialog(AdminDashboard.this, "User updated successfully!");
                         formPanel.setVisible(false);
                         mainPanel.remove(formPanel);
-                        toggleFormBtn.setText("Hide Form");
-                        showUserManagement(contentPanel); // Refresh
+                        contentPanel.removeAll();
+                        showUserManagement(contentPanel);
+                        contentPanel.revalidate();
+                        contentPanel.repaint();
                     }
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(AdminDashboard.this, "Error: " + ex.getMessage());
@@ -551,30 +554,11 @@ class AdminDashboard extends JFrame {
             public void actionPerformed(ActionEvent ae) {
                 formPanel.setVisible(false);
                 mainPanel.remove(formPanel);
-                toggleFormBtn.setText("Show Form");
-                contentPanel.revalidate();
                 contentPanel.repaint();
             }
         });
         
-        toggleFormBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (formPanel.isVisible()) {
-                    formPanel.setVisible(false);
-                    mainPanel.remove(formPanel);
-                    toggleFormBtn.setText("Show Form");
-                } else {
-                    formPanel.setVisible(true);
-                    mainPanel.add(formPanel, BorderLayout.SOUTH);
-                    toggleFormBtn.setText("Hide Form");
-                }
-                contentPanel.revalidate();
-                contentPanel.repaint();
-            }
-        });
-        
-        
+    
     }
 
     private JPanel createFieldRow(String labelText, JComponent comp) {
