@@ -1,13 +1,5 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.BufferedWriter;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 /**
  * FileManager class - handles all file I/O operations for data persistence
@@ -55,9 +47,9 @@ public class FileManager {
             bw.write(serializeUser(user));
             bw.newLine(); // Add newline after each user
 
-            System.out.println("✅ User saved successfully!");
+
         } catch (IOException e) {
-            System.err.println("❌ Error saving user: " + e.getMessage());
+
         }
     }
 
@@ -75,9 +67,9 @@ public class FileManager {
                 bw.newLine();
             }
 
-            System.out.println("✅ All users saved successfully!");
+
         } catch (IOException e) {
-            System.err.println("❌ Error saving users: " + e.getMessage());
+
         }
     }
     
@@ -95,9 +87,9 @@ public class FileManager {
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Users file not found. Creating new file...");
+
         } catch (IOException e) {
-            System.err.println("Error loading users: " + e.getMessage());
+
         }
         return users;
     }
@@ -110,9 +102,9 @@ public class FileManager {
              BufferedWriter bw = new BufferedWriter(fw)) {
             bw.write(serializeModule(module));
             bw.newLine();
-            System.out.println("Module saved successfully!");
+
         } catch (IOException e) {
-            System.err.println("Error saving module: " + e.getMessage());
+
         }
     }
     
@@ -130,9 +122,9 @@ public class FileManager {
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Modules file not found. Creating new file...");
+
         } catch (IOException e) {
-            System.err.println("Error loading modules: " + e.getMessage());
+
         }
         return modules;
     }
@@ -145,9 +137,9 @@ public class FileManager {
              BufferedWriter bw = new BufferedWriter(fw)) {
             bw.write(serializeClass(cls));
             bw.newLine();
-            System.out.println("Class saved successfully!");
+
         } catch (IOException e) {
-            System.err.println("Error saving class: " + e.getMessage());
+
         }
     }
 
@@ -161,9 +153,9 @@ public class FileManager {
                 bw.write(serializeClass(cls));
                 bw.newLine();
             }
-            System.out.println("All classes saved successfully!");
+
         } catch (IOException e) {
-            System.err.println("Error saving classes: " + e.getMessage());
+
         }
     }
 
@@ -179,9 +171,9 @@ public class FileManager {
                 if (cls != null) classes.add(cls);
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Classes file not found. Creating new file...");
+
         } catch (IOException e) {
-            System.err.println("Error loading classes: " + e.getMessage());
+
         }
         return classes;
     }
@@ -194,9 +186,9 @@ public class FileManager {
              BufferedWriter bw = new BufferedWriter(fw)) {
             bw.write(serializeAssessment(assessment));
             bw.newLine();
-            System.out.println("Assessment saved successfully!");
+
         } catch (IOException e) {
-            System.err.println("Error saving assessment: " + e.getMessage());
+
         }
     }
     
@@ -208,9 +200,9 @@ public class FileManager {
              BufferedWriter bw = new BufferedWriter(fw)) {
             bw.write(serializeFeedback(feedback));
             bw.newLine();
-            System.out.println("Feedback saved successfully!");
+
         } catch (IOException e) {
-            System.err.println("Error saving feedback: " + e.getMessage());
+
         }
     }
     
@@ -228,9 +220,9 @@ public class FileManager {
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("Feedback file not found. Creating new file...");
+
         } catch (IOException e) {
-            System.err.println("Error loading feedback: " + e.getMessage());
+
         }
         return feedbackList;
     }
@@ -455,9 +447,9 @@ public class FileManager {
         try (FileWriter fw = new FileWriter(GRADING_FILE, false); // overwrite
              BufferedWriter bw = new BufferedWriter(fw)) {
             bw.write(serializeGradingSystem(gradingSystem));
-            System.out.println("✅ Grading system saved successfully!");
+
         } catch (IOException e) {
-            System.err.println("❌ Error saving grading system: " + e.getMessage());
+
         }
     }
     
@@ -473,7 +465,7 @@ public class FileManager {
         } catch (FileNotFoundException e) {
             // File doesn't exist, return null
         } catch (IOException e) {
-            System.err.println("❌ Error loading grading system: " + e.getMessage());
+
         }
         return null; // Return null if not found or error
     }
@@ -488,9 +480,9 @@ public class FileManager {
             new FileWriter(ASSESSMENTS_FILE).close();
             new FileWriter(FEEDBACK_FILE).close();
             new FileWriter(GRADING_FILE).close();
-            System.out.println("All data cleared!");
+
         } catch (IOException e) {
-            System.err.println("Error clearing data: " + e.getMessage());
+
         }
     }
 }

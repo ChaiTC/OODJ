@@ -1,33 +1,7 @@
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.BorderFactory;
-import javax.swing.SwingConstants;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JTabbedPane;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.FlowLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 /**
  * Lecturer class - manages assessment and feedback
@@ -54,55 +28,47 @@ public class Lecturer extends User {
     
     @Override
     public void displayMenu() {
-        System.out.println("\n========== LECTURER MENU ==========");
-        System.out.println("1. Edit Personal Profile");
-        System.out.println("2. Design Assessment Types");
-        System.out.println("3. Key-in Assessment Marks");
-        System.out.println("4. Provide Feedback");
-        System.out.println("5. View My Modules");
-        System.out.println("6. Logout");
-        System.out.println("===================================");
+        
+        
+        
+        
+        
+        
+        
     }
     
     @Override
     public void handleAction(String action) {
         switch(action) {
             case "1":
-                System.out.println("Opening Profile Management...");
                 break;
             case "2":
-                System.out.println("Opening Assessment Design...");
                 break;
             case "3":
-                System.out.println("Opening Mark Entry...");
                 break;
             case "4":
-                System.out.println("Opening Feedback Management...");
                 break;
             case "5":
-                System.out.println("Displaying assigned modules...");
                 break;
             case "6":
-                System.out.println("Logging out...");
                 break;
             default:
-                System.out.println("Invalid action!");
         }
     }
     
     public void designAssessment(Assessment assessment) {
         createdAssessments.add(assessment);
-        System.out.println("Assessment " + assessment.getAssessmentName() + " designed by " + this.getFullName());
+        
     }
     
     public void keyInMarks(Assessment assessment, Student student, double marks) {
         assessment.recordMarks(student, marks);
-        System.out.println("Marks recorded for student " + student.getFullName());
+        
     }
     
     public void provideFeedback(Feedback feedback) {
         providedFeedback.add(feedback);
-        System.out.println("Feedback provided by " + this.getFullName());
+        
     }
     
     public String getLecturerID() { return lecturerID; }

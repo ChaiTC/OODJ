@@ -1,33 +1,7 @@
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.JFrame;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.BorderFactory;
-import javax.swing.SwingConstants;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JTabbedPane;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.FlowLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 /**
  * Student class - manages personal assessment and results
@@ -54,61 +28,53 @@ public class Student extends User {
     
     @Override
     public void displayMenu() {
-        System.out.println("\n=========== STUDENT MENU ===========");
-        System.out.println("1. Edit Personal Profile");
-        System.out.println("2. Register for Classes");
-        System.out.println("3. Check Results");
-        System.out.println("4. View Feedback");
-        System.out.println("5. Provide Comments to Lecturers");
-        System.out.println("6. Logout");
-        System.out.println("===================================");
+        
+        
+        
+        
+        
+        
+        
     }
     
     @Override
     public void handleAction(String action) {
         switch(action) {
             case "1":
-                System.out.println("Opening Profile Management...");
                 break;
             case "2":
-                System.out.println("Opening Class Registration...");
                 break;
             case "3":
-                System.out.println("Displaying assessment results...");
                 break;
             case "4":
-                System.out.println("Displaying received feedback...");
                 break;
             case "5":
-                System.out.println("Opening Feedback Comments...");
                 break;
             case "6":
-                System.out.println("Logging out...");
                 break;
             default:
-                System.out.println("Invalid action!");
         }
     }
     
     public void registerClass(ClassModule classModule) {
         registeredClasses.add(classModule);
-        System.out.println("Student " + this.getFullName() + " registered for class " + classModule.getClassName());
+        
     }
     
     public void viewResults() {
-        System.out.println("========== ASSESSMENT RESULTS FOR " + this.getFullName() + " ==========");
+        
         for (Assessment assessment : takenAssessments) {
-            System.out.println("Assessment: " + assessment.getAssessmentName() + " - Score: ");
+            
         }
     }
     
     public void receiveFeedback(Feedback feedback) {
         receivedFeedback.add(feedback);
-        System.out.println("Feedback received for assessment: " + feedback.getAssessmentID());
+        
     }
     
     public void commentOnFeedback(String comment) {
-        System.out.println("Your comment: " + comment);
+        
     }
     
     public String getStudentID() { return studentID; }

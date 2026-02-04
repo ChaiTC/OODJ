@@ -1,32 +1,7 @@
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.JFrame;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.BorderFactory;
-import javax.swing.SwingConstants;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JTabbedPane;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.FlowLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.util.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 /**
  * AcademicLeader class - manages academic operations
@@ -51,50 +26,43 @@ public class AcademicLeader extends User {
     
     @Override
     public void displayMenu() {
-        System.out.println("\n===== ACADEMIC LEADER MENU =====");
-        System.out.println("1. Edit Personal Profile");
-        System.out.println("2. Create/Read/Update/Delete Modules");
-        System.out.println("3. Assign Lecturers to Modules");
-        System.out.println("4. View Analyzed Reports");
-        System.out.println("5. Logout");
-        System.out.println("================================");
+        
+        
+        
+        
+        
+        
     }
     
     @Override
     public void handleAction(String action) {
         switch(action) {
             case "1":
-                System.out.println("Opening Profile Management...");
                 break;
             case "2":
-                System.out.println("Opening Module Management...");
                 break;
             case "3":
-                System.out.println("Opening Lecturer Assignment...");
                 break;
             case "4":
-                System.out.println("Opening Report Analysis...");
                 break;
             case "5":
-                System.out.println("Logging out...");
                 break;
             default:
-                System.out.println("Invalid action!");
         }
     }
     
     public void createModule(Module module) {
         managedModules.add(module);
-        System.out.println("Module " + module.getModuleName() + " created by " + this.getFullName());
+        
     }
     
     public void assignLecturer(Lecturer lecturer) {
         assignedLecturers.add(lecturer);
-        System.out.println("Lecturer " + lecturer.getFullName() + " assigned by " + this.getFullName());
+        
     }
     
     public void generateAnalyzedReport() {
-        System.out.println("Generating analyzed report for " + this.getFullName());
+        
     }
     
     public String getDepartment() { return department; }

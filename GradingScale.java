@@ -1,4 +1,4 @@
-import java.io.Serializable;
+import java.io.*;
 
 /**
  * GradingScale class - represents a grade with its criteria

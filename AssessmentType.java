@@ -1,4 +1,4 @@
-import java.io.Serializable;
+import java.io.*;
 
 /**
  * AssessmentType class - represents the type of assessment (Assignment, Test, etc.)

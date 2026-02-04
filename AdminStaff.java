@@ -1,36 +1,7 @@
-import javax.swing.JFrame;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTable;
-import javax.swing.BorderFactory;
-import javax.swing.SwingConstants;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.ListSelectionModel;
-import javax.swing.JTabbedPane;
-import javax.swing.JPasswordField;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.FlowLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Dimension;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
 
 public class AdminStaff extends User {
     private static final long serialVersionUID = 1L;
@@ -46,52 +17,44 @@ public class AdminStaff extends User {
     
     @Override
     public void displayMenu() {
-        System.out.println("\n========== ADMIN STAFF MENU ==========");
-        System.out.println("1. Create/Read/Update/Delete Users");
-        System.out.println("2. Assign Lecturers to Academic Leaders");
-        System.out.println("3. Define APU Grading System");
-        System.out.println("4. Create New Classes");
-        System.out.println("5. View System Reports");
-        System.out.println("6. Logout");
-        System.out.println("=====================================");
+        
+        
+        
+        
+        
+        
+        
     }
     
     @Override
     public void handleAction(String action) {
         switch(action) {
             case "1":
-                System.out.println("Opening User Management Module...");
                 break;
             case "2":
-                System.out.println("Opening Lecturer Assignment Module...");
                 break;
             case "3":
-                System.out.println("Opening Grading System Configuration...");
                 break;
             case "4":
-                System.out.println("Opening Class Creation Module...");
                 break;
             case "5":
-                System.out.println("Opening System Reports...");
                 break;
             case "6":
-                System.out.println("Logging out...");
                 break;
             default:
-                System.out.println("Invalid action!");
         }
     }
     
     public void createUser(User user) {
-        System.out.println("User " + user.getFullName() + " has been created by " + this.getFullName());
+        
     }
     
     public void deleteUser(String userID) {
-        System.out.println("User " + userID + " has been deleted by " + this.getFullName());
+        
     }
     
     public void defineGradingSystem(GradingSystem gradingSystem) {
-        System.out.println("Grading system has been updated by " + this.getFullName());
+        
     }
     
     public String getDepartment() { return department; }

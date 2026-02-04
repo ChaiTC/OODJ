@@ -1,7 +1,5 @@
-import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 
 public class Assessment implements Serializable {
@@ -30,9 +28,9 @@ public class Assessment implements Serializable {
     public void recordMarks(Student student, double marks) {
         if (marks >= 0 && marks <= assessmentType.getTotalMarks()) {
             studentMarks.put(student.getStudentID(), marks);
-            System.out.println("Marks recorded for student: " + student.getFullName());
+            
         } else {
-            System.out.println("Invalid marks! Please enter marks between 0 and " + assessmentType.getTotalMarks());
+            
         }
     }
     

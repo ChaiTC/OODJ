@@ -1,6 +1,5 @@
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 /**
  * ClassModule class - represents a class for a specific module
@@ -30,9 +29,9 @@ public class ClassModule implements Serializable {
     public void enrollStudent(Student student) {
         if (enrolledStudents.size() < capacity) {
             enrolledStudents.add(student);
-            System.out.println("Student " + student.getFullName() + " enrolled in " + this.className);
+            
         } else {
-            System.out.println("Class is full!");
+            
         }
     }
     

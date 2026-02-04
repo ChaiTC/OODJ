@@ -1,5 +1,5 @@
-import java.io.Serializable;
-import java.util.Date;
+import java.io.*;
+import java.util.*;
 
 public class Feedback implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -28,12 +28,12 @@ public class Feedback implements Serializable {
     
     public void deliverFeedback() {
         this.isDelivered = true;
-        System.out.println("Feedback delivered to student " + this.studentID);
+        
     }
     
     public void addStudentComment(String comment) {
         this.comments = comment;
-        System.out.println("Student comment added");
+        
     }
     
     public String getFeedbackID() { return feedbackID; }

@@ -1,5 +1,4 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * SystemManager class - manages overall system operations
@@ -67,7 +66,7 @@ public class SystemManager {
         if (loadedGrading != null) {
             this.gradingSystem = loadedGrading;
         }
-        System.out.println("✅ All data loaded successfully!");
+
     }
     
     /**
@@ -80,7 +79,7 @@ public class SystemManager {
         // Check if username is already taken (like checking if email already exists)
         for (User existingUser : users) {
             if (existingUser.getUsername().equals(user.getUsername())) {
-                System.out.println("❌ Sorry, that username is already taken!");
+
                 return false; // Can't register with duplicate username
             }
         }
@@ -91,7 +90,7 @@ public class SystemManager {
         // Save to file so it persists between program runs
         FileManager.saveUser(user);
 
-        System.out.println("✅ User registered successfully!");
+
         return true;
     }
 
@@ -112,18 +111,18 @@ public class SystemManager {
                 if (user.isActive()) {
                     // Login successful!
                     currentUser = user;
-                    System.out.println("✅ Login successful! Welcome " + user.getFullName());
+
                     return user;
                 } else {
                     // Account is disabled
-                    System.out.println("❌ Sorry, your account is currently inactive.");
+
                     return null;
                 }
             }
         }
 
         // No matching username/password found
-        System.out.println("❌ Invalid username or password. Please try again.");
+
         return null;
     }
     
@@ -133,7 +132,7 @@ public class SystemManager {
     public void createModule(Module module) {
         modules.add(module);
         FileManager.saveModule(module);
-        System.out.println("Module created successfully!");
+
     }
     
     /**
@@ -142,7 +141,7 @@ public class SystemManager {
     public void createClass(ClassModule classModule) {
         classes.add(classModule);
         FileManager.saveClass(classModule);
-        System.out.println("Class created successfully!");
+
     }
 
     /**
@@ -178,7 +177,7 @@ public class SystemManager {
     public void createAssessment(Assessment assessment) {
         assessments.add(assessment);
         FileManager.saveAssessment(assessment);
-        System.out.println("Assessment created successfully!");
+
     }
     
     /**
@@ -187,7 +186,7 @@ public class SystemManager {
     public void createFeedback(Feedback feedback) {
         feedbackList.add(feedback);
         FileManager.saveFeedback(feedback);
-        System.out.println("Feedback created successfully!");
+
     }
     
     /**
