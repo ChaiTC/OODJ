@@ -3,66 +3,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-public class AdminStaff extends User {
-    private static final long serialVersionUID = 1L;
-    private String department;
-    private String staffID;
-    
-    public AdminStaff(String userID, String username, String password, String email,
-                      String fullName, String phoneNumber, String department, String staffID) {
-        super(userID, username, password, email, fullName, phoneNumber, "ADMIN_STAFF");
-        this.department = department;
-        this.staffID = staffID;
-    }
-    
-    @Override
-    public void displayMenu() {
-        
-        
-        
-        
-        
-        
-        
-    }
-    
-    @Override
-    public void handleAction(String action) {
-        switch(action) {
-            case "1":
-                break;
-            case "2":
-                break;
-            case "3":
-                break;
-            case "4":
-                break;
-            case "5":
-                break;
-            case "6":
-                break;
-            default:
-        }
-    }
-    
-    public void createUser(User user) {
-        
-    }
-    
-    public void deleteUser(String userID) {
-        
-    }
-    
-    public void defineGradingSystem(GradingSystem gradingSystem) {
-        
-    }
-    
-    public String getDepartment() { return department; }
-    public void setDepartment(String department) { this.department = department; }
-    
-    public String getStaffID() { return staffID; }
-    public void setStaffID(String staffID) { this.staffID = staffID; }
-}
+class AdminDashboard extends JFrame {
+    private SystemManager systemManager;
+    private AdminStaff admin;
     
     public AdminDashboard(SystemManager systemManager, AdminStaff admin) {
         this.systemManager = systemManager;
