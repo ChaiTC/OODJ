@@ -1,10 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class AcademicLeaderDashboard extends JFrame {
 
     private final SystemManager systemManager;
     private final AcademicLeader leader;
+
+    private JComboBox<String> moduleCombo; // shared between tabs
+    private JTextArea reportArea;
 
     public AcademicLeaderDashboard(SystemManager systemManager, AcademicLeader leader) {
         this.systemManager = systemManager;
@@ -77,46 +81,69 @@ public class AcademicLeaderDashboard extends JFrame {
     }
 
     // ======================================================
-    // EDIT PROFILE
+    // 1️⃣ EDIT PROFILE (Improved Layout)
     // ======================================================
     private JPanel buildEditProfilePanel() {
-        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        JTextField nameField = new JTextField(leader.getFullName());
-        JTextField emailField = new JTextField(leader.getEmail());
-        JTextField deptField = new JTextField(leader.getDepartment());
-        deptField.setEditable(false); // Improvement 3
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        panel.add(new JLabel("Full Name:"));
-        panel.add(nameField);
+        JTextField nameField = new JTextField(25);
+        nameField.setText(leader.getFullName());
 
-        panel.add(new JLabel("Email:"));
-        panel.add(emailField);
+        JTextField emailField = new JTextField(25);
+        emailField.setText(leader.getEmail());
 
-        panel.add(new JLabel("Department:"));
-        panel.add(deptField);
+        JTextField deptField = new JTextField(25);
+        deptField.setText(leader.getDepartment());
 
-        panel.add(new JLabel("Leader ID:"));
-        panel.add(new JLabel(leader.getLeaderID()));
+        addRow(panel, gbc, 0, "Full Name:", nameField);
+        addRow(panel, gbc, 1, "Email:", emailField);
+        addRow(panel, gbc, 2, "Department:", deptField);
+        addRow(panel, gbc, 3, "Leader ID:", new JLabel(leader.getLeaderID()));
 
         return panel;
     }
 
+    private void addRow(JPanel panel, GridBagConstraints gbc, int row,
+                        String label, Component field) {
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        panel.add(new JLabel(label), gbc);
+
+        gbc.gridx = 1;
+        panel.add(field, gbc);
+    }
+
     // ======================================================
-    // MODULE MANAGEMENT
+    // 2️⃣ MODULE MANAGEMENT (Dynamic Update)
     // ======================================================
     private JPanel buildModuleManagementPanel() {
-        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        JTextField codeField = new JTextField();
-        JTextField nameField = new JTextField();
-        JTextField creditField = new JTextField("3");
-        JTextField deptField = new JTextField(leader.getDepartment());
-        deptField.setEditable(false);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.anchor = GridBagConstraints.WEST;
+
+        JTextField codeField = new JTextField(20);
+        JTextField nameField = new JTextField(20);
+        JTextField creditField = new JTextField("3", 5);
+        JTextField deptField = new JTextField(leader.getDepartment(), 20);
 
         JButton createBtn = new JButton("Create Module");
+
+        addRow(panel, gbc, 0, "Module Code:", codeField);
+        addRow(panel, gbc, 1, "Module Name:", nameField);
+        addRow(panel, gbc, 2, "Credits:", creditField);
+        addRow(panel, gbc, 3, "Department:", deptField);
+
+        gbc.gridx = 1;
+        gbc.gridy = 4;
+        panel.add(createBtn, gbc);
 
         createBtn.addActionListener(e -> {
             if (codeField.getText().isEmpty() || nameField.getText().isEmpty()) {
@@ -124,123 +151,100 @@ public class AcademicLeaderDashboard extends JFrame {
                 return;
             }
 
-            int credits;
-            try {
-                credits = Integer.parseInt(creditField.getText());
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Credits must be a number");
-                return;
-            }
-
             Module module = new Module(
                     codeField.getText(),
                     nameField.getText(),
-                    credits,
+                    Integer.parseInt(creditField.getText()),
                     deptField.getText()
             );
 
             leader.createModule(module);
-            JOptionPane.showMessageDialog(this, "Module created successfully");
+            refreshModuleCombo();
+            refreshReport();
 
+            JOptionPane.showMessageDialog(this, "Module created successfully");
             codeField.setText("");
             nameField.setText("");
         });
 
-        panel.add(new JLabel("Module Code:"));
-        panel.add(codeField);
-
-        panel.add(new JLabel("Module Name:"));
-        panel.add(nameField);
-
-        panel.add(new JLabel("Credits:"));
-        panel.add(creditField);
-
-        panel.add(new JLabel("Department:"));
-        panel.add(deptField);
-
-        panel.add(new JLabel());
-        panel.add(createBtn);
-
         return panel;
     }
 
     // ======================================================
-    // ASSIGN LECTURERS (IMPROVEMENT 1)
+    // 3️⃣ ASSIGN LECTURERS (Live Module List)
     // ======================================================
     private JPanel buildAssignLecturersPanel() {
-        JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
+        JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        JComboBox<String> moduleBox = new JComboBox<>();
-        JComboBox<String> lecturerBox = new JComboBox<>();
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        if (leader.getManagedModules().isEmpty()) {
-            moduleBox.addItem("No modules available");
-        } else {
-            leader.getManagedModules().forEach(
-                    m -> moduleBox.addItem(m.getModuleCode() + " - " + m.getModuleName())
-            );
-        }
+        moduleCombo = new JComboBox<>();
+        refreshModuleCombo();
 
-        lecturerBox.addItem("LEC001 - AIDEN");
+        JComboBox<String> lecturerCombo = new JComboBox<>();
+        lecturerCombo.addItem("LEC001 - AIDEN");
 
         JButton assignBtn = new JButton("Assign Lecturer");
-        assignBtn.addActionListener(e -> {
-            if (leader.getManagedModules().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No modules to assign");
-                return;
-            }
 
-            Lecturer lecturer = new Lecturer(
-                    "LEC001",
-                    "aiden",
-                    "pass",
-                    "aiden@college.edu",
-                    "Aiden",
-                    "0123456789"
-            );
+        addRow(panel, gbc, 0, "Select Module:", moduleCombo);
+        addRow(panel, gbc, 1, "Select Lecturer:", lecturerCombo);
 
-            leader.assignLecturer(lecturer);
-            JOptionPane.showMessageDialog(this, "Lecturer assigned successfully");
-        });
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        panel.add(assignBtn, gbc);
 
-        panel.add(new JLabel("Select Module:"));
-        panel.add(moduleBox);
-
-        panel.add(new JLabel("Select Lecturer:"));
-        panel.add(lecturerBox);
-
-        panel.add(new JLabel());
-        panel.add(assignBtn);
+        assignBtn.addActionListener(e ->
+                JOptionPane.showMessageDialog(this, "Lecturer assigned (demo)")
+        );
 
         return panel;
     }
 
+    private void refreshModuleCombo() {
+        if (moduleCombo == null) return;
+
+        moduleCombo.removeAllItems();
+        List<Module> modules = leader.getManagedModules();
+
+        if (modules.isEmpty()) {
+            moduleCombo.addItem("No modules available");
+        } else {
+            for (Module m : modules) {
+                moduleCombo.addItem(m.getModuleCode() + " - " + m.getModuleName());
+            }
+        }
+    }
+
     // ======================================================
-    // VIEW REPORTS (IMPROVEMENT 2)
+    // 3️⃣ VIEW REPORTS (Real Data)
     // ======================================================
     private JPanel buildReportsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        JTextArea reportArea = new JTextArea();
+        reportArea = new JTextArea();
         reportArea.setEditable(false);
         reportArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
 
-        String riskLevel =
-                leader.getManagedModules().isEmpty() ? "HIGH RISK" : "LOW RISK";
+        refreshReport();
+
+        panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
+        return panel;
+    }
+
+    private void refreshReport() {
+        int totalModules = leader.getManagedModules().size();
+
+        String risk = totalModules == 0 ? "HIGH RISK" : "LOW RISK";
 
         reportArea.setText(
                 "Academic Reports\n\n" +
                 "Department: " + leader.getDepartment() + "\n" +
                 "Academic Leader: " + leader.getFullName() + "\n\n" +
                 "Summary:\n" +
-                "- Total Modules: " + leader.getManagedModules().size() + "\n" +
-                "- Total Lecturers Assigned: " + leader.getAssignedLecturers().size() + "\n" +
-                "- Academic Risk Level: " + riskLevel + "\n\n" +
-                "Remarks:\n" +
-                "This report is generated based on current in-memory academic data."
+                "- Total Modules: " + totalModules + "\n" +
+                "- Academic Risk Level: " + risk + "\n"
         );
-
-        panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
-        return panel;
     }
 }
