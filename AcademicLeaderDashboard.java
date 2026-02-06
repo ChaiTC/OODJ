@@ -137,6 +137,8 @@ public class AcademicLeaderDashboard extends JFrame {
             Module module = new Module(
                     codeField.getText(),
                     nameField.getText(),
+                    "UNASSIGNED",
+                    "UNASSIGNED",
                     Integer.parseInt(creditField.getText()),
                     deptField.getText()
             );
@@ -193,16 +195,23 @@ public class AcademicLeaderDashboard extends JFrame {
 
     // ================= REPORTS =================
     private JPanel buildReportsPanel() {
-        JTextArea area = new JTextArea();
-        area.setEditable(false);
-        area.setFont(new Font("Monospaced", Font.PLAIN, 13));
-        area.setText(
-                "Academic Reports\n\n" +
-                "Department: " + leader.getDepartment() + "\n" +
-                "Academic Leader: " + leader.getFullName() + "\n\n" +
-                "- Total Modules: " + leader.getManagedModules().size()
-        );
+    JPanel panel = new JPanel(new BorderLayout());
 
-        return new JScrollPane(area);
-    }
+    JTextArea area = new JTextArea();
+    area.setEditable(false);
+    area.setFont(new Font("Monospaced", Font.PLAIN, 13));
+
+    area.setText(
+        "Academic Reports\n\n" +
+        "Department: " + leader.getDepartment() + "\n" +
+        "Academic Leader: " + leader.getFullName() + "\n\n" +
+        "Summary:\n" +
+        "- Total Modules: " + leader.getManagedModules().size() + "\n" +
+        "- Academic Risk Level: HIGH RISK\n"
+    );
+
+    JScrollPane scrollPane = new JScrollPane(area);
+    panel.add(scrollPane, BorderLayout.CENTER);
+
+    return panel;
 }
