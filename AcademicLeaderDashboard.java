@@ -6,7 +6,7 @@ public class AcademicLeaderDashboard extends JFrame {
     private final SystemManager systemManager;
     private final AcademicLeader leader;
 
-    private JTabbedPane tabs;
+    private JLabel headerLabel;
 
     public AcademicLeaderDashboard(SystemManager systemManager, AcademicLeader leader) {
         this.systemManager = systemManager;
@@ -14,9 +14,6 @@ public class AcademicLeaderDashboard extends JFrame {
         initUI();
     }
 
-    // ======================================================
-    // MAIN UI
-    // ======================================================
     private void initUI() {
         setTitle("Academic Leader Dashboard - " + leader.getFullName());
         setSize(900, 600);
@@ -29,28 +26,24 @@ public class AcademicLeaderDashboard extends JFrame {
         add(buildFooter(), BorderLayout.SOUTH);
     }
 
-    // ======================================================
-    // HEADER
-    // ======================================================
+    // ================= HEADER =================
     private JPanel buildHeader() {
         JPanel header = new JPanel();
         header.setBackground(new Color(56, 142, 60));
 
-        JLabel title = new JLabel(
+        headerLabel = new JLabel(
                 "Welcome, " + leader.getFullName() + " (Academic Leader)"
         );
-        title.setForeground(Color.WHITE);
-        title.setFont(new Font("Arial", Font.BOLD, 18));
+        headerLabel.setForeground(Color.WHITE);
+        headerLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-        header.add(title);
+        header.add(headerLabel);
         return header;
     }
 
-    // ======================================================
-    // TABS
-    // ======================================================
+    // ================= TABS =================
     private JTabbedPane buildTabs() {
-        tabs = new JTabbedPane();
+        JTabbedPane tabs = new JTabbedPane();
 
         tabs.addTab("Edit Profile", buildEditProfilePanel());
         tabs.addTab("Module Management", buildModuleManagementPanel());
@@ -60,14 +53,12 @@ public class AcademicLeaderDashboard extends JFrame {
         return tabs;
     }
 
-    // ======================================================
-    // FOOTER (FIXED LOGOUT BUTTON)
-    // ======================================================
+    // ================= FOOTER =================
     private JPanel buildFooter() {
         JButton logoutBtn = new JButton("Logout");
         logoutBtn.setBackground(Color.RED);
         logoutBtn.setForeground(Color.WHITE);
-        logoutBtn.setPreferredSize(new Dimension(100, 35));
+        logoutBtn.setPreferredSize(new Dimension(110, 35));
 
         logoutBtn.addActionListener(e -> {
             dispose();
@@ -79,9 +70,7 @@ public class AcademicLeaderDashboard extends JFrame {
         return footer;
     }
 
-    // ======================================================
-    // EDIT PROFILE (NOW SAVES DATA)
-    // ======================================================
+    // ================= EDIT PROFILE =================
     private JPanel buildEditProfilePanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
@@ -93,31 +82,26 @@ public class AcademicLeaderDashboard extends JFrame {
         JTextField emailField = new JTextField(leader.getEmail(), 20);
         JTextField deptField = new JTextField(leader.getDepartment(), 20);
 
-        // Row 1
         gbc.gridx = 0; gbc.gridy = 0;
         panel.add(new JLabel("Full Name:"), gbc);
         gbc.gridx = 1;
         panel.add(nameField, gbc);
 
-        // Row 2
         gbc.gridx = 0; gbc.gridy = 1;
         panel.add(new JLabel("Email:"), gbc);
         gbc.gridx = 1;
         panel.add(emailField, gbc);
 
-        // Row 3
         gbc.gridx = 0; gbc.gridy = 2;
         panel.add(new JLabel("Department:"), gbc);
         gbc.gridx = 1;
         panel.add(deptField, gbc);
 
-        // Row 4 (read-only ID)
         gbc.gridx = 0; gbc.gridy = 3;
         panel.add(new JLabel("Leader ID:"), gbc);
         gbc.gridx = 1;
         panel.add(new JLabel(leader.getLeaderID()), gbc);
 
-        // Save button
         JButton saveBtn = new JButton("Save Profile");
         gbc.gridx = 1; gbc.gridy = 4;
         panel.add(saveBtn, gbc);
@@ -127,16 +111,17 @@ public class AcademicLeaderDashboard extends JFrame {
             leader.setEmail(emailField.getText());
             leader.setDepartment(deptField.getText());
 
-            JOptionPane.showMessageDialog(this,
-                    "Profile updated successfully");
+            headerLabel.setText(
+                    "Welcome, " + leader.getFullName() + " (Academic Leader)"
+            );
+
+            JOptionPane.showMessageDialog(this, "Profile updated successfully");
         });
 
         return panel;
     }
 
-    // ======================================================
-    // MODULE MANAGEMENT
-    // ======================================================
+    // ================= MODULE MANAGEMENT =================
     private JPanel buildModuleManagementPanel() {
         JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
@@ -149,46 +134,31 @@ public class AcademicLeaderDashboard extends JFrame {
         JButton createBtn = new JButton("Create Module");
 
         createBtn.addActionListener(e -> {
-            if (codeField.getText().isEmpty() || nameField.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Please fill all fields");
-                return;
-            }
-
             Module module = new Module(
                     codeField.getText(),
                     nameField.getText(),
                     Integer.parseInt(creditField.getText()),
                     deptField.getText()
             );
-
             leader.createModule(module);
-            JOptionPane.showMessageDialog(this, "Module created successfully");
-
-            codeField.setText("");
-            nameField.setText("");
+            JOptionPane.showMessageDialog(this, "Module created");
         });
 
         panel.add(new JLabel("Module Code:"));
         panel.add(codeField);
-
         panel.add(new JLabel("Module Name:"));
         panel.add(nameField);
-
         panel.add(new JLabel("Credits:"));
         panel.add(creditField);
-
         panel.add(new JLabel("Department:"));
         panel.add(deptField);
-
         panel.add(new JLabel());
         panel.add(createBtn);
 
         return panel;
     }
 
-    // ======================================================
-    // ASSIGN LECTURERS
-    // ======================================================
+    // ================= ASSIGN LECTURERS =================
     private JPanel buildAssignLecturersPanel() {
         JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
@@ -213,35 +183,26 @@ public class AcademicLeaderDashboard extends JFrame {
 
         panel.add(new JLabel("Select Module:"));
         panel.add(moduleBox);
-
         panel.add(new JLabel("Select Lecturer:"));
         panel.add(lecturerBox);
-
         panel.add(new JLabel());
         panel.add(assignBtn);
 
         return panel;
     }
 
-    // ======================================================
-    // VIEW REPORTS
-    // ======================================================
+    // ================= REPORTS =================
     private JPanel buildReportsPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JTextArea reportArea = new JTextArea();
-        reportArea.setEditable(false);
-        reportArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
-
-        reportArea.setText(
+        JTextArea area = new JTextArea();
+        area.setEditable(false);
+        area.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        area.setText(
                 "Academic Reports\n\n" +
                 "Department: " + leader.getDepartment() + "\n" +
                 "Academic Leader: " + leader.getFullName() + "\n\n" +
-                "Summary:\n" +
-                "- Total Modules: " + leader.getManagedModules().size() + "\n" +
-                "- Academic Risk Level: HIGH RISK\n"
+                "- Total Modules: " + leader.getManagedModules().size()
         );
 
-        panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
-        return panel;
+        return new JScrollPane(area);
     }
 }
