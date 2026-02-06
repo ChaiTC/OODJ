@@ -1,19 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
-/**
- * AcademicLeaderDashboard
- * UI layer for Academic Leader role
- */
 public class AcademicLeaderDashboard extends JFrame {
 
     private final SystemManager systemManager;
     private final AcademicLeader leader;
-
-    private JTextArea reportArea;
-    private JComboBox<String> moduleBox;
-    private JComboBox<String> lecturerBox;
 
     public AcademicLeaderDashboard(SystemManager systemManager, AcademicLeader leader) {
         this.systemManager = systemManager;
@@ -26,7 +17,7 @@ public class AcademicLeaderDashboard extends JFrame {
     // ======================================================
     private void initUI() {
         setTitle("Academic Leader Dashboard - " + leader.getFullName());
-        setSize(950, 620);
+        setSize(900, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -42,7 +33,6 @@ public class AcademicLeaderDashboard extends JFrame {
     private JPanel buildHeader() {
         JPanel header = new JPanel();
         header.setBackground(new Color(56, 142, 60));
-        header.setPreferredSize(new Dimension(950, 55));
 
         JLabel title = new JLabel(
                 "Welcome, " + leader.getFullName() + " (Academic Leader)"
@@ -60,17 +50,10 @@ public class AcademicLeaderDashboard extends JFrame {
     private JTabbedPane buildTabs() {
         JTabbedPane tabs = new JTabbedPane();
 
-        tabs.addTab("Edit Profile", buildProfilePanel());
-        tabs.addTab("Module Management", buildModulePanel());
-        tabs.addTab("Assign Lecturers", buildAssignPanel());
+        tabs.addTab("Edit Profile", buildEditProfilePanel());
+        tabs.addTab("Module Management", buildModuleManagementPanel());
+        tabs.addTab("Assign Lecturers", buildAssignLecturersPanel());
         tabs.addTab("View Reports", buildReportsPanel());
-
-        // Refresh reports whenever tab is selected
-        tabs.addChangeListener(e -> {
-            if (tabs.getSelectedIndex() == 3) {
-                refreshReport();
-            }
-        });
 
         return tabs;
     }
@@ -96,22 +79,24 @@ public class AcademicLeaderDashboard extends JFrame {
     // ======================================================
     // EDIT PROFILE
     // ======================================================
-    private JPanel buildProfilePanel() {
-        JPanel panel = new JPanel(new GridLayout(4, 2, 12, 12));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
+    private JPanel buildEditProfilePanel() {
+        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         JTextField nameField = new JTextField(leader.getFullName());
         JTextField emailField = new JTextField(leader.getEmail());
         JTextField deptField = new JTextField(leader.getDepartment());
-
-        deptField.setEditable(false);
+        deptField.setEditable(false); // Improvement 3
 
         panel.add(new JLabel("Full Name:"));
         panel.add(nameField);
+
         panel.add(new JLabel("Email:"));
         panel.add(emailField);
+
         panel.add(new JLabel("Department:"));
         panel.add(deptField);
+
         panel.add(new JLabel("Leader ID:"));
         panel.add(new JLabel(leader.getLeaderID()));
 
@@ -121,9 +106,9 @@ public class AcademicLeaderDashboard extends JFrame {
     // ======================================================
     // MODULE MANAGEMENT
     // ======================================================
-    private JPanel buildModulePanel() {
-        JPanel panel = new JPanel(new GridLayout(5, 2, 12, 12));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
+    private JPanel buildModuleManagementPanel() {
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         JTextField codeField = new JTextField();
         JTextField nameField = new JTextField();
@@ -135,52 +120,44 @@ public class AcademicLeaderDashboard extends JFrame {
 
         createBtn.addActionListener(e -> {
             if (codeField.getText().isEmpty() || nameField.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(this,
-                        "Module code and name are required",
-                        "Validation Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Please fill all fields");
                 return;
             }
 
+            int credits;
             try {
-                int credits = Integer.parseInt(creditField.getText());
-
-                Module module = new Module(
-                        codeField.getText(),
-                        nameField.getText(),
-                        credits,
-                        deptField.getText()
-                );
-
-                leader.createModule(module);
-
-                // Optional persistence
-                FileManager.saveModules(leader.getManagedModules());
-
-                refreshModuleDropdown();
-
-                JOptionPane.showMessageDialog(this,
-                        "Module created successfully");
-
-                codeField.setText("");
-                nameField.setText("");
-
+                credits = Integer.parseInt(creditField.getText());
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this,
-                        "Credits must be a number",
-                        "Input Error",
-                        JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Credits must be a number");
+                return;
             }
+
+            Module module = new Module(
+                    codeField.getText(),
+                    nameField.getText(),
+                    credits,
+                    deptField.getText()
+            );
+
+            leader.createModule(module);
+            JOptionPane.showMessageDialog(this, "Module created successfully");
+
+            codeField.setText("");
+            nameField.setText("");
         });
 
         panel.add(new JLabel("Module Code:"));
         panel.add(codeField);
+
         panel.add(new JLabel("Module Name:"));
         panel.add(nameField);
+
         panel.add(new JLabel("Credits:"));
         panel.add(creditField);
+
         panel.add(new JLabel("Department:"));
         panel.add(deptField);
+
         panel.add(new JLabel());
         panel.add(createBtn);
 
@@ -188,95 +165,82 @@ public class AcademicLeaderDashboard extends JFrame {
     }
 
     // ======================================================
-    // ASSIGN LECTURERS
+    // ASSIGN LECTURERS (IMPROVEMENT 1)
     // ======================================================
-    private JPanel buildAssignPanel() {
-        JPanel panel = new JPanel(new GridLayout(3, 2, 12, 12));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
+    private JPanel buildAssignLecturersPanel() {
+        JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        moduleBox = new JComboBox<>();
-        lecturerBox = new JComboBox<>();
+        JComboBox<String> moduleBox = new JComboBox<>();
+        JComboBox<String> lecturerBox = new JComboBox<>();
 
-        refreshModuleDropdown();
-        refreshLecturerDropdown();
+        if (leader.getManagedModules().isEmpty()) {
+            moduleBox.addItem("No modules available");
+        } else {
+            leader.getManagedModules().forEach(
+                    m -> moduleBox.addItem(m.getModuleCode() + " - " + m.getModuleName())
+            );
+        }
+
+        lecturerBox.addItem("LEC001 - AIDEN");
 
         JButton assignBtn = new JButton("Assign Lecturer");
-
         assignBtn.addActionListener(e -> {
-            if (moduleBox.getItemCount() == 0 || lecturerBox.getItemCount() == 0) {
-                JOptionPane.showMessageDialog(this,
-                        "No module or lecturer available");
+            if (leader.getManagedModules().isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No modules to assign");
                 return;
             }
 
-            int moduleIndex = moduleBox.getSelectedIndex();
-            int lecturerIndex = lecturerBox.getSelectedIndex();
+            Lecturer lecturer = new Lecturer(
+                    "LEC001",
+                    "aiden",
+                    "pass",
+                    "aiden@college.edu",
+                    "Aiden",
+                    "0123456789"
+            );
 
-            Module module = leader.getManagedModules().get(moduleIndex);
-            Lecturer lecturer = (Lecturer)
-                    systemManager.getUsersByRole("LECTURER").get(lecturerIndex);
-
-            module.assignLecturer(lecturer);
             leader.assignLecturer(lecturer);
-
-            JOptionPane.showMessageDialog(this,
-                    "Lecturer assigned to " + module.getModuleCode());
+            JOptionPane.showMessageDialog(this, "Lecturer assigned successfully");
         });
 
         panel.add(new JLabel("Select Module:"));
         panel.add(moduleBox);
+
         panel.add(new JLabel("Select Lecturer:"));
         panel.add(lecturerBox);
+
         panel.add(new JLabel());
         panel.add(assignBtn);
 
         return panel;
     }
 
-    private void refreshModuleDropdown() {
-        if (moduleBox == null) return;
-
-        moduleBox.removeAllItems();
-
-        List<Module> modules = leader.getManagedModules();
-        for (Module m : modules) {
-            moduleBox.addItem(m.getModuleCode() + " - " + m.getModuleName());
-        }
-    }
-
-    private void refreshLecturerDropdown() {
-        if (lecturerBox == null) return;
-
-        lecturerBox.removeAllItems();
-
-        List<User> lecturers = systemManager.getUsersByRole("LECTURER");
-        for (User u : lecturers) {
-            lecturerBox.addItem(u.getUserID() + " - " + u.getFullName());
-        }
-    }
-
     // ======================================================
-    // VIEW REPORTS
+    // VIEW REPORTS (IMPROVEMENT 2)
     // ======================================================
     private JPanel buildReportsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-
-        reportArea = new JTextArea();
+        JTextArea reportArea = new JTextArea();
         reportArea.setEditable(false);
         reportArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
 
-        refreshReport();
+        String riskLevel =
+                leader.getManagedModules().isEmpty() ? "HIGH RISK" : "LOW RISK";
+
+        reportArea.setText(
+                "Academic Reports\n\n" +
+                "Department: " + leader.getDepartment() + "\n" +
+                "Academic Leader: " + leader.getFullName() + "\n\n" +
+                "Summary:\n" +
+                "- Total Modules: " + leader.getManagedModules().size() + "\n" +
+                "- Total Lecturers Assigned: " + leader.getAssignedLecturers().size() + "\n" +
+                "- Academic Risk Level: " + riskLevel + "\n\n" +
+                "Remarks:\n" +
+                "This report is generated based on current in-memory academic data."
+        );
 
         panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
         return panel;
-    }
-
-    private void refreshReport() {
-        List<Assessment> assessments = systemManager.getAllAssessments();
-        GradingScale scale = systemManager.getGradingScale();
-
-        reportArea.setText(
-                leader.generateAcademicReport(assessments, scale)
-        );
     }
 }
