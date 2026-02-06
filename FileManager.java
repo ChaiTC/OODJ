@@ -387,7 +387,7 @@ public class FileManager {
         StringBuilder sb = new StringBuilder();
         sb.append(cls.getClassID()).append("|")
           .append(cls.getClassName()).append("|")
-          .append(cls.getModule() != null ? cls.getModule().getModuleID() : "").append("|")
+          .append(cls.getModuleID()).append("|")
           .append(cls.getLecturer() != null ? cls.getLecturer().getLecturerID() : "").append("|")
           .append(cls.getSemester()).append("|")
           .append(cls.getCapacity()).append("|");
@@ -484,5 +484,19 @@ public class FileManager {
         } catch (IOException e) {
 
         }
+    }
+    
+    /**
+     * Save grading scale
+     */
+    public static void saveGradingScale(Object scale) {
+        // Stub implementation
+    }
+    
+    /**
+     * Save assessment type
+     */
+    public static void saveAssessmentType(Object type) {
+        // Stub implementation
     }
 }

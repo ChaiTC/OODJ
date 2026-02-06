@@ -345,4 +345,102 @@ public class SystemManager {
         int next = max + 1;
         return String.format("%s%03d", prefix, next);
     }
+    
+    /**
+     * Get all lecturers
+     */
+    public List<User> getAllLecturers() {
+        return getUsersByRole("LECTURER");
+    }
+    
+    /**
+     * Get all students
+     */
+    public List<User> getAllStudents() {
+        return getUsersByRole("STUDENT");
+    }
+    
+    /**
+     * Find a class by its ID
+     */
+    public ClassModule findClassByID(String classID) {
+        for (ClassModule c : classes) {
+            if (c.getClassID().equals(classID)) return c;
+        }
+        return null;
+    }
+    
+    /**
+     * Update an existing class
+     */
+    public void updateClass(ClassModule updated) {
+        for (int i = 0; i < classes.size(); i++) {
+            if (classes.get(i).getClassID().equals(updated.getClassID())) {
+                classes.set(i, updated);
+                FileManager.saveAllClasses(classes);
+                return;
+            }
+        }
+    }
+    
+    /**
+     * Delete a class by ID
+     */
+    public void deleteClass(String classID) {
+        for (int i = 0; i < classes.size(); i++) {
+            if (classes.get(i).getClassID().equals(classID)) {
+                classes.remove(i);
+                FileManager.saveAllClasses(classes);
+                return;
+            }
+        }
+    }
+    
+    /**
+     * Get the grading scale
+     */
+    public GradingScale getGradingScale() {
+        return new GradingScale("GR001", "A", 80, 100, "Excellent");
+    }
+    
+    /**
+     * Set the grading scale
+     */
+    public void setGradingScale(GradingScale scale) {
+        // Save to file
+        FileManager.saveGradingScale(scale);
+    }
+    
+    /**
+     * Get all assessment types
+     */
+    public List<AssessmentType> getAllAssessmentTypes() {
+        List<AssessmentType> types = new ArrayList<>();
+        types.add(new AssessmentType("AT001", AssessmentType.Type.ASSIGNMENT, 20, 100));
+        types.add(new AssessmentType("AT002", AssessmentType.Type.CLASS_TEST, 30, 100));
+        types.add(new AssessmentType("AT003", AssessmentType.Type.FINAL_EXAM, 50, 100));
+        return types;
+    }
+    
+    /**
+     * Generate an assessment type ID
+     */
+    public String generateAssessmentTypeID() {
+        return "AT" + String.format("%03d", getAllAssessmentTypes().size() + 1);
+    }
+    
+    /**
+     * Add an assessment type
+     */
+    public void addAssessmentType(AssessmentType type) {
+        // This would normally save to persistent storage
+        FileManager.saveAssessmentType(type);
+    }
+    
+    /**
+     * Delete an assessment type
+     */
+    public void deleteAssessmentType(String typeID) {
+        // This would normally delete from persistent storage
+    }
 }

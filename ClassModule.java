@@ -9,20 +9,39 @@ public class ClassModule implements Serializable {
     
     private String classID;
     private String className;
-    private Module module;
+    private String moduleID;
     private Lecturer lecturer;
     private List<Student> enrolledStudents;
-    private String semester;
     private int capacity;
+    private String day;
+    private String time;
+    private String location;
+    private Module module; // For backward compatibility
     
+    // Original constructor with Module object
     public ClassModule(String classID, String className, Module module, 
                        Lecturer lecturer, String semester, int capacity) {
         this.classID = classID;
         this.className = className;
-        this.module = module;
+        this.moduleID = module != null ? module.getModuleID() : "";
         this.lecturer = lecturer;
-        this.semester = semester;
         this.capacity = capacity;
+        this.day = semester;
+        this.enrolledStudents = new ArrayList<>();
+    }
+    
+    // New constructor matching AdminClassCreationPanel expectations
+    public ClassModule(String classID, String className, String moduleID, 
+                       int capacity, String day, String time, String location, 
+                       Lecturer lecturer) {
+        this.classID = classID;
+        this.className = className;
+        this.moduleID = moduleID;
+        this.capacity = capacity;
+        this.day = day;
+        this.time = time;
+        this.location = location;
+        this.lecturer = lecturer;
         this.enrolledStudents = new ArrayList<>();
     }
     
@@ -41,29 +60,45 @@ public class ClassModule implements Serializable {
     public String getClassName() { return className; }
     public void setClassName(String className) { this.className = className; }
     
-    public Module getModule() { return module; }
-    public void setModule(Module module) { this.module = module; }
-    
     public Lecturer getLecturer() { return lecturer; }
     public void setLecturer(Lecturer lecturer) { this.lecturer = lecturer; }
     
     public List<Student> getEnrolledStudents() { return enrolledStudents; }
     
-    public String getSemester() { return semester; }
-    public void setSemester(String semester) { this.semester = semester; }
-    
     public int getCapacity() { return capacity; }
     public void setCapacity(int capacity) { this.capacity = capacity; }
+    
+    public String getModuleID() { return moduleID; }
+    public String getSemester() { return day; }
+    
+    public String getLecturerID() { return lecturer != null ? lecturer.getUserID() : null; }
+    public void setLecturerID(String lecturerID) { 
+        if (lecturerID == null) {
+            this.lecturer = null;
+        }
+    }
+    public String getDay() { return day; }
+    public String getTime() { return time; }
+    public String getLocation() { return location; }
+    
+    public Module getModule() { 
+        if (module != null) {
+            return module;
+        }
+        // Return a default Module with just the ID
+        return new Module(moduleID, "Unknown Module", "", "Unknown", 0, "");
+    }
+    public void setModule(Module module) { this.module = module; }
     
     @Override
     public String toString() {
         return "ClassModule{" +
                 "classID='" + classID + '\'' +
                 ", className='" + className + '\'' +
-                ", module=" + module.getModuleName() +
-                ", lecturer=" + lecturer.getFullName() +
+                ", moduleID='" + moduleID + '\'' +
+                ", lecturer=" + (lecturer != null ? lecturer.getFullName() : "N/A") +
                 ", enrolledCount=" + enrolledStudents.size() +
-                ", semester='" + semester + '\'' +
+                ", day='" + day + '\'' +
                 '}';
     }
 }

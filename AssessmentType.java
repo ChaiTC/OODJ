@@ -15,11 +15,20 @@ public class AssessmentType implements Serializable {
     private double weightage; // Percentage contribution to final grade
     private double totalMarks;
     
+    // Original constructor
     public AssessmentType(String typeID, Type assessmentType, double weightage, double totalMarks) {
         this.typeID = typeID;
         this.assessmentType = assessmentType;
         this.weightage = weightage;
         this.totalMarks = totalMarks;
+    }
+    
+    // Overloaded constructor for simpler usage
+    public AssessmentType(String typeID, String typeName, double weightage) {
+        this.typeID = typeID;
+        this.assessmentType = Type.ASSIGNMENT; // Default type
+        this.weightage = weightage;
+        this.totalMarks = 100; // Default total marks
     }
     
     public String getTypeID() { return typeID; }
@@ -33,6 +42,9 @@ public class AssessmentType implements Serializable {
     
     public double getTotalMarks() { return totalMarks; }
     public void setTotalMarks(double totalMarks) { this.totalMarks = totalMarks; }
+    
+    public String getTypeName() { return assessmentType.toString(); }
+    public double getWeight() { return weightage; }
     
     @Override
     public String toString() {

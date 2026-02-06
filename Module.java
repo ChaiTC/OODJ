@@ -38,6 +38,8 @@ public class Module implements Serializable {
     public String getDepartment() { return department; }
     public void setDepartment(String department) { this.department = department; }
     
+    public int getCredits() { return creditHours; }
+    
     @Override
     public String toString() {
         return "Module{" +

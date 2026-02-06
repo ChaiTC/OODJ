@@ -60,6 +60,13 @@ public class Assessment implements Serializable {
     
     public Map<String, Double> getStudentMarks() { return studentMarks; }
     
+    public Double getScore() { return 0.0; }
+    public String getClassID() { return ""; }
+    public String getTitle() { return assessmentName; }
+    public String getStatus() { return "PENDING"; }
+    public Double getTotalMarks() { return assessmentType.getTotalMarks(); }
+    public String getModuleCode() { return module.getModuleCode(); }
+    
     @Override
     public String toString() {
         return "Assessment{" +

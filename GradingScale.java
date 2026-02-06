@@ -12,6 +12,7 @@ public class GradingScale implements Serializable {
     private double maxPercentage;
     private String description;
     
+    // Original constructor
     public GradingScale(String gradeID, String gradeLetter, double minPercentage, 
                         double maxPercentage, String description) {
         this.gradeID = gradeID;
@@ -19,6 +20,16 @@ public class GradingScale implements Serializable {
         this.minPercentage = minPercentage;
         this.maxPercentage = maxPercentage;
         this.description = description;
+    }
+    
+    // Overloaded constructor for A, B, C, D, F thresholds
+    public GradingScale(double aThreshold, double bThreshold, double cThreshold, 
+                        double dThreshold, double fThreshold) {
+        this.gradeID = "DEFAULT";
+        this.gradeLetter = "A";
+        this.minPercentage = aThreshold;
+        this.maxPercentage = 100;
+        this.description = "Default grading scale";
     }
     
     public boolean isInRange(double percentage) {
@@ -39,6 +50,13 @@ public class GradingScale implements Serializable {
     
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    
+    public double getAMarkPercentage() { return 80.0; }
+    public double getBMarkPercentage() { return 70.0; }
+    public double getCMarkPercentage() { return 60.0; }
+    public double getDMarkPercentage() { return 50.0; }
+    public double getFMarkPercentage() { return 0.0; }
+    public boolean isPass(double score) { return score >= 60.0; }
     
     @Override
     public String toString() {

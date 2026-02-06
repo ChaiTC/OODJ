@@ -62,6 +62,8 @@ public class Feedback implements Serializable {
     public boolean isDelivered() { return isDelivered; }
     public void setDelivered(boolean delivered) { isDelivered = delivered; }
     
+    public String getComment() { return comments; }
+    
     @Override
     public String toString() {
         return "Feedback{" +
