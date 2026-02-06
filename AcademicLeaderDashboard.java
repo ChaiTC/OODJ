@@ -1,14 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 public class AcademicLeaderDashboard extends JFrame {
 
     private final SystemManager systemManager;
     private final AcademicLeader leader;
 
-    private JComboBox<String> moduleCombo; // shared between tabs
-    private JTextArea reportArea;
+    private JTabbedPane tabs;
 
     public AcademicLeaderDashboard(SystemManager systemManager, AcademicLeader leader) {
         this.systemManager = systemManager;
@@ -52,7 +50,7 @@ public class AcademicLeaderDashboard extends JFrame {
     // TABS
     // ======================================================
     private JTabbedPane buildTabs() {
-        JTabbedPane tabs = new JTabbedPane();
+        tabs = new JTabbedPane();
 
         tabs.addTab("Edit Profile", buildEditProfilePanel());
         tabs.addTab("Module Management", buildModuleManagementPanel());
@@ -63,12 +61,13 @@ public class AcademicLeaderDashboard extends JFrame {
     }
 
     // ======================================================
-    // FOOTER
+    // FOOTER (FIXED LOGOUT BUTTON)
     // ======================================================
     private JPanel buildFooter() {
         JButton logoutBtn = new JButton("Logout");
         logoutBtn.setBackground(Color.RED);
         logoutBtn.setForeground(Color.WHITE);
+        logoutBtn.setPreferredSize(new Dimension(100, 35));
 
         logoutBtn.addActionListener(e -> {
             dispose();
@@ -81,69 +80,73 @@ public class AcademicLeaderDashboard extends JFrame {
     }
 
     // ======================================================
-    // 1️⃣ EDIT PROFILE (Improved Layout)
+    // EDIT PROFILE (NOW SAVES DATA)
     // ======================================================
     private JPanel buildEditProfilePanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JTextField nameField = new JTextField(25);
-        nameField.setText(leader.getFullName());
+        JTextField nameField = new JTextField(leader.getFullName(), 20);
+        JTextField emailField = new JTextField(leader.getEmail(), 20);
+        JTextField deptField = new JTextField(leader.getDepartment(), 20);
 
-        JTextField emailField = new JTextField(25);
-        emailField.setText(leader.getEmail());
+        // Row 1
+        gbc.gridx = 0; gbc.gridy = 0;
+        panel.add(new JLabel("Full Name:"), gbc);
+        gbc.gridx = 1;
+        panel.add(nameField, gbc);
 
-        JTextField deptField = new JTextField(25);
-        deptField.setText(leader.getDepartment());
+        // Row 2
+        gbc.gridx = 0; gbc.gridy = 1;
+        panel.add(new JLabel("Email:"), gbc);
+        gbc.gridx = 1;
+        panel.add(emailField, gbc);
 
-        addRow(panel, gbc, 0, "Full Name:", nameField);
-        addRow(panel, gbc, 1, "Email:", emailField);
-        addRow(panel, gbc, 2, "Department:", deptField);
-        addRow(panel, gbc, 3, "Leader ID:", new JLabel(leader.getLeaderID()));
+        // Row 3
+        gbc.gridx = 0; gbc.gridy = 2;
+        panel.add(new JLabel("Department:"), gbc);
+        gbc.gridx = 1;
+        panel.add(deptField, gbc);
+
+        // Row 4 (read-only ID)
+        gbc.gridx = 0; gbc.gridy = 3;
+        panel.add(new JLabel("Leader ID:"), gbc);
+        gbc.gridx = 1;
+        panel.add(new JLabel(leader.getLeaderID()), gbc);
+
+        // Save button
+        JButton saveBtn = new JButton("Save Profile");
+        gbc.gridx = 1; gbc.gridy = 4;
+        panel.add(saveBtn, gbc);
+
+        saveBtn.addActionListener(e -> {
+            leader.setFullName(nameField.getText());
+            leader.setEmail(emailField.getText());
+            leader.setDepartment(deptField.getText());
+
+            JOptionPane.showMessageDialog(this,
+                    "Profile updated successfully");
+        });
 
         return panel;
     }
 
-    private void addRow(JPanel panel, GridBagConstraints gbc, int row,
-                        String label, Component field) {
-        gbc.gridx = 0;
-        gbc.gridy = row;
-        panel.add(new JLabel(label), gbc);
-
-        gbc.gridx = 1;
-        panel.add(field, gbc);
-    }
-
     // ======================================================
-    // 2️⃣ MODULE MANAGEMENT (Dynamic Update)
+    // MODULE MANAGEMENT
     // ======================================================
     private JPanel buildModuleManagementPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.anchor = GridBagConstraints.WEST;
-
-        JTextField codeField = new JTextField(20);
-        JTextField nameField = new JTextField(20);
-        JTextField creditField = new JTextField("3", 5);
-        JTextField deptField = new JTextField(leader.getDepartment(), 20);
+        JTextField codeField = new JTextField();
+        JTextField nameField = new JTextField();
+        JTextField creditField = new JTextField("3");
+        JTextField deptField = new JTextField(leader.getDepartment());
 
         JButton createBtn = new JButton("Create Module");
-
-        addRow(panel, gbc, 0, "Module Code:", codeField);
-        addRow(panel, gbc, 1, "Module Name:", nameField);
-        addRow(panel, gbc, 2, "Credits:", creditField);
-        addRow(panel, gbc, 3, "Department:", deptField);
-
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        panel.add(createBtn, gbc);
 
         createBtn.addActionListener(e -> {
             if (codeField.getText().isEmpty() || nameField.getText().isEmpty()) {
@@ -159,92 +162,86 @@ public class AcademicLeaderDashboard extends JFrame {
             );
 
             leader.createModule(module);
-            refreshModuleCombo();
-            refreshReport();
-
             JOptionPane.showMessageDialog(this, "Module created successfully");
+
             codeField.setText("");
             nameField.setText("");
         });
 
+        panel.add(new JLabel("Module Code:"));
+        panel.add(codeField);
+
+        panel.add(new JLabel("Module Name:"));
+        panel.add(nameField);
+
+        panel.add(new JLabel("Credits:"));
+        panel.add(creditField);
+
+        panel.add(new JLabel("Department:"));
+        panel.add(deptField);
+
+        panel.add(new JLabel());
+        panel.add(createBtn);
+
         return panel;
     }
 
     // ======================================================
-    // 3️⃣ ASSIGN LECTURERS (Live Module List)
+    // ASSIGN LECTURERS
     // ======================================================
     private JPanel buildAssignLecturersPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
-        gbc.anchor = GridBagConstraints.WEST;
+        JComboBox<String> moduleBox = new JComboBox<>();
+        JComboBox<String> lecturerBox = new JComboBox<>();
 
-        moduleCombo = new JComboBox<>();
-        refreshModuleCombo();
+        if (leader.getManagedModules().isEmpty()) {
+            moduleBox.addItem("No modules available");
+        } else {
+            leader.getManagedModules().forEach(
+                    m -> moduleBox.addItem(m.getModuleCode() + " - " + m.getModuleName())
+            );
+        }
 
-        JComboBox<String> lecturerCombo = new JComboBox<>();
-        lecturerCombo.addItem("LEC001 - AIDEN");
+        lecturerBox.addItem("LEC001 - AIDEN");
 
         JButton assignBtn = new JButton("Assign Lecturer");
-
-        addRow(panel, gbc, 0, "Select Module:", moduleCombo);
-        addRow(panel, gbc, 1, "Select Lecturer:", lecturerCombo);
-
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        panel.add(assignBtn, gbc);
-
         assignBtn.addActionListener(e ->
                 JOptionPane.showMessageDialog(this, "Lecturer assigned (demo)")
         );
 
+        panel.add(new JLabel("Select Module:"));
+        panel.add(moduleBox);
+
+        panel.add(new JLabel("Select Lecturer:"));
+        panel.add(lecturerBox);
+
+        panel.add(new JLabel());
+        panel.add(assignBtn);
+
         return panel;
     }
 
-    private void refreshModuleCombo() {
-        if (moduleCombo == null) return;
-
-        moduleCombo.removeAllItems();
-        List<Module> modules = leader.getManagedModules();
-
-        if (modules.isEmpty()) {
-            moduleCombo.addItem("No modules available");
-        } else {
-            for (Module m : modules) {
-                moduleCombo.addItem(m.getModuleCode() + " - " + m.getModuleName());
-            }
-        }
-    }
-
     // ======================================================
-    // 3️⃣ VIEW REPORTS (Real Data)
+    // VIEW REPORTS
     // ======================================================
     private JPanel buildReportsPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        reportArea = new JTextArea();
+        JTextArea reportArea = new JTextArea();
         reportArea.setEditable(false);
         reportArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
-
-        refreshReport();
-
-        panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
-        return panel;
-    }
-
-    private void refreshReport() {
-        int totalModules = leader.getManagedModules().size();
-
-        String risk = totalModules == 0 ? "HIGH RISK" : "LOW RISK";
 
         reportArea.setText(
                 "Academic Reports\n\n" +
                 "Department: " + leader.getDepartment() + "\n" +
                 "Academic Leader: " + leader.getFullName() + "\n\n" +
                 "Summary:\n" +
-                "- Total Modules: " + totalModules + "\n" +
-                "- Academic Risk Level: " + risk + "\n"
+                "- Total Modules: " + leader.getManagedModules().size() + "\n" +
+                "- Academic Risk Level: HIGH RISK\n"
         );
+
+        panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
+        return panel;
     }
 }
