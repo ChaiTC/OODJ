@@ -21,13 +21,13 @@ public class AFSLoginFrame extends JFrame {
     private void initializeFrame() {
         setTitle("Assessment Feedback System - Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 400);
+        setSize(550, 420);
         setLocationRelativeTo(null);
         setResizable(false);
         
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBackground(new Color(240, 240, 240));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
         
         // Header Panel
         JPanel headerPanel = new JPanel();
@@ -45,16 +45,16 @@ public class AFSLoginFrame extends JFrame {
 
         usernameField = new JTextField();
         usernameField.setFont(new Font("Arial", Font.PLAIN, 12));
-        usernameField.setPreferredSize(new Dimension(240, 28));
-        usernameField.setMaximumSize(new Dimension(240, 28));
+        usernameField.setPreferredSize(new Dimension(300, 32));
+        usernameField.setMaximumSize(new Dimension(300, 32));
 
         passwordField = new JPasswordField();
         passwordField.setFont(new Font("Arial", Font.PLAIN, 12));
-        passwordField.setPreferredSize(new Dimension(240, 28));
-        passwordField.setMaximumSize(new Dimension(240, 28));
+        passwordField.setPreferredSize(new Dimension(300, 32));
+        passwordField.setMaximumSize(new Dimension(300, 32));
 
         loginPanel.add(createFieldRow("Username:", usernameField));
-        loginPanel.add(Box.createVerticalStrut(8));
+        loginPanel.add(Box.createVerticalStrut(12));
         loginPanel.add(createFieldRow("Password:", passwordField));
         
         // Button Panel
@@ -145,11 +145,11 @@ public class AFSLoginFrame extends JFrame {
 
     // Helper to create a horizontal labeled row: label on left, component on right
     private JPanel createFieldRow(String labelText, JComponent field) {
-        JPanel rowPanel = new JPanel(new BorderLayout(5, 0));
+        JPanel rowPanel = new JPanel(new BorderLayout(3, 0));
         rowPanel.setBackground(new Color(240, 240, 240));
 
         JLabel label = new JLabel(labelText);
-        label.setPreferredSize(new Dimension(120, 25));
+        label.setPreferredSize(new Dimension(90, 32));
         label.setFont(new Font("Arial", Font.PLAIN, 12));
         rowPanel.add(label, BorderLayout.WEST);
         rowPanel.add(field, BorderLayout.CENTER);
