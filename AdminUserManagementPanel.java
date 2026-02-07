@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -6,6 +7,8 @@ import java.util.*;
 class AdminUserManagementPanel extends JPanel {
     private SystemManager systemManager;
     private JFrame parentFrame;
+    private DefaultTableModel tableModel;
+    private JTable table;
     
     public AdminUserManagementPanel(SystemManager systemManager, JFrame parentFrame) {
         this.systemManager = systemManager;
@@ -18,18 +21,20 @@ class AdminUserManagementPanel extends JPanel {
         
         JPanel mainPanel = new JPanel(new BorderLayout());
         
-        // User table
-        java.util.List<User> users = systemManager.getAllUsers();
+        // User table with DefaultTableModel
         String[] cols = new String[] {"UserID", "Username", "Full Name", "Email", "Role"};
-        Object[][] data = new Object[users.size()][];
-        for (int i = 0; i < users.size(); i++) {
-            User u = users.get(i);
-            data[i] = new Object[] { u.getUserID(), u.getUsername(), u.getFullName(), u.getEmail(), u.getRole() };
-        }
-
-        JTable table = new JTable(data, cols);
+        tableModel = new DefaultTableModel(cols, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        table = new JTable(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane scroll = new JScrollPane(table);
+        
+        refreshTable();
         
         // Action buttons
         JPanel buttonBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -129,24 +134,36 @@ class AdminUserManagementPanel extends JPanel {
                 if (u instanceof Student) {
                     typeBox.setSelectedItem("Student");
                     userIdField.setText(u.getUserID());
+                    departmentBox.removeAllItems();
+                    departmentBox.addItem("IT");
                     departmentBox.setSelectedItem("IT");
                     staffIdField.setText("N/A");
                 } else if (u instanceof Lecturer) {
                     typeBox.setSelectedItem("Lecturer");
                     Lecturer lec = (Lecturer) u;
                     userIdField.setText(u.getUserID());
+                    departmentBox.removeAllItems();
+                    departmentBox.addItem("IT");
+                    departmentBox.addItem("Business");
+                    departmentBox.addItem("Engineering");
                     departmentBox.setSelectedItem(lec.getDepartment());
                     staffIdField.setText(lec.getLecturerID());
                 } else if (u instanceof AcademicLeader) {
                     typeBox.setSelectedItem("Academic Leader");
                     AcademicLeader leader = (AcademicLeader) u;
                     userIdField.setText(u.getUserID());
+                    departmentBox.removeAllItems();
+                    departmentBox.addItem("IT");
+                    departmentBox.addItem("Business");
+                    departmentBox.addItem("Engineering");
                     departmentBox.setSelectedItem(leader.getDepartment());
                     staffIdField.setText(leader.getLeaderID());
                 } else if (u instanceof AdminStaff) {
                     typeBox.setSelectedItem("Admin Staff");
                     AdminStaff staff = (AdminStaff) u;
                     userIdField.setText(u.getUserID());
+                    departmentBox.removeAllItems();
+                    departmentBox.addItem("Administration");
                     departmentBox.setSelectedItem(staff.getDepartment());
                     staffIdField.setText(staff.getStaffID());
                 }
@@ -173,10 +190,12 @@ class AdminUserManagementPanel extends JPanel {
                     return; 
                 }
                 String userId = (String)table.getValueAt(r,0);
-                int yn = JOptionPane.showConfirmDialog(parentFrame, "Delete user " + userId + "?","Confirm",JOptionPane.YES_NO_OPTION);
+                String username = (String)table.getValueAt(r,1);
+                int yn = JOptionPane.showConfirmDialog(parentFrame, "Delete this user " + username + "?","Confirm",JOptionPane.YES_NO_OPTION);
                 if (yn == JOptionPane.YES_OPTION) {
                     systemManager.deleteUser(userId);
                     JOptionPane.showMessageDialog(parentFrame, "User deleted successfully!");
+                    refreshTable();
                 }
             }
         });
@@ -227,7 +246,8 @@ class AdminUserManagementPanel extends JPanel {
                         userIdField.setText(userId);
                         
                         if (type.equals("Student")) {
-                            newUser = new Student(userId, usern, pass, mail, name, phoneStr.isEmpty()?"N/A":phoneStr, userId, "2024");
+                            String enrollmentYear = String.valueOf(java.time.Year.now().getValue());
+                            newUser = new Student(userId, usern, pass, mail, name, phoneStr.isEmpty()?"N/A":phoneStr, userId, enrollmentYear);
                         } else if (type.equals("Lecturer")) {
                             String staffId = systemManager.generateStaffID();
                             staffIdField.setText(staffId);
@@ -245,9 +265,49 @@ class AdminUserManagementPanel extends JPanel {
                             JOptionPane.showMessageDialog(parentFrame, "User created successfully!");
                             formPanel.setVisible(false);
                             mainPanel.remove(formPanel);
+                            refreshTable();
                         } else {
                             JOptionPane.showMessageDialog(parentFrame, "Username already exists");
                         }
+                    } else if ("Update".equals(saveBtn.getText())) {
+                        String userId = userIdField.getText();
+                        User existingUser = systemManager.findUserByID(userId);
+                        if (existingUser == null) {
+                            JOptionPane.showMessageDialog(parentFrame, "User not found");
+                            return;
+                        }
+                        
+                        // Update common fields
+                        existingUser.setUsername(usern);
+                        if (!pass.isEmpty()) {
+                            if (pass.length() < 8) {
+                                JOptionPane.showMessageDialog(parentFrame, "Password must be at least 8 characters long");
+                                return;
+                            }
+                            if (!pass.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
+                                JOptionPane.showMessageDialog(parentFrame, "Password must contain at least one special character");
+                                return;
+                            }
+                            existingUser.setPassword(pass);
+                        }
+                        existingUser.setEmail(mail);
+                        existingUser.setFullName(name);
+                        existingUser.setPhoneNumber(phoneStr.isEmpty()?"N/A":phoneStr);
+                        
+                        // Update role-specific fields
+                        if (existingUser instanceof Lecturer) {
+                            ((Lecturer)existingUser).setDepartment(dept);
+                        } else if (existingUser instanceof AcademicLeader) {
+                            ((AcademicLeader)existingUser).setDepartment(dept);
+                        } else if (existingUser instanceof AdminStaff) {
+                            ((AdminStaff)existingUser).setDepartment(dept);
+                        }
+                        
+                        systemManager.updateUser(existingUser);
+                        JOptionPane.showMessageDialog(parentFrame, "User updated successfully!");
+                        formPanel.setVisible(false);
+                        mainPanel.remove(formPanel);
+                        refreshTable();
                     }
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(parentFrame, "Error: " + ex.getMessage());
@@ -288,6 +348,20 @@ class AdminUserManagementPanel extends JPanel {
                 mainPanel.repaint();
             }
         });
+    }
+    
+    private void refreshTable() {
+        tableModel.setRowCount(0);
+        java.util.List<User> users = systemManager.getAllUsers();
+        for (User u : users) {
+            tableModel.addRow(new Object[] { 
+                u.getUserID(), 
+                u.getUsername(), 
+                u.getFullName(), 
+                u.getEmail(), 
+                u.getRole() 
+            });
+        }
     }
     
     private JPanel createLabeledRow(String labelText, JComponent comp) {

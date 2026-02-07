@@ -361,6 +361,37 @@ public class SystemManager {
     }
     
     /**
+     * Get all academic leaders
+     */
+    public List<User> getAllAcademicLeaders() {
+        return getUsersByRole("ACADEMIC_LEADER");
+    }
+    
+    /**
+     * Assign a lecturer to an academic leader
+     */
+    public void assignLecturerToLeader(String lecturerID, String leaderID) {
+        User user = findUserByID(lecturerID);
+        if (user instanceof Lecturer) {
+            Lecturer lec = (Lecturer) user;
+            lec.setAcademicLeaderID(leaderID);
+            updateUser(lec);
+        }
+    }
+    
+    /**
+     * Unassign a lecturer from their academic leader
+     */
+    public void unassignLecturerFromLeader(String lecturerID) {
+        User user = findUserByID(lecturerID);
+        if (user instanceof Lecturer) {
+            Lecturer lec = (Lecturer) user;
+            lec.setAcademicLeaderID(null);
+            updateUser(lec);
+        }
+    }
+    
+    /**
      * Find a class by its ID
      */
     public ClassModule findClassByID(String classID) {

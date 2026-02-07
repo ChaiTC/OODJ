@@ -76,23 +76,28 @@ public class AFSLoginFrame extends JFrame {
             }
         });
         
-        JButton registerButton = new JButton("Register");
-        registerButton.setPreferredSize(new Dimension(120, 40));
-        registerButton.setFont(new Font("Arial", Font.BOLD, 12));
-        registerButton.setBackground(new Color(56, 142, 60));
-        registerButton.setForeground(Color.WHITE);
-        registerButton.setOpaque(true);
-        registerButton.setContentAreaFilled(true);
-        registerButton.setBorderPainted(false);
-        registerButton.addActionListener(new ActionListener() {
+        buttonPanel.add(loginButton);
+        
+        // Registration link panel
+        JPanel registerLinkPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        registerLinkPanel.setBackground(new Color(240, 240, 240));
+        
+        JLabel notRegisteredLabel = new JLabel("Not registered yet? ");
+        notRegisteredLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        
+        JLabel registerLink = new JLabel("<html><u>Register Here</u></html>");
+        registerLink.setFont(new Font("Arial", Font.PLAIN, 12));
+        registerLink.setForeground(new Color(25, 118, 210));
+        registerLink.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        registerLink.addMouseListener(new MouseAdapter() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 openRegistrationFrame();
             }
         });
         
-        buttonPanel.add(loginButton);
-        buttonPanel.add(registerButton);
+        registerLinkPanel.add(notRegisteredLabel);
+        registerLinkPanel.add(registerLink);
         
         // Status Label
         statusLabel = new JLabel("");
@@ -102,10 +107,14 @@ public class AFSLoginFrame extends JFrame {
         // Combine panels
         mainPanel.add(headerPanel, BorderLayout.NORTH);
         mainPanel.add(loginPanel, BorderLayout.CENTER);
-        JPanel bottomPanel = new JPanel(new BorderLayout());
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS));
         bottomPanel.setBackground(new Color(240, 240, 240));
-        bottomPanel.add(statusLabel, BorderLayout.NORTH);
-        bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
+        bottomPanel.add(statusLabel);
+        bottomPanel.add(Box.createVerticalStrut(5));
+        bottomPanel.add(buttonPanel);
+        bottomPanel.add(Box.createVerticalStrut(10));
+        bottomPanel.add(registerLinkPanel);
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
         
         add(mainPanel);

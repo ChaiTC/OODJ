@@ -17,6 +17,7 @@ public class Lecturer extends User {
     
     private String lecturerID;
     private String department;
+    private String academicLeaderID;
     private List<Module> assignedModules;
     private List<Assessment> createdAssessments;
     private List<Feedback> providedFeedback;
@@ -26,6 +27,7 @@ public class Lecturer extends User {
         super(userID, username, password, email, fullName, phoneNumber, "LECTURER");
         this.lecturerID = lecturerID;
         this.department = department;
+        this.academicLeaderID = null;
         this.assignedModules = new ArrayList<>();
         this.createdAssessments = new ArrayList<>();
         this.providedFeedback = new ArrayList<>();
@@ -81,6 +83,9 @@ public class Lecturer extends User {
     
     public String getDepartment() { return department; }
     public void setDepartment(String department) { this.department = department; }
+    
+    public String getAcademicLeaderID() { return academicLeaderID; }
+    public void setAcademicLeaderID(String academicLeaderID) { this.academicLeaderID = academicLeaderID; }
     
     public List<Module> getAssignedModules() { return assignedModules; }
     public List<Assessment> getCreatedAssessments() { return createdAssessments; }

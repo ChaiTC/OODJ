@@ -134,16 +134,40 @@ public class AcademicLeaderDashboard extends JFrame {
         JButton createBtn = new JButton("Create Module");
 
         createBtn.addActionListener(e -> {
-            Module module = new Module(
-                    codeField.getText(),
-                    nameField.getText(),
-                    "UNASSIGNED",
-                    "UNASSIGNED",
-                    Integer.parseInt(creditField.getText()),
-                    deptField.getText()
-            );
-            leader.createModule(module);
-            JOptionPane.showMessageDialog(this, "Module created");
+            String code = codeField.getText().trim();
+            String name = nameField.getText().trim();
+            String credits = creditField.getText().trim();
+            
+            if (code.isEmpty() || name.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Module Code and Name are required", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            try {
+                Module module = new Module(
+                        code,
+                        name,
+                        "UNASSIGNED",
+                        "UNASSIGNED",
+                        Integer.parseInt(credits),
+                        deptField.getText()
+                );
+                
+                // Add to SystemManager (persists to file)
+                systemManager.createModule(module);
+                
+                // Add to leader's local list
+                leader.createModule(module);
+                
+                JOptionPane.showMessageDialog(this, "Module created successfully!");
+                
+                // Clear fields
+                codeField.setText("");
+                nameField.setText("");
+                creditField.setText("3");
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Credits must be a valid number", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         panel.add(new JLabel("Module Code:"));
@@ -212,6 +236,6 @@ public class AcademicLeaderDashboard extends JFrame {
 
     JScrollPane scrollPane = new JScrollPane(area);
     panel.add(scrollPane, BorderLayout.CENTER);
-
     return panel;
+}
 }

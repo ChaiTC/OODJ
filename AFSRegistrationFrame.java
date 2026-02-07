@@ -14,7 +14,7 @@ public class AFSRegistrationFrame extends JFrame {
     private SystemManager systemManager;
     private JComboBox<String> userTypeCombo, departmentCombo;
     private JTextField userIDField, usernameField, emailField, fullNameField, phoneField;
-    private JTextField staffIdField;
+    private JTextField staffIdField, enrollmentField;
     private JPasswordField passwordField;
     private JLabel departmentLabel, staffIdLabel;
     private JLabel usernameError, passwordError, emailError, fullNameError, phoneError;
@@ -97,7 +97,8 @@ public class AFSRegistrationFrame extends JFrame {
         registrationPanel.add(createFieldRow("Staff ID:", staffIdField, null));
         
         // Enrollment Year (for students only)
-        JTextField enrollmentField = new JTextField("2024");
+        String currentYear = String.valueOf(java.time.Year.now().getValue());
+        enrollmentField = new JTextField(currentYear);
         registrationPanel.add(createFieldRow("Enrollment Year:", enrollmentField, null));
         
         // Button Panel
@@ -299,7 +300,8 @@ public class AFSRegistrationFrame extends JFrame {
         
         try {
             if (userType.equals("Student")) {
-                newUser = new Student(userID, username, password, email, fullName, phone, userID, "2024");
+                String enrollmentYear = enrollmentField.getText().trim();
+                newUser = new Student(userID, username, password, email, fullName, phone, userID, enrollmentYear);
             } else if (userType.equals("Lecturer")) {
                 newUser = new Lecturer(userID, username, password, email, fullName, phone, staffId, department);
             } else if (userType.equals("Academic Leader")) {

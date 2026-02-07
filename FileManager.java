@@ -248,6 +248,8 @@ public class FileManager {
         } else if (user instanceof Lecturer) {
             Lecturer lecturer = (Lecturer) user;
             sb.append("|").append(lecturer.getDepartment()).append("|").append(lecturer.getLecturerID());
+            String leaderID = lecturer.getAcademicLeaderID();
+            sb.append("|").append(leaderID != null ? leaderID : "UNASSIGNED");
         } else if (user instanceof Student) {
             Student student = (Student) user;
             sb.append("|").append(student.getStudentID()).append("|").append(student.getEnrollmentYear());
@@ -327,7 +329,12 @@ public class FileManager {
                 if (parts.length >= 9) {
                     String lecturerID = parts[7];
                     String department = parts[8];
-                    return new Lecturer(userID, username, password, email, fullName, phoneNumber, lecturerID, department);
+                    Lecturer lec = new Lecturer(userID, username, password, email, fullName, phoneNumber, lecturerID, department);
+                    // Handle academicLeaderID field (backward compatible)
+                    if (parts.length >= 10 && !parts[9].equals("UNASSIGNED")) {
+                        lec.setAcademicLeaderID(parts[9]);
+                    }
+                    return lec;
                 }
                 break;
             case "STUDENT":
@@ -383,13 +390,15 @@ public class FileManager {
     }
 
     private static String serializeClass(ClassModule cls) {
-        // Format: classID|className|moduleID|lecturerID|semester|capacity|studentIDs(comma)
+        // Format: classID|className|moduleID|lecturerID|day|time|location|capacity|studentIDs(comma)
         StringBuilder sb = new StringBuilder();
         sb.append(cls.getClassID()).append("|")
           .append(cls.getClassName()).append("|")
           .append(cls.getModuleID()).append("|")
-          .append(cls.getLecturer() != null ? cls.getLecturer().getLecturerID() : "").append("|")
-          .append(cls.getSemester()).append("|")
+          .append(cls.getLecturerID() != null ? cls.getLecturerID() : "").append("|")
+          .append(cls.getDay() != null ? cls.getDay() : "").append("|")
+          .append(cls.getTime() != null ? cls.getTime() : "").append("|")
+          .append(cls.getLocation() != null ? cls.getLocation() : "").append("|")
           .append(cls.getCapacity()).append("|");
         // enrolled students
         List<Student> enrolled = cls.getEnrolledStudents();
@@ -402,27 +411,31 @@ public class FileManager {
 
     private static ClassModule deserializeClass(String data, List<Module> modules, List<User> users) {
         String[] parts = data.split("\\|");
-        if (parts.length < 7) return null;
+        if (parts.length < 8) return null;
+        
         String classID = parts[0];
         String className = parts[1];
         String moduleID = parts[2];
         String lecturerID = parts[3];
-        String semester = parts[4];
+        String day = parts[4].isEmpty() ? null : parts[4];
+        String time = parts[5].isEmpty() ? null : parts[5];
+        String location = parts[6].isEmpty() ? null : parts[6];
         int capacity = 50;
-        try { capacity = Integer.parseInt(parts[5]); } catch (Exception ignored) {}
-        String studentCSV = parts[6];
+        try { capacity = Integer.parseInt(parts[7]); } catch (Exception ignored) {}
+        String studentCSV = parts.length > 8 ? parts[8] : "";
 
-        Module moduleObj = null;
-        for (Module m : modules) if (m.getModuleID().equals(moduleID)) { moduleObj = m; break; }
-
-        Lecturer lecturerObj = null;
-        for (User u : users) if (u instanceof Lecturer && u.getUserID().equals(lecturerID)) { lecturerObj = (Lecturer) u; break; }
-
-        // fallbacks
-        if (moduleObj == null) moduleObj = new Module("", moduleID, "", "", 3, "N/A");
-        if (lecturerObj == null) lecturerObj = new Lecturer("LEC000", "unassigned", "pass", "unassigned@apu.edu", "Unassigned", "N/A", "LEC000", "N/A");
-
-        ClassModule cls = new ClassModule(classID, className, moduleObj, lecturerObj, semester, capacity);
+        // Create using new constructor
+        ClassModule cls = new ClassModule(classID, className, moduleID, capacity, day, time, location, null);
+        
+        // Set lecturer if available
+        if (lecturerID != null && !lecturerID.isEmpty()) {
+            for (User u : users) {
+                if (u instanceof Lecturer && u.getUserID().equals(lecturerID)) {
+                    cls.setLecturer((Lecturer) u);
+                    break;
+                }
+            }
+        }
 
         if (studentCSV != null && !studentCSV.isEmpty()) {
             String[] sids = studentCSV.split(",");

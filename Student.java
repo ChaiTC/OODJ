@@ -386,7 +386,8 @@ class StudentDashboard extends JFrame {
             classNames = classList.stream().map(ClassModule::getClassName).toArray(String[]::new);
         }
         JComboBox<String> classCombo = new JComboBox<>(classNames);
-        JTextField semesterField = new JTextField("2024-1");
+        String currentYear = String.valueOf(java.time.Year.now().getValue());
+        JTextField semesterField = new JTextField(currentYear + "-1");
 
         panel.add(createLabeledRow("Module:", moduleCombo)); panel.add(Box.createVerticalStrut(6));
         panel.add(createLabeledRow("Class:", classCombo)); panel.add(Box.createVerticalStrut(6));
