@@ -9,6 +9,8 @@ public abstract class User implements Serializable {
     private String email;         // Email address
     private String fullName;      // Full display name
     private String phoneNumber;   // Phone number
+    private String gender;        // Gender (Male/Female)
+    private int age;              // Age
     private String role;          // "STUDENT", "LECTURER", "ACADEMIC_LEADER", or "ADMIN_STAFF"
     private Date createdDate;     // When account was created
     private boolean isActive;     // Is account active (can login) or disabled
@@ -25,6 +27,8 @@ public abstract class User implements Serializable {
         this.email = email;
         this.fullName = fullName;
         this.phoneNumber = phoneNumber;
+        this.gender = "N/A";
+        this.age = 0;
         this.role = role;
         this.createdDate = new Date();  // Current date/time
         this.isActive = true;           // New accounts start as active
@@ -41,6 +45,8 @@ public abstract class User implements Serializable {
     public String getEmail() { return email; }
     public String getFullName() { return fullName; }
     public String getPhoneNumber() { return phoneNumber; }
+    public String getGender() { return gender; }
+    public int getAge() { return age; }
     public String getRole() { return role; }
     public Date getCreatedDate() { return createdDate; }
     public boolean isActive() { return isActive; }
@@ -53,6 +59,8 @@ public abstract class User implements Serializable {
     public void setEmail(String email) { this.email = email; }
     public void setFullName(String fullName) { this.fullName = fullName; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public void setGender(String gender) { this.gender = gender; }
+    public void setAge(int age) { this.age = age; }
     public void setRole(String role) { this.role = role; }
     public void setActive(boolean isActive) { this.isActive = isActive; }
 }

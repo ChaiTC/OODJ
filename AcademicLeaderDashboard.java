@@ -84,6 +84,12 @@ public class AcademicLeaderDashboard extends JFrame {
         JTextField nameField = new JTextField(leader.getFullName(), 20);
         JTextField emailField = new JTextField(leader.getEmail(), 20);
         JTextField deptField = new JTextField(leader.getDepartment(), 20);
+        JComboBox<String> genderBox = new JComboBox<>(new String[]{"Male", "Female"});
+        String gender = leader.getGender();
+        if (gender != null && !gender.isEmpty()) {
+            genderBox.setSelectedItem(gender);
+        }
+        JSpinner ageSpinner = new JSpinner(new SpinnerNumberModel(leader.getAge() > 0 ? leader.getAge() : 20, 15, 100, 1));
 
         gbc.gridx = 0; gbc.gridy = 0;
         panel.add(new JLabel("Full Name:"), gbc);
@@ -101,18 +107,30 @@ public class AcademicLeaderDashboard extends JFrame {
         panel.add(deptField, gbc);
 
         gbc.gridx = 0; gbc.gridy = 3;
+        panel.add(new JLabel("Gender:"), gbc);
+        gbc.gridx = 1;
+        panel.add(genderBox, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 4;
+        panel.add(new JLabel("Age:"), gbc);
+        gbc.gridx = 1;
+        panel.add(ageSpinner, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 5;
         panel.add(new JLabel("Leader ID:"), gbc);
         gbc.gridx = 1;
         panel.add(new JLabel(leader.getLeaderID()), gbc);
 
         JButton saveBtn = new JButton("Save Profile");
-        gbc.gridx = 1; gbc.gridy = 4;
+        gbc.gridx = 1; gbc.gridy = 6;
         panel.add(saveBtn, gbc);
 
         saveBtn.addActionListener(e -> {
             leader.setFullName(nameField.getText());
             leader.setEmail(emailField.getText());
             leader.setDepartment(deptField.getText());
+            leader.setGender((String) genderBox.getSelectedItem());
+            leader.setAge((Integer) ageSpinner.getValue());
 
             headerLabel.setText(
                     "Welcome, " + leader.getFullName() + " (Academic Leader)"

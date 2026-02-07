@@ -59,6 +59,8 @@ class AdminUserManagementPanel extends JPanel {
         JTextField email = new JTextField();
         JTextField fullname = new JTextField();
         JTextField phone = new JTextField();
+        JComboBox<String> genderBox = new JComboBox<>(new String[]{"Male", "Female"});
+        JSpinner ageSpinner = new JSpinner(new SpinnerNumberModel(20, 15, 100, 1));
         JComboBox<String> departmentBox = new JComboBox<>(new String[]{"IT", "Business", "Engineering", "Administration"});
         JTextField staffIdField = new JTextField();
         staffIdField.setEditable(false);
@@ -76,6 +78,10 @@ class AdminUserManagementPanel extends JPanel {
         formPanel.add(createLabeledRow("Full name:", fullname));
         formPanel.add(Box.createVerticalStrut(6));
         formPanel.add(createLabeledRow("Phone Number:", phone));
+        formPanel.add(Box.createVerticalStrut(6));
+        formPanel.add(createLabeledRow("Gender:", genderBox));
+        formPanel.add(Box.createVerticalStrut(6));
+        formPanel.add(createLabeledRow("Age:", ageSpinner));
         formPanel.add(Box.createVerticalStrut(6));
         formPanel.add(createLabeledRow("Department:", departmentBox));
         formPanel.add(Box.createVerticalStrut(6));
@@ -103,6 +109,8 @@ class AdminUserManagementPanel extends JPanel {
                 email.setText("");
                 fullname.setText("");
                 phone.setText("");
+                genderBox.setSelectedIndex(0);
+                ageSpinner.setValue(20);
                 departmentBox.removeAllItems();
                 departmentBox.addItem("IT");
                 departmentBox.addItem("Business");
@@ -147,7 +155,7 @@ class AdminUserManagementPanel extends JPanel {
                     departmentBox.addItem("Business");
                     departmentBox.addItem("Engineering");
                     departmentBox.setSelectedItem(lec.getDepartment());
-                    staffIdField.setText(lec.getLecturerID());
+                    staffIdField.setText(lec.getStaffID());
                 } else if (u instanceof AcademicLeader) {
                     typeBox.setSelectedItem("Academic Leader");
                     AcademicLeader leader = (AcademicLeader) u;
@@ -157,7 +165,7 @@ class AdminUserManagementPanel extends JPanel {
                     departmentBox.addItem("Business");
                     departmentBox.addItem("Engineering");
                     departmentBox.setSelectedItem(leader.getDepartment());
-                    staffIdField.setText(leader.getLeaderID());
+                    staffIdField.setText(leader.getStaffID());
                 } else if (u instanceof AdminStaff) {
                     typeBox.setSelectedItem("Admin Staff");
                     AdminStaff staff = (AdminStaff) u;
@@ -173,6 +181,13 @@ class AdminUserManagementPanel extends JPanel {
                 email.setText(u.getEmail());
                 fullname.setText(u.getFullName());
                 phone.setText(u.getPhoneNumber());
+                String gender = u.getGender();
+                if (gender == null || gender.isEmpty()) {
+                    genderBox.setSelectedIndex(0);
+                } else {
+                    genderBox.setSelectedItem(gender);
+                }
+                ageSpinner.setValue(u.getAge() > 0 ? u.getAge() : 20);
                 
                 formPanel.setVisible(true);
                 saveBtn.setText("Update");
@@ -209,6 +224,8 @@ class AdminUserManagementPanel extends JPanel {
                 String mail = email.getText().trim();
                 String name = fullname.getText().trim();
                 String phoneStr = phone.getText().trim();
+                String gender = (String) genderBox.getSelectedItem();
+                int age = (Integer) ageSpinner.getValue();
                 String dept = (String)departmentBox.getSelectedItem();
                 
                 if (usern.isEmpty() || name.isEmpty()) { 
@@ -265,6 +282,10 @@ class AdminUserManagementPanel extends JPanel {
                             staffIdField.setText(staffId);
                             newUser = new AdminStaff(userId, usern, pass, mail, name, phoneStr.isEmpty()?"N/A":phoneStr, dept, staffId);
                         }
+                        if (newUser != null) {
+                            newUser.setGender(gender);
+                            newUser.setAge(age);
+                        }
                         if (systemManager.registerUser(newUser)) {
                             JOptionPane.showMessageDialog(parentFrame, "User created successfully!");
                             formPanel.setVisible(false);
@@ -297,6 +318,8 @@ class AdminUserManagementPanel extends JPanel {
                         existingUser.setEmail(mail);
                         existingUser.setFullName(name);
                         existingUser.setPhoneNumber(phoneStr.isEmpty()?"N/A":phoneStr);
+                        existingUser.setGender(gender);
+                        existingUser.setAge(age);
                         
                         // Update role-specific fields
                         if (existingUser instanceof Lecturer) {

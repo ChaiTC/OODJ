@@ -237,7 +237,9 @@ public class FileManager {
           .append(user.getPassword()).append("|")
           .append(user.getEmail()).append("|")
           .append(user.getFullName()).append("|")
-          .append(user.getPhoneNumber());
+                    .append(user.getPhoneNumber()).append("|")
+                    .append(user.getGender() != null ? user.getGender() : "N/A").append("|")
+                    .append(user.getAge());
         
         if (user instanceof AdminStaff) {
             AdminStaff admin = (AdminStaff) user;
@@ -309,42 +311,62 @@ public class FileManager {
         String email = parts[4];
         String fullName = parts[5];
         String phoneNumber = parts[6];
+        String gender = "N/A";
+        int age = 0;
+        boolean hasGenderAge = parts.length >= 9 && (
+            "Male".equals(parts[7]) || "Female".equals(parts[7]) || "N/A".equals(parts[7])
+        );
+        if (hasGenderAge) {
+            gender = parts[7];
+            try { age = Integer.parseInt(parts[8]); } catch (Exception ignored) {}
+        }
+        int idx = hasGenderAge ? 9 : 7;
         
         switch(role) {
             case "ADMIN_STAFF":
-                if (parts.length >= 9) {
-                    String department = parts[7];
-                    String staffID = parts[8];
-                    return new AdminStaff(userID, username, password, email, fullName, phoneNumber, department, staffID);
+                if (parts.length >= idx + 2) {
+                    String department = parts[idx];
+                    String staffID = parts[idx + 1];
+                    AdminStaff admin = new AdminStaff(userID, username, password, email, fullName, phoneNumber, department, staffID);
+                    admin.setGender(gender);
+                    admin.setAge(age);
+                    return admin;
                 }
                 break;
             case "ACADEMIC_LEADER":
-                if (parts.length >= 9) {
-                    String department = parts[7];
-                    String staffID = parts[8];
+                if (parts.length >= idx + 2) {
+                    String department = parts[idx];
+                    String staffID = parts[idx + 1];
                     AcademicLeader leader = new AcademicLeader(userID, username, password, email, fullName, phoneNumber, department, userID);
                     leader.setStaffID(staffID);
+                    leader.setGender(gender);
+                    leader.setAge(age);
                     return leader;
                 }
                 break;
             case "LECTURER":
-                if (parts.length >= 9) {
-                    String department = parts[7];
-                    String staffID = parts[8];
+                if (parts.length >= idx + 2) {
+                    String department = parts[idx];
+                    String staffID = parts[idx + 1];
                     Lecturer lec = new Lecturer(userID, username, password, email, fullName, phoneNumber, userID, department);
                     lec.setStaffID(staffID);
+                    lec.setGender(gender);
+                    lec.setAge(age);
                     // Handle academicLeaderID field (backward compatible)
-                    if (parts.length >= 10 && !parts[9].equals("UNASSIGNED")) {
-                        lec.setAcademicLeaderID(parts[9]);
+                    if (parts.length >= idx + 3 && !parts[idx + 2].equals("UNASSIGNED")) {
+                        lec.setAcademicLeaderID(parts[idx + 2]);
                     }
                     return lec;
                 }
                 break;
             case "STUDENT":
-                if (parts.length >= 9) {
-                    String studentID = parts[7];
-                    String enrollmentYear = parts[8];
-                    return new Student(userID, username, password, email, fullName, phoneNumber, studentID, enrollmentYear);
+                if (parts.length >= idx + 2) {
+                    String studentID = parts[idx];
+                    String enrollmentYear = parts[idx + 1];
+                    Student student = new Student(userID, username, password, email, fullName, phoneNumber, studentID, enrollmentYear);
+                    student.setGender(gender);
+                    student.setAge(age);
+                    return student;
                 }
                 break;
         }

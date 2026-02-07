@@ -229,10 +229,18 @@ class LecturerDashboard extends JFrame {
         JTextField nameField = new JTextField(lecturer.getFullName());
         JTextField emailField = new JTextField(lecturer.getEmail());
         JTextField departmentField = new JTextField(lecturer.getDepartment());
+        JComboBox<String> genderBox = new JComboBox<>(new String[]{"Male", "Female"});
+        String gender = lecturer.getGender();
+        if (gender != null && !gender.isEmpty()) {
+            genderBox.setSelectedItem(gender);
+        }
+        JSpinner ageSpinner = new JSpinner(new SpinnerNumberModel(lecturer.getAge() > 0 ? lecturer.getAge() : 20, 15, 100, 1));
 
         panel.add(createLabeledRow("Full Name:", nameField)); panel.add(Box.createVerticalStrut(6));
         panel.add(createLabeledRow("Email:", emailField)); panel.add(Box.createVerticalStrut(6));
         panel.add(createLabeledRow("Department:", departmentField)); panel.add(Box.createVerticalStrut(6));
+        panel.add(createLabeledRow("Gender:", genderBox)); panel.add(Box.createVerticalStrut(6));
+        panel.add(createLabeledRow("Age:", ageSpinner)); panel.add(Box.createVerticalStrut(6));
         panel.add(createLabeledRow("Lecturer ID:", new JLabel(lecturer.getLecturerID()))); panel.add(Box.createVerticalStrut(8));
 
         JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -240,6 +248,11 @@ class LecturerDashboard extends JFrame {
         saveBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                lecturer.setFullName(nameField.getText());
+                lecturer.setEmail(emailField.getText());
+                lecturer.setDepartment(departmentField.getText());
+                lecturer.setGender((String) genderBox.getSelectedItem());
+                lecturer.setAge((Integer) ageSpinner.getValue());
                 JOptionPane.showMessageDialog(LecturerDashboard.this, "✓ Profile updated successfully!");
             }
         });

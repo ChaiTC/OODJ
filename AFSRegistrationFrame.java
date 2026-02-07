@@ -12,10 +12,11 @@ import java.awt.event.*;
  */
 public class AFSRegistrationFrame extends JFrame {
     private SystemManager systemManager;
-    private JComboBox<String> userTypeCombo, departmentCombo;
+    private JComboBox<String> userTypeCombo, departmentCombo, genderCombo;
     private JTextField userIDField, usernameField, emailField, fullNameField, phoneField;
     private JTextField staffIdField, enrollmentField;
     private JPasswordField passwordField;
+    private JSpinner ageSpinner;
     private JLabel departmentLabel, staffIdLabel;
     private JLabel usernameError, passwordError, emailError, fullNameError, phoneError;
     
@@ -27,7 +28,7 @@ public class AFSRegistrationFrame extends JFrame {
     private void initializeFrame() {
         setTitle("Assessment Feedback System - Register");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setSize(600, 600);
+        setSize(600, 680);
         setLocationRelativeTo(null);
         setResizable(false);
         
@@ -83,6 +84,14 @@ public class AFSRegistrationFrame extends JFrame {
         phoneField = new JTextField();
         phoneError = new JLabel();
         registrationPanel.add(createFieldRow("Phone Number:", phoneField, phoneError));
+
+        // Gender
+        genderCombo = new JComboBox<>(new String[]{"Male", "Female"});
+        registrationPanel.add(createFieldRow("Gender:", genderCombo, null));
+
+        // Age
+        ageSpinner = new JSpinner(new SpinnerNumberModel(20, 15, 100, 1));
+        registrationPanel.add(createFieldRow("Age:", ageSpinner, null));
         
         // Department (dropdown)
         departmentLabel = new JLabel("Department:");
@@ -248,6 +257,8 @@ public class AFSRegistrationFrame extends JFrame {
         String phone = phoneField.getText().trim();
         String department = (String) departmentCombo.getSelectedItem();
         String staffId = staffIdField.getText().trim();
+        String gender = (String) genderCombo.getSelectedItem();
+        int age = (Integer) ageSpinner.getValue();
         
         // Basic field validation
         if (username.isEmpty()) {
@@ -310,6 +321,11 @@ public class AFSRegistrationFrame extends JFrame {
                 newUser = new AdminStaff(userID, username, password, email, fullName, phone, department, staffId);
             }
             
+            if (newUser != null) {
+                newUser.setGender(gender);
+                newUser.setAge(age);
+            }
+
             if (newUser != null && systemManager.registerUser(newUser)) {
                 JOptionPane.showMessageDialog(this, 
                     "Registration successful!\n\n" +

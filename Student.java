@@ -318,7 +318,13 @@ class StudentDashboard extends JFrame {
         // Create input fields with current values pre-filled
         JTextField nameField = new JTextField(student.getFullName());    // Current name
         JTextField emailField = new JTextField(student.getEmail());      // Current email
-        JTextField phoneField = new JTextField("N/A");                   // Phone (placeholder)
+        JTextField phoneField = new JTextField(student.getPhoneNumber());
+        JComboBox<String> genderBox = new JComboBox<>(new String[]{"Male", "Female"});
+        String gender = student.getGender();
+        if (gender != null && !gender.isEmpty()) {
+            genderBox.setSelectedItem(gender);
+        }
+        JSpinner ageSpinner = new JSpinner(new SpinnerNumberModel(student.getAge() > 0 ? student.getAge() : 20, 15, 100, 1));
 
         // Add labeled input rows to panel
         panel.add(createLabeledRow("Full Name:", nameField));
@@ -327,6 +333,10 @@ class StudentDashboard extends JFrame {
         panel.add(Box.createVerticalStrut(6)); // 6px vertical space
         panel.add(createLabeledRow("Phone:", phoneField));
         panel.add(Box.createVerticalStrut(6)); // 6px vertical space
+        panel.add(createLabeledRow("Gender:", genderBox));
+        panel.add(Box.createVerticalStrut(6));
+        panel.add(createLabeledRow("Age:", ageSpinner));
+        panel.add(Box.createVerticalStrut(6));
 
         // Show student ID (read-only, can't be changed)
         panel.add(createLabeledRow("Student ID:", new JLabel(student.getStudentID())));
@@ -341,6 +351,11 @@ class StudentDashboard extends JFrame {
         saveBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                student.setFullName(nameField.getText());
+                student.setEmail(emailField.getText());
+                student.setPhoneNumber(phoneField.getText());
+                student.setGender((String) genderBox.getSelectedItem());
+                student.setAge((Integer) ageSpinner.getValue());
                 JOptionPane.showMessageDialog(StudentDashboard.this, "✅ Profile updated successfully!");
             }
         });
