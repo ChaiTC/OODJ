@@ -13,6 +13,7 @@ public class AcademicLeader extends User {
 
     private String department;
     private String leaderID;
+    private String staffID;
     private List<Lecturer> assignedLecturers;
     private List<Module> managedModules;
 
@@ -31,6 +32,7 @@ public class AcademicLeader extends User {
         super(userID, username, password, email, fullName, phoneNumber, "ACADEMIC_LEADER");
         this.department = department;
         this.leaderID = leaderID;
+        this.staffID = null;
         this.assignedLecturers = new ArrayList<>();
         this.managedModules = new ArrayList<>();
     }
@@ -132,6 +134,14 @@ public class AcademicLeader extends User {
 
     public String getLeaderID() {
         return leaderID;
+    }
+
+    public String getStaffID() {
+        return staffID;
+    }
+
+    public void setStaffID(String staffID) {
+        this.staffID = staffID;
     }
 
     public List<Lecturer> getAssignedLecturers() {

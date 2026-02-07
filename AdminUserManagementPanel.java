@@ -251,11 +251,15 @@ class AdminUserManagementPanel extends JPanel {
                         } else if (type.equals("Lecturer")) {
                             String staffId = systemManager.generateStaffID();
                             staffIdField.setText(staffId);
-                            newUser = new Lecturer(userId, usern, pass, mail, name, phoneStr.isEmpty()?"N/A":phoneStr, staffId, dept);
+                            Lecturer lec = new Lecturer(userId, usern, pass, mail, name, phoneStr.isEmpty()?"N/A":phoneStr, userId, dept);
+                            lec.setStaffID(staffId);
+                            newUser = lec;
                         } else if (type.equals("Academic Leader")) {
                             String staffId = systemManager.generateStaffID();
                             staffIdField.setText(staffId);
-                            newUser = new AcademicLeader(userId, usern, pass, mail, name, phoneStr.isEmpty()?"N/A":phoneStr, dept, staffId);
+                            AcademicLeader leader = new AcademicLeader(userId, usern, pass, mail, name, phoneStr.isEmpty()?"N/A":phoneStr, dept, userId);
+                            leader.setStaffID(staffId);
+                            newUser = leader;
                         } else {
                             String staffId = systemManager.generateStaffID();
                             staffIdField.setText(staffId);

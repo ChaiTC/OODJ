@@ -244,10 +244,10 @@ public class FileManager {
             sb.append("|").append(admin.getDepartment()).append("|").append(admin.getStaffID());
         } else if (user instanceof AcademicLeader) {
             AcademicLeader leader = (AcademicLeader) user;
-            sb.append("|").append(leader.getDepartment()).append("|").append(leader.getLeaderID());
+            sb.append("|").append(leader.getDepartment()).append("|").append(leader.getStaffID() != null ? leader.getStaffID() : leader.getLeaderID());
         } else if (user instanceof Lecturer) {
             Lecturer lecturer = (Lecturer) user;
-            sb.append("|").append(lecturer.getDepartment()).append("|").append(lecturer.getLecturerID());
+            sb.append("|").append(lecturer.getDepartment()).append("|").append(lecturer.getStaffID() != null ? lecturer.getStaffID() : lecturer.getLecturerID());
             String leaderID = lecturer.getAcademicLeaderID();
             sb.append("|").append(leaderID != null ? leaderID : "UNASSIGNED");
         } else if (user instanceof Student) {
@@ -321,15 +321,18 @@ public class FileManager {
             case "ACADEMIC_LEADER":
                 if (parts.length >= 9) {
                     String department = parts[7];
-                    String leaderID = parts[8];
-                    return new AcademicLeader(userID, username, password, email, fullName, phoneNumber, department, leaderID);
+                    String staffID = parts[8];
+                    AcademicLeader leader = new AcademicLeader(userID, username, password, email, fullName, phoneNumber, department, userID);
+                    leader.setStaffID(staffID);
+                    return leader;
                 }
                 break;
             case "LECTURER":
                 if (parts.length >= 9) {
-                    String lecturerID = parts[7];
-                    String department = parts[8];
-                    Lecturer lec = new Lecturer(userID, username, password, email, fullName, phoneNumber, lecturerID, department);
+                    String department = parts[7];
+                    String staffID = parts[8];
+                    Lecturer lec = new Lecturer(userID, username, password, email, fullName, phoneNumber, userID, department);
+                    lec.setStaffID(staffID);
                     // Handle academicLeaderID field (backward compatible)
                     if (parts.length >= 10 && !parts[9].equals("UNASSIGNED")) {
                         lec.setAcademicLeaderID(parts[9]);

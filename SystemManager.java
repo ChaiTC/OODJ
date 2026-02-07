@@ -287,21 +287,28 @@ public class SystemManager {
 
     /**
      * Generate a staff ID like STF001
+     * Checks all staff types: AdminStaff, Lecturer, AcademicLeader
      */
     public String generateStaffID() {
         String prefix = "STF";
         int max = 0;
         for (User u : users) {
+            String staffId = null;
+            
             if (u instanceof AdminStaff) {
-                AdminStaff staff = (AdminStaff) u;
-                String staffId = staff.getStaffID();
-                if (staffId != null && staffId.startsWith(prefix)) {
-                    try {
-                        String num = staffId.substring(prefix.length());
-                        int v = Integer.parseInt(num);
-                        if (v > max) max = v;
-                    } catch (Exception ignored) {}
-                }
+                staffId = ((AdminStaff) u).getStaffID();
+            } else if (u instanceof Lecturer) {
+                staffId = ((Lecturer) u).getStaffID();
+            } else if (u instanceof AcademicLeader) {
+                staffId = ((AcademicLeader) u).getStaffID();
+            }
+            
+            if (staffId != null && staffId.startsWith(prefix)) {
+                try {
+                    String num = staffId.substring(prefix.length());
+                    int v = Integer.parseInt(num);
+                    if (v > max) max = v;
+                } catch (Exception ignored) {}
             }
         }
         int next = max + 1;

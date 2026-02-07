@@ -41,14 +41,12 @@ class AdminDashboard extends JFrame {
         AdminLecturerAssignmentPanel assignPanel = new AdminLecturerAssignmentPanel(systemManager, this);
         AdminGradingSystemPanel gradingPanel = new AdminGradingSystemPanel(systemManager, this);
         AdminClassCreationPanel classPanel = new AdminClassCreationPanel(systemManager, this);
-        AdminReportsPanel reportPanel = new AdminReportsPanel(systemManager, this);
 
         // Add tabs
         tabbedPane.addTab("User Management", userPanel);
         tabbedPane.addTab("Lecturer Assignment", assignPanel);
         tabbedPane.addTab("Grading System", gradingPanel);
         tabbedPane.addTab("Create Classes", classPanel);
-        tabbedPane.addTab("View Reports", reportPanel);
         
         // Logout Button
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

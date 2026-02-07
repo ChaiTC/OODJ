@@ -16,6 +16,7 @@ public class Lecturer extends User {
     private static final long serialVersionUID = 1L;
     
     private String lecturerID;
+    private String staffID;
     private String department;
     private String academicLeaderID;
     private List<Module> assignedModules;
@@ -26,6 +27,7 @@ public class Lecturer extends User {
                     String fullName, String phoneNumber, String lecturerID, String department) {
         super(userID, username, password, email, fullName, phoneNumber, "LECTURER");
         this.lecturerID = lecturerID;
+        this.staffID = null;
         this.department = department;
         this.academicLeaderID = null;
         this.assignedModules = new ArrayList<>();
@@ -80,6 +82,9 @@ public class Lecturer extends User {
     
     public String getLecturerID() { return lecturerID; }
     public void setLecturerID(String lecturerID) { this.lecturerID = lecturerID; }
+    
+    public String getStaffID() { return staffID; }
+    public void setStaffID(String staffID) { this.staffID = staffID; }
     
     public String getDepartment() { return department; }
     public void setDepartment(String department) { this.department = department; }
