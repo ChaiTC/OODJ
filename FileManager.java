@@ -239,7 +239,9 @@ public class FileManager {
           .append(user.getFullName()).append("|")
                     .append(user.getPhoneNumber()).append("|")
                     .append(user.getGender() != null ? user.getGender() : "N/A").append("|")
-                    .append(user.getAge());
+                    .append(user.getAge()).append("|")
+                    .append(user.isActive()).append("|")
+                    .append(user.isApproved());
         
         if (user instanceof AdminStaff) {
             AdminStaff admin = (AdminStaff) user;
@@ -294,7 +296,8 @@ public class FileManager {
               .append(grade.getGradeLetter()).append(",")
               .append(grade.getMinPercentage()).append(",")
               .append(grade.getMaxPercentage()).append(",")
-              .append(grade.getDescription());
+              .append(grade.getDescription()).append(",")
+              .append(grade.getGPA());
         }
         return sb.toString();
     }
@@ -313,6 +316,8 @@ public class FileManager {
         String phoneNumber = parts[6];
         String gender = "N/A";
         int age = 0;
+        boolean isActive = true;
+        boolean isApproved = false;
         boolean hasGenderAge = parts.length >= 9 && (
             "Male".equals(parts[7]) || "Female".equals(parts[7]) || "N/A".equals(parts[7])
         );
@@ -322,6 +327,17 @@ public class FileManager {
         }
         int idx = hasGenderAge ? 9 : 7;
         
+        // Check for isActive and isApproved fields (new format)
+        if (parts.length > idx && ("true".equals(parts[idx]) || "false".equals(parts[idx]))) {
+            try { isActive = Boolean.parseBoolean(parts[idx]); } catch (Exception ignored) {}
+            if (parts.length > idx + 1) {
+                try { isApproved = Boolean.parseBoolean(parts[idx + 1]); } catch (Exception ignored) {}
+                idx += 2;
+            } else {
+                idx += 1;
+            }
+        }
+        
         switch(role) {
             case "ADMIN_STAFF":
                 if (parts.length >= idx + 2) {
@@ -330,6 +346,8 @@ public class FileManager {
                     AdminStaff admin = new AdminStaff(userID, username, password, email, fullName, phoneNumber, department, staffID);
                     admin.setGender(gender);
                     admin.setAge(age);
+                    admin.setActive(isActive);
+                    admin.setApproved(isApproved);
                     return admin;
                 }
                 break;
@@ -341,6 +359,8 @@ public class FileManager {
                     leader.setStaffID(staffID);
                     leader.setGender(gender);
                     leader.setAge(age);
+                    leader.setActive(isActive);
+                    leader.setApproved(isApproved);
                     return leader;
                 }
                 break;
@@ -352,6 +372,8 @@ public class FileManager {
                     lec.setStaffID(staffID);
                     lec.setGender(gender);
                     lec.setAge(age);
+                    lec.setActive(isActive);
+                    lec.setApproved(isApproved);
                     // Handle academicLeaderID field (backward compatible)
                     if (parts.length >= idx + 3 && !parts[idx + 2].equals("UNASSIGNED")) {
                         lec.setAcademicLeaderID(parts[idx + 2]);
@@ -366,6 +388,8 @@ public class FileManager {
                     Student student = new Student(userID, username, password, email, fullName, phoneNumber, studentID, enrollmentYear);
                     student.setGender(gender);
                     student.setAge(age);
+                    student.setActive(isActive);
+                    student.setApproved(isApproved);
                     return student;
                 }
                 break;
@@ -408,7 +432,13 @@ public class FileManager {
                 double min = Double.parseDouble(gradeParts[2]);
                 double max = Double.parseDouble(gradeParts[3]);
                 String desc = gradeParts[4];
-                gs.getGrades().add(new GradingScale(gradeID, gradeLetter, min, max, desc));
+                double gpa = 0.0;
+                if (gradeParts.length >= 6) {
+                    try {
+                        gpa = Double.parseDouble(gradeParts[5]);
+                    } catch (Exception ignored) {}
+                }
+                gs.getGrades().add(new GradingScale(gradeID, gradeLetter, min, max, desc, gpa));
             }
         }
         return gs;
@@ -485,9 +515,11 @@ public class FileManager {
         try (FileWriter fw = new FileWriter(GRADING_FILE, false); // overwrite
              BufferedWriter bw = new BufferedWriter(fw)) {
             bw.write(serializeGradingSystem(gradingSystem));
+            bw.flush();
 
         } catch (IOException e) {
-
+            System.err.println("Error saving grading system to file: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     

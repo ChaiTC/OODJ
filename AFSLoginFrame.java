@@ -134,7 +134,20 @@ public class AFSLoginFrame extends JFrame {
             openDashboard(user);
             this.dispose();
         } else {
-            statusLabel.setText("Invalid username or password!");
+            // Check if user exists but is not approved
+            User existingUser = null;
+            for (User u : systemManager.getAllUsers()) {
+                if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
+                    existingUser = u;
+                    break;
+                }
+            }
+            
+            if (existingUser != null && !existingUser.isApproved()) {
+                statusLabel.setText("Your account is pending approval. Please wait for admin approval.");
+            } else {
+                statusLabel.setText("Invalid username or password!");
+            }
             passwordField.setText("");
         }
     }

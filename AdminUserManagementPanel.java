@@ -22,7 +22,7 @@ class AdminUserManagementPanel extends JPanel {
         JPanel mainPanel = new JPanel(new BorderLayout());
         
         // User table with DefaultTableModel
-        String[] cols = new String[] {"UserID", "Username", "Full Name", "Email", "Role"};
+        String[] cols = new String[] {"UserID", "Username", "Full Name", "Email", "Role", "Status"};
         tableModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -41,9 +41,13 @@ class AdminUserManagementPanel extends JPanel {
         JButton createBtn = new JButton("Create User");
         JButton editBtn = new JButton("Edit User");
         JButton deleteBtn = new JButton("Delete User");
+        JButton approveBtn = new JButton("Approve User");
+        JButton rejectBtn = new JButton("Reject User");
         buttonBar.add(createBtn);
         buttonBar.add(editBtn);
         buttonBar.add(deleteBtn);
+        buttonBar.add(approveBtn);
+        buttonBar.add(rejectBtn);
         
         // Form panel (initially hidden)
         JPanel formPanel = new JPanel();
@@ -215,6 +219,47 @@ class AdminUserManagementPanel extends JPanel {
             }
         });
         
+        approveBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = table.getSelectedRow();
+                if (r < 0) { 
+                    JOptionPane.showMessageDialog(parentFrame, "Select a user to approve"); 
+                    return; 
+                }
+                String userId = (String)table.getValueAt(r,0);
+                String username = (String)table.getValueAt(r,1);
+                if (systemManager.approveUser(userId)) {
+                    JOptionPane.showMessageDialog(parentFrame, "User " + username + " approved successfully!");
+                    refreshTable();
+                } else {
+                    JOptionPane.showMessageDialog(parentFrame, "Failed to approve user");
+                }
+            }
+        });
+        
+        rejectBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int r = table.getSelectedRow();
+                if (r < 0) { 
+                    JOptionPane.showMessageDialog(parentFrame, "Select a user to reject"); 
+                    return; 
+                }
+                String userId = (String)table.getValueAt(r,0);
+                String username = (String)table.getValueAt(r,1);
+                int yn = JOptionPane.showConfirmDialog(parentFrame, "Reject this user " + username + "?","Confirm",JOptionPane.YES_NO_OPTION);
+                if (yn == JOptionPane.YES_OPTION) {
+                    if (systemManager.rejectUser(userId)) {
+                        JOptionPane.showMessageDialog(parentFrame, "User rejected successfully!");
+                        refreshTable();
+                    } else {
+                        JOptionPane.showMessageDialog(parentFrame, "Failed to reject user");
+                    }
+                }
+            }
+        });
+        
         saveBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent ae) {
@@ -381,12 +426,14 @@ class AdminUserManagementPanel extends JPanel {
         tableModel.setRowCount(0);
         java.util.List<User> users = systemManager.getAllUsers();
         for (User u : users) {
+            String status = u.isApproved() ? "Approved" : "Pending";
             tableModel.addRow(new Object[] { 
                 u.getUserID(), 
                 u.getUsername(), 
                 u.getFullName(), 
                 u.getEmail(), 
-                u.getRole() 
+                u.getRole(),
+                status
             });
         }
     }

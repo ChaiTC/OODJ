@@ -14,6 +14,7 @@ public abstract class User implements Serializable {
     private String role;          // "STUDENT", "LECTURER", "ACADEMIC_LEADER", or "ADMIN_STAFF"
     private Date createdDate;     // When account was created
     private boolean isActive;     // Is account active (can login) or disabled
+    private boolean isApproved;   // Has admin approved this account
 
     /**
      * Constructor - creates a new User
@@ -32,6 +33,7 @@ public abstract class User implements Serializable {
         this.role = role;
         this.createdDate = new Date();  // Current date/time
         this.isActive = true;           // New accounts start as active
+        this.isApproved = false;        // New accounts need admin approval
     }
 
     public abstract void displayMenu();
@@ -50,6 +52,7 @@ public abstract class User implements Serializable {
     public String getRole() { return role; }
     public Date getCreatedDate() { return createdDate; }
     public boolean isActive() { return isActive; }
+    public boolean isApproved() { return isApproved; }
 
     // ===== SETTER METHODS =====
     // These let other classes change the user's information
@@ -63,4 +66,5 @@ public abstract class User implements Serializable {
     public void setAge(int age) { this.age = age; }
     public void setRole(String role) { this.role = role; }
     public void setActive(boolean isActive) { this.isActive = isActive; }
+    public void setApproved(boolean isApproved) { this.isApproved = isApproved; }
 }

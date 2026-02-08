@@ -22,14 +22,14 @@ public class GradingSystem implements Serializable {
     
     private void initializeDefaultGrades() {
         // APU Standard Grading System
-        grades.add(new GradingScale("G1", "A+", 90, 100, "Excellent"));
-        grades.add(new GradingScale("G2", "A", 80, 89, "Very Good"));
-        grades.add(new GradingScale("G3", "B+", 75, 79, "Good"));
-        grades.add(new GradingScale("G4", "B", 70, 74, "Satisfactory"));
-        grades.add(new GradingScale("G5", "C+", 65, 69, "Acceptable"));
-        grades.add(new GradingScale("G6", "C", 60, 64, "Pass"));
-        grades.add(new GradingScale("G7", "D", 50, 59, "Weak"));
-        grades.add(new GradingScale("G8", "F", 0, 49, "Fail"));
+        grades.add(new GradingScale("G1", "A+", 90, 100, "Excellent", 4.0));
+        grades.add(new GradingScale("G2", "A", 80, 89, "Very Good", 3.7));
+        grades.add(new GradingScale("G3", "B+", 75, 79, "Good", 3.3));
+        grades.add(new GradingScale("G4", "B", 70, 74, "Satisfactory", 3.0));
+        grades.add(new GradingScale("G5", "C+", 65, 69, "Acceptable", 2.7));
+        grades.add(new GradingScale("G6", "C", 60, 64, "Pass", 2.3));
+        grades.add(new GradingScale("G7", "D", 50, 59, "Weak", 1.7));
+        grades.add(new GradingScale("G8", "F", 0, 49, "Fail", 0.0));
     }
     
     public String getGradeLetterByPercentage(double percentage) {

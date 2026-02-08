@@ -107,7 +107,13 @@ public class SystemManager {
             // Check if this user matches the login attempt
             if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
 
-                // Found matching user, now check if account is active
+                // Found matching user, now check if account is approved by admin
+                if (!user.isApproved()) {
+                    // Account not approved yet
+                    return null;
+                }
+
+                // Check if account is active
                 if (user.isActive()) {
                     // Login successful!
                     currentUser = user;
@@ -115,7 +121,6 @@ public class SystemManager {
                     return user;
                 } else {
                     // Account is disabled
-
                     return null;
                 }
             }
@@ -480,5 +485,45 @@ public class SystemManager {
      */
     public void deleteAssessmentType(String typeID) {
         // This would normally delete from persistent storage
+    }
+    
+    /**
+     * Approve a pending user account
+     */
+    public boolean approveUser(String userID) {
+        User user = findUserByID(userID);
+        if (user != null) {
+            user.setApproved(true);
+            FileManager.saveAllUsers(users);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Reject a pending user account (disable it)
+     */
+    public boolean rejectUser(String userID) {
+        User user = findUserByID(userID);
+        if (user != null) {
+            user.setActive(false);
+            user.setApproved(false);
+            FileManager.saveAllUsers(users);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Get list of pending users (not yet approved)
+     */
+    public List<User> getPendingUsers() {
+        List<User> pending = new ArrayList<>();
+        for (User user : users) {
+            if (!user.isApproved()) {
+                pending.add(user);
+            }
+        }
+        return pending;
     }
 }

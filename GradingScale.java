@@ -11,6 +11,7 @@ public class GradingScale implements Serializable {
     private double minPercentage;
     private double maxPercentage;
     private String description;
+    private double gpa;
     
     // Original constructor
     public GradingScale(String gradeID, String gradeLetter, double minPercentage, 
@@ -20,6 +21,18 @@ public class GradingScale implements Serializable {
         this.minPercentage = minPercentage;
         this.maxPercentage = maxPercentage;
         this.description = description;
+        this.gpa = 0.0;
+    }
+    
+    // Constructor with GPA
+    public GradingScale(String gradeID, String gradeLetter, double minPercentage, 
+                        double maxPercentage, String description, double gpa) {
+        this.gradeID = gradeID;
+        this.gradeLetter = gradeLetter;
+        this.minPercentage = minPercentage;
+        this.maxPercentage = maxPercentage;
+        this.description = description;
+        this.gpa = gpa;
     }
     
     // Overloaded constructor for A, B, C, D, F thresholds
@@ -50,6 +63,9 @@ public class GradingScale implements Serializable {
     
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    
+    public double getGPA() { return gpa; }
+    public void setGPA(double gpa) { this.gpa = gpa; }
     
     public double getAMarkPercentage() { return 80.0; }
     public double getBMarkPercentage() { return 70.0; }

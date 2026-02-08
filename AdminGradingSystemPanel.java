@@ -9,6 +9,7 @@ class AdminGradingSystemPanel extends JPanel {
     private JFrame parentFrame;
     private DefaultTableModel tableModel;
     private JTable table;
+    private GradingSystem gradingSystem;
     
     public AdminGradingSystemPanel(SystemManager systemManager, JFrame parentFrame) {
         this.systemManager = systemManager;
@@ -20,24 +21,59 @@ class AdminGradingSystemPanel extends JPanel {
         setLayout(new BorderLayout(8, 8));
         setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         
+        // Load grading system from system manager
+        gradingSystem = systemManager.getGradingSystem();
+        
         // Top section: Grading scale table
         JPanel tablePanel = new JPanel(new BorderLayout());
-        tablePanel.setBorder(BorderFactory.createTitledBorder("APU Grading Scale"));
+        tablePanel.setBorder(BorderFactory.createTitledBorder("APU Grading Scale (double-click to edit cells)"));
         
         String[] cols = new String[] {"Min %", "Max %", "Grade", "GPA", "Classification"};
         tableModel = new DefaultTableModel(cols, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                return true;
             }
         };
         
         table = new JTable(tableModel);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
+        // Add cell editors for numeric columns so they can be edited directly
+        // Column 0: Min % (Integer)
+        JTextField minEditor = new JTextField();
+        table.getColumnModel().getColumn(0).setCellEditor(new javax.swing.DefaultCellEditor(minEditor));
+        
+        // Column 1: Max % (Integer)
+        JTextField maxEditor = new JTextField();
+        table.getColumnModel().getColumn(1).setCellEditor(new javax.swing.DefaultCellEditor(maxEditor));
+        
+        // Column 2: Grade (String)
+        JTextField gradeEditor = new JTextField();
+        table.getColumnModel().getColumn(2).setCellEditor(new javax.swing.DefaultCellEditor(gradeEditor));
+        
+        // Column 3: GPA (Double) - THIS IS THE KEY ONE YOU NEED!
+        JTextField gpaEditor = new JTextField();
+        table.getColumnModel().getColumn(3).setCellEditor(new javax.swing.DefaultCellEditor(gpaEditor));
+        
+        // Column 4: Classification (String)
+        JTextField classEditor = new JTextField();
+        table.getColumnModel().getColumn(4).setCellEditor(new javax.swing.DefaultCellEditor(classEditor));
+        
         JScrollPane scroll = new JScrollPane(table);
         
-        // Load initial grading scale data only once
+        // Load initial grading scale data from gradingSystem
         loadInitialGrades();
+        
+        // Add listener to detect cell edits and save changes
+        tableModel.addTableModelListener(new javax.swing.event.TableModelListener() {
+            @Override
+            public void tableChanged(javax.swing.event.TableModelEvent e) {
+                if (e.getType() == javax.swing.event.TableModelEvent.UPDATE) {
+                    saveGradingSystemToFile();
+                }
+            }
+        });
         
         tablePanel.add(scroll, BorderLayout.CENTER);
         
@@ -65,10 +101,10 @@ class AdminGradingSystemPanel extends JPanel {
         
         JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton addBtn = new JButton("Add Grade");
-        JButton editBtn = new JButton("Edit Selected");
+        JButton saveChangesBtn = new JButton("Save Changes");
         JButton deleteBtn = new JButton("Delete Selected");
         btnPanel.add(addBtn);
-        btnPanel.add(editBtn);
+        btnPanel.add(saveChangesBtn);
         btnPanel.add(deleteBtn);
         editPanel.add(btnPanel);
         
@@ -95,8 +131,16 @@ class AdminGradingSystemPanel extends JPanel {
                         return;
                     }
                     
-                    // Add to table model (note: in a real app, you'd persist this)
+                    // Add to table model
                     tableModel.addRow(new Object[] { minScore, maxScore, grade, gpa, classification });
+                    
+                    // Add to grading system with GPA
+                    String gradeID = "G" + (gradingSystem.getGrades().size() + 1);
+                    GradingScale gradingScale = new GradingScale(gradeID, grade, minScore, maxScore, classification, gpa);
+                    gradingSystem.addGradingScale(gradingScale);
+                    
+                    // Save to file immediately
+                    FileManager.saveGradingSystem(gradingSystem);
                     
                     // Clear fields
                     minSpinner.setValue(80);
@@ -105,38 +149,21 @@ class AdminGradingSystemPanel extends JPanel {
                     gpaSpinner.setValue(4.00);
                     classificationField.setText("");
                     
-                    JOptionPane.showMessageDialog(parentFrame, "Grade added successfully!");
+                    JOptionPane.showMessageDialog(parentFrame, "Grade added and saved successfully!");
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(parentFrame, "Error: " + ex.getMessage());
                 }
             }
         });
         
-        editBtn.addActionListener(new ActionListener() {
+        saveChangesBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int r = table.getSelectedRow();
-                if (r < 0) {
-                    JOptionPane.showMessageDialog(parentFrame, "Select a grade to edit");
-                    return;
-                }
-                
-                int minScore = ((Number) tableModel.getValueAt(r, 0)).intValue();
-                int maxScore = ((Number) tableModel.getValueAt(r, 1)).intValue();
-                String grade = (String) tableModel.getValueAt(r, 2);
-                double gpa = ((Number) tableModel.getValueAt(r, 3)).doubleValue();
-                String classification = (String) tableModel.getValueAt(r, 4);
-                
-                minSpinner.setValue(minScore);
-                maxSpinner.setValue(maxScore);
-                gradeField.setText(grade);
-                gpaSpinner.setValue(gpa);
-                classificationField.setText(classification);
-                
-                JOptionPane.showMessageDialog(parentFrame, "Edit the values above and click 'Add Grade' to save changes");
+                saveGradingSystemToFile();
+                JOptionPane.showMessageDialog(parentFrame, "All changes saved successfully!");
             }
         });
-        
+
         deleteBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -148,32 +175,111 @@ class AdminGradingSystemPanel extends JPanel {
                 
                 int confirm = JOptionPane.showConfirmDialog(parentFrame, "Delete this grade?", "Confirm", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
+                    // Remove from grading system
+                    if (r < gradingSystem.getGrades().size()) {
+                        gradingSystem.getGrades().remove(r);
+                    }
+                    // Remove from table model
                     tableModel.removeRow(r);
-                    JOptionPane.showMessageDialog(parentFrame, "Grade deleted successfully!");
+                    // Save changes immediately
+                    saveGradingSystemToFile();
+                    JOptionPane.showMessageDialog(parentFrame, "Grade deleted and saved successfully!");
                 }
             }
         });
     }
     
-    private void refreshTable() {
-        // Don't reload defaults - keep user's changes in memory
-        // This method is kept for backward compatibility but doesn't clear data
+    
+    private void saveGradingSystemToFile() {
+        try {
+            // Create a NEW grading system from what's in the table (not syncing with existing object)
+            GradingSystem newGradingSystem = new GradingSystem("GS001", "APU Grading System", 60.0);
+            newGradingSystem.getGrades().clear();
+            
+            System.out.println("\n=== SAVING GRADING SYSTEM ===");
+            System.out.println("Table has " + tableModel.getRowCount() + " rows");
+            
+            for (int i = 0; i < tableModel.getRowCount(); i++) {
+                try {
+                    // Read each cell value
+                    Object minObj = tableModel.getValueAt(i, 0);
+                    Object maxObj = tableModel.getValueAt(i, 1);
+                    Object gradeObj = tableModel.getValueAt(i, 2);
+                    Object gpaObj = tableModel.getValueAt(i, 3);
+                    Object classObj = tableModel.getValueAt(i, 4);
+                    
+                    // Convert to proper types - handle both String and Number types
+                    int minScore = 0;
+                    try {
+                        minScore = (minObj instanceof Number) ? ((Number) minObj).intValue() : Integer.parseInt(minObj.toString());
+                    } catch (Exception e) {
+                        System.err.println("Error parsing min score: " + minObj);
+                        continue;
+                    }
+                    
+                    int maxScore = 0;
+                    try {
+                        maxScore = (maxObj instanceof Number) ? ((Number) maxObj).intValue() : Integer.parseInt(maxObj.toString());
+                    } catch (Exception e) {
+                        System.err.println("Error parsing max score: " + maxObj);
+                        continue;
+                    }
+                    
+                    double gpa = 0.0;
+                    try {
+                        gpa = (gpaObj instanceof Number) ? ((Number) gpaObj).doubleValue() : Double.parseDouble(gpaObj.toString());
+                    } catch (Exception e) {
+                        System.err.println("Error parsing GPA: " + gpaObj);
+                        gpa = 0.0;
+                    }
+                    
+                    String grade = (gradeObj != null) ? gradeObj.toString() : "";
+                    String classification = (classObj != null) ? classObj.toString() : "";
+                    
+                    if (grade.isEmpty() || classification.isEmpty()) {
+                        System.err.println("Skipping row " + i + " - empty grade or classification");
+                        continue;
+                    }
+                    
+                    System.out.println("Row " + i + ": " + grade + " [" + minScore + "-" + maxScore + "] GPA=" + gpa + " (" + classification + ")");
+                    
+                    String gradeID = "G" + (i + 1);
+                    GradingScale gradingScale = new GradingScale(gradeID, grade, minScore, maxScore, classification, gpa);
+                    newGradingSystem.addGradingScale(gradingScale);
+                    
+                } catch (Exception e) {
+                    System.err.println("Error processing row " + i + ": " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+            
+            // Save the new grading system to file
+            FileManager.saveGradingSystem(newGradingSystem);
+            // Update the internal reference
+            this.gradingSystem = newGradingSystem;
+            
+            System.out.println("=== SAVED " + newGradingSystem.getGrades().size() + " GRADES ===\n");
+            
+        } catch (Exception ex) {
+            System.err.println("Error saving grading system: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
     
     private void loadInitialGrades() {
         tableModel.setRowCount(0);
-        // Load grading scales from system manager
-        // For now, we'll load the default ones
-        tableModel.addRow(new Object[] { 80, 100, "A+", 4.00, "Distinction" });
-        tableModel.addRow(new Object[] { 75, 79, "A", 3.70, "Distinction" });
-        tableModel.addRow(new Object[] { 70, 74, "B+", 3.30, "Credit" });
-        tableModel.addRow(new Object[] { 65, 69, "B", 3.00, "Credit" });
-        tableModel.addRow(new Object[] { 60, 64, "C+", 2.70, "Pass" });
-        tableModel.addRow(new Object[] { 55, 59, "C", 2.30, "Pass" });
-        tableModel.addRow(new Object[] { 50, 54, "C-", 2.00, "Pass" });
-        tableModel.addRow(new Object[] { 40, 49, "D", 1.70, "Fail (Marginal)" });
-        tableModel.addRow(new Object[] { 30, 39, "F+", 1.30, "Fail" });
-        tableModel.addRow(new Object[] { 20, 29, "F", 1.00, "Fail" });
+        // Load grading scales from the gradingSystem object as initial data
+        java.util.List<GradingScale> grades = gradingSystem.getGrades();
+        for (GradingScale scale : grades) {
+            // Store as Object array so each cell is independent
+            Object[] row = new Object[5];
+            row[0] = Integer.valueOf((int) scale.getMinPercentage());  // Min %
+            row[1] = Integer.valueOf((int) scale.getMaxPercentage());  // Max %
+            row[2] = scale.getGradeLetter();                           // Grade
+            row[3] = Double.valueOf(scale.getGPA());                   // GPA
+            row[4] = scale.getDescription();                           // Classification
+            tableModel.addRow(row);
+        }
     }
     
     private JPanel createLabeledRow(String labelText, JComponent comp) {
