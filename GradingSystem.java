@@ -58,16 +58,30 @@ public class GradingSystem implements Serializable {
         grades.add(scale);
     }
     
-    public String getSystemID() { return systemID; }
-    public void setSystemID(String systemID) { this.systemID = systemID; }
+    public String getSystemID() { 
+        return systemID; 
+    }
+    public void setSystemID(String systemID) { 
+        this.systemID = systemID; 
+    }
     
-    public String getSystemName() { return systemName; }
-    public void setSystemName(String systemName) { this.systemName = systemName; }
+    public String getSystemName() { 
+        return systemName; 
+    }
+    public void setSystemName(String systemName) { 
+        this.systemName = systemName; 
+    }
     
-    public List<GradingScale> getGrades() { return grades; }
+    public List<GradingScale> getGrades() { 
+        return grades; 
+    }
     
-    public double getPassingPercentage() { return passingPercentage; }
-    public void setPassingPercentage(double passingPercentage) { this.passingPercentage = passingPercentage; }
+    public double getPassingPercentage() { 
+        return passingPercentage; 
+    }
+    public void setPassingPercentage(double passingPercentage) { 
+        this.passingPercentage = passingPercentage; 
+    }
     
     @Override
     public String toString() {

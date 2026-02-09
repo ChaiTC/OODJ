@@ -71,12 +71,6 @@ public class AFSApplication {
      * Handle user registration
      */
     private void handleRegistration() {
-        
-        
-        
-        
-        
-        
         String choice = scanner.nextLine().trim();
         
         String userID = scanner.nextLine().trim();
@@ -126,10 +120,6 @@ public class AFSApplication {
      */
     private void showMainMenu() {
         User currentUser = systemManager.getCurrentUser();
-        
-        
-        
-        
         if (currentUser instanceof AdminStaff) {
             handleAdminMenu((AdminStaff) currentUser);
         } else if (currentUser instanceof AcademicLeader) {

@@ -20,25 +20,51 @@ public class Module implements Serializable {
         this.department = department;
     }
     
-    public String getModuleID() { return moduleID; }
-    public void setModuleID(String moduleID) { this.moduleID = moduleID; }
+    public String getModuleID() { 
+        return moduleID; 
+    }
+    public void setModuleID(String moduleID) { 
+        this.moduleID = moduleID; 
+    }
     
-    public String getModuleName() { return moduleName; }
-    public void setModuleName(String moduleName) { this.moduleName = moduleName; }
+    public String getModuleName() { 
+        return moduleName; 
+    }
+    public void setModuleName(String moduleName) { 
+        this.moduleName = moduleName; 
+    }
     
-    public String getModuleCode() { return moduleCode; }
-    public void setModuleCode(String moduleCode) { this.moduleCode = moduleCode; }
+    public String getModuleCode() { 
+        return moduleCode; 
+    }
+    public void setModuleCode(String moduleCode) { 
+        this.moduleCode = moduleCode; 
+    }
     
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getDescription() { 
+        return description; 
+    }
+    public void setDescription(String description) { 
+        this.description = description; 
+    }
     
-    public int getCreditHours() { return creditHours; }
-    public void setCreditHours(int creditHours) { this.creditHours = creditHours; }
+    public int getCreditHours() { 
+        return creditHours; 
+    }
+    public void setCreditHours(int creditHours) { 
+        this.creditHours = creditHours; 
+    }
     
-    public String getDepartment() { return department; }
-    public void setDepartment(String department) { this.department = department; }
+    public String getDepartment() { 
+        return department; 
+    }
+    public void setDepartment(String department) { 
+        this.department = department; 
+    }
     
-    public int getCredits() { return creditHours; }
+    public int getCredits() { 
+        return creditHours; 
+    }
     
     @Override
     public String toString() {
