@@ -163,20 +163,4 @@ public class AcademicLeader extends User {
         this.leaderID = leaderID;
     }
 
-    // ======================================================
-    // CONSOLE MENU (LEGACY SUPPORT)
-    // ======================================================
-    @Override
-    public void displayMenu() {
-        System.out.println("=== Academic Leader Menu ===");
-        System.out.println("1. Manage Modules");
-        System.out.println("2. Assign Lecturers");
-        System.out.println("3. View Analytics");
-        System.out.println("4. Audit Feedback");
-    }
-
-    @Override
-    public void handleAction(String action) {
-        System.out.println("Handling action: " + action);
-    }
 }

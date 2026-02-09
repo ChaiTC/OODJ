@@ -20,13 +20,6 @@ public class AdminStaff extends User {
         this.staffID = staffID;
     }
     
-    @Override
-    public void displayMenu() {
-    }
-    
-    @Override
-    public void handleAction(String action) {
-    }
     
     public String getDepartment() { 
         return department; 

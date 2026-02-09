@@ -36,9 +36,6 @@ public abstract class User implements Serializable {
         this.isApproved = false;        // New accounts need admin approval
     }
 
-    public abstract void displayMenu();
-    public abstract void handleAction(String action);
-
     // ===== GETTER METHODS =====
     // These let other classes read the user's information
     public String getUserID() { 

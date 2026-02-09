@@ -35,35 +35,6 @@ public class Lecturer extends User {
         this.providedFeedback = new ArrayList<>();
     }
     
-    @Override
-    public void displayMenu() {
-        
-        
-        
-        
-        
-        
-        
-    }
-    
-    @Override
-    public void handleAction(String action) {
-        switch(action) {
-            case "1":
-                break;
-            case "2":
-                break;
-            case "3":
-                break;
-            case "4":
-                break;
-            case "5":
-                break;
-            case "6":
-                break;
-            default:
-        }
-    }
     
     public void designAssessment(Assessment assessment) {
         createdAssessments.add(assessment);
