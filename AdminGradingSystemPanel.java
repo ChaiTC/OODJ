@@ -82,10 +82,10 @@ class AdminGradingSystemPanel extends JPanel {
         editPanel.setLayout(new BoxLayout(editPanel, BoxLayout.Y_AXIS));
         editPanel.setBorder(BorderFactory.createTitledBorder("Add/Edit Grade"));
         
-        JSpinner minSpinner = new JSpinner(new SpinnerNumberModel(80, 0, 100, 1));
-        JSpinner maxSpinner = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
+        JSpinner minSpinner = new JSpinner(new SpinnerNumberModel());
+        JSpinner maxSpinner = new JSpinner(new SpinnerNumberModel());
         JTextField gradeField = new JTextField();
-        JSpinner gpaSpinner = new JSpinner(new SpinnerNumberModel(4.00, 0.00, 4.00, 0.10));
+        JSpinner gpaSpinner = new JSpinner(new SpinnerNumberModel());
         JTextField classificationField = new JTextField();
         
         editPanel.add(createLabeledRow("Min Score (%):", minSpinner));
