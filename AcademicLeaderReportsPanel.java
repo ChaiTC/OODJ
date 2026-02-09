@@ -3,11 +3,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 
-class AdminReportsPanel extends JPanel {
+class AcademicLeaderReportsPanel extends JPanel {
     private SystemManager systemManager;
     private JFrame parentFrame;
     
-    public AdminReportsPanel(SystemManager systemManager, JFrame parentFrame) {
+    public AcademicLeaderReportsPanel(SystemManager systemManager, JFrame parentFrame) {
         this.systemManager = systemManager;
         this.parentFrame = parentFrame;
         initializePanel();
