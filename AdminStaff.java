@@ -28,9 +28,17 @@ public class AdminStaff extends User {
     public void handleAction(String action) {
     }
     
-    public String getDepartment() { return department; }
-    public void setDepartment(String department) { this.department = department; }
+    public String getDepartment() { 
+        return department; 
+    }
+    public void setDepartment(String department) { 
+        this.department = department; 
+    }
     
-    public String getStaffID() { return staffID; }
-    public void setStaffID(String staffID) { this.staffID = staffID; }
+    public String getStaffID() { 
+        return staffID; 
+    }
+    public void setStaffID(String staffID) { 
+        this.staffID = staffID; 
+    }
 }
