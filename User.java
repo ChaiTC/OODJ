@@ -110,4 +110,7 @@ public abstract class User implements Serializable {
     public void setApproved(boolean isApproved) { 
         this.isApproved = isApproved; 
     }
+    public void displayMenu() { }
+    public void handleAction(String action) { }
+       
 }

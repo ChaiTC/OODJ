@@ -13,7 +13,7 @@ public class AFSLoginFrame extends JFrame {
     private JPasswordField passwordField;
     private JLabel statusLabel;
     
-    public AFSLoginFrame() {
+    public AFSLoginFrame(SystemManager systemManager2) {
         this.systemManager = new SystemManager();
         initializeFrame();
     }

@@ -16,7 +16,7 @@ public class main {
 
         SwingUtilities.invokeLater(() -> {
             try {
-                AFSLoginFrame loginFrame = new AFSLoginFrame();
+                AFSLoginFrame loginFrame = new AFSLoginFrame(systemManager);
                 loginFrame.setVisible(true); // Show the login window
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Error creating window: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
