@@ -291,12 +291,34 @@ public class FileManager {
                module.getDepartment();
     }
     
-    private static String serializeAssessment(Assessment assessment) {
-        return assessment.getAssessmentID() + "|" +
-               assessment.getAssessmentName() + "|" +
-               assessment.getModule().getModuleID() + "|" +
-               assessment.getDueDate();
+    private static String serializeAssessment(Assessment a) {
+    StringBuilder sb = new StringBuilder();
+
+    long createdMillis = (a.getCreatedDate() != null) ? a.getCreatedDate().getTime() : 0;
+    long dueMillis = (a.getDueDate() != null) ? a.getDueDate().getTime() : 0;
+
+    sb.append(a.getAssessmentID()).append("|")
+      .append(a.getAssessmentName()).append("|")
+      .append(a.getAssessmentType().getAssessmentType().name()).append("|")
+      .append(a.getAssessmentType().getWeightage()).append("|")
+      .append(a.getAssessmentType().getTotalMarks()).append("|")
+      .append(a.getModule().getModuleID()).append("|")
+      .append(a.getCreatedBy() != null ? a.getCreatedBy().getUserID() : "").append("|")
+      .append(createdMillis).append("|")
+      .append(dueMillis).append("|")
+      .append(a.getClassID() != null ? a.getClassID() : "").append("|");
+
+    // marks: studentID=mark,studentID=mark
+    int count = 0;
+    for (Map.Entry<String, Double> e : a.getStudentMarks().entrySet()) {
+        if (count > 0) sb.append(",");
+        sb.append(e.getKey()).append("=").append(e.getValue());
+        count++;
     }
+
+    return sb.toString();
+}
+
     
     private static String serializeFeedback(Feedback feedback) {
         return feedback.getFeedbackID() + "|" +
@@ -435,40 +457,77 @@ public class FileManager {
     }
     
     private static Assessment deserializeAssessment(String data, List<Module> modules, List<User> users) {
-        String[] parts = data.split("\\|");
-        if (parts.length < 4) return null;
-        
+    try {
+        String[] parts = data.split("\\|", -1);
+        if (parts.length < 11) return null;
+
         String assessmentID = parts[0];
-        String assessmentName = parts[1];
-        String moduleID = parts[2];
-        
-        // Find the module
+        String name = parts[1];
+        String typeName = parts[2];
+        double weightage = Double.parseDouble(parts[3]);
+        double totalMarks = Double.parseDouble(parts[4]);
+        String moduleID = parts[5];
+        String lecturerUserID = parts[6];
+        long createdMillis = Long.parseLong(parts[7]);
+        long dueMillis = Long.parseLong(parts[8]);
+        String classID = parts[9];
+        String marksCSV = parts[10];
+
+        // Find module
         Module module = null;
         for (Module m : modules) {
-            if (m.getModuleID().equals(moduleID)) {
-                module = m;
-                break;
+            if (m.getModuleID().equals(moduleID)) { module = m; break; }
+        }
+        if (module == null) return null;
+
+        // Find lecturer (createdBy)
+        Lecturer lecturer = null;
+        if (lecturerUserID != null && !lecturerUserID.isEmpty()) {
+            for (User u : users) {
+                if (u instanceof Lecturer && u.getUserID().equals(lecturerUserID)) {
+                    lecturer = (Lecturer) u;
+                    break;
+                }
             }
         }
-        
-        if (module == null) return null;
-        
-        // Parse date if available
-        Date dueDate = null;
-        if (parts.length > 3 && !parts[3].isEmpty()) {
-            try {
-                dueDate = new Date(Long.parseLong(parts[3]));
-            } catch (Exception ignored) {}
+
+        AssessmentType at = new AssessmentType(
+                "ATX",
+                AssessmentType.Type.valueOf(typeName.toUpperCase()),
+                weightage,
+                totalMarks
+        );
+
+        Assessment a = new Assessment(
+                assessmentID,
+                name,
+                at,
+                module,
+                lecturer,
+                classID,
+                (dueMillis == 0 ? null : new Date(dueMillis))
+        );
+
+        a.setCreatedDate(createdMillis == 0 ? new Date() : new Date(createdMillis));
+
+        // Restore marks
+        if (marksCSV != null && !marksCSV.isEmpty()) {
+            String[] entries = marksCSV.split(",");
+            for (String entry : entries) {
+                String[] kv = entry.split("=");
+                if (kv.length == 2) {
+                    a.addStudentMark(kv[0], Double.parseDouble(kv[1]));
+                }
+            }
         }
-        
-        // Create assessment with default AssessmentType
-        Assessment assessment = new Assessment(assessmentID, assessmentName, 
-                                               new AssessmentType(assessmentID, assessmentName, 100), 
-                                               module, null, dueDate);
-        
-        return assessment;
+
+        return a;
+
+    } catch (Exception e) {
+        return null;
     }
-    
+}
+
     private static GradingSystem deserializeGradingSystem(String data) {
         String[] parts = data.split("\\|");
         if (parts.length < 3) return null;

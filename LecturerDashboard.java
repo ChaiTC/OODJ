@@ -147,103 +147,315 @@ public class LecturerDashboard extends JFrame {
         contentPanel.add(panel, BorderLayout.CENTER);
     }
 
-    private void showDesignAssessment(JPanel contentPanel) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(12,12,12,12));
+   private void showDesignAssessment(JPanel contentPanel) {
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    panel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
-        JTextField titleField = new JTextField();
-        JComboBox<String> typeCombo = new JComboBox<>(new String[]{
-                "ASSIGNMENT", "CLASS_TEST", "FINAL_EXAM", "PROJECT", "QUIZ", "PRESENTATION"
-        });
-        JTextField marksField = new JTextField("100");
-        JTextField weightageField = new JTextField("10");
+    // Choose module (only from modules assigned to this lecturer)
+    java.util.List<Module> modules = systemManager.getAllModules();
+    String[] moduleItems = modules.stream()
+            .map(m -> m.getModuleID() + " - " + m.getModuleName())
+            .toArray(String[]::new);
+    if (moduleItems.length == 0) moduleItems = new String[]{"No modules available"};
+    JComboBox<String> moduleCombo = new JComboBox<>(moduleItems);
 
-        panel.add(createLabeledRow("Assessment Title:", titleField)); panel.add(Box.createVerticalStrut(6));
-        panel.add(createLabeledRow("Type:", typeCombo)); panel.add(Box.createVerticalStrut(6));
-        panel.add(createLabeledRow("Total Marks:", marksField)); panel.add(Box.createVerticalStrut(6));
-        panel.add(createLabeledRow("Weightage (%):", weightageField)); panel.add(Box.createVerticalStrut(8));
+    JTextField titleField = new JTextField();
+    JComboBox<String> typeCombo = new JComboBox<>(new String[]{
+            "ASSIGNMENT", "CLASS_TEST", "FINAL_EXAM"
+    });
+    JTextField marksField = new JTextField("100");
+    JTextField weightageField = new JTextField("10");
 
-        JButton createBtn = new JButton("Create Assessment");
-        createBtn.addActionListener(e -> {
+    // Due date input 
+    JTextField dueField = new JTextField("2026-02-20"); // yyyy-MM-dd
+
+    panel.add(createLabeledRow("Module:", moduleCombo)); panel.add(Box.createVerticalStrut(6));
+    panel.add(createLabeledRow("Assessment Title:", titleField)); panel.add(Box.createVerticalStrut(6));
+    panel.add(createLabeledRow("Type:", typeCombo)); panel.add(Box.createVerticalStrut(6));
+    panel.add(createLabeledRow("Total Marks:", marksField)); panel.add(Box.createVerticalStrut(6));
+    panel.add(createLabeledRow("Weightage (%):", weightageField)); panel.add(Box.createVerticalStrut(6));
+    panel.add(createLabeledRow("Due Date (yyyy-MM-dd):", dueField)); panel.add(Box.createVerticalStrut(10));
+
+    JButton createBtn = new JButton("Create Assessment");
+    createBtn.addActionListener(e -> {
+        try {
+            if (modules.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No modules exist. Admin/Leader must create modules first.");
+                return;
+            }
+
+            String title = titleField.getText().trim();
+            if (title.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Assessment title cannot be empty.");
+                return;
+            }
+
+            double totalMarks = Double.parseDouble(marksField.getText().trim());
+            double weightage = Double.parseDouble(weightageField.getText().trim());
+            if (totalMarks <= 0 || weightage <= 0) {
+                JOptionPane.showMessageDialog(this, "Total marks and weightage must be > 0.");
+                return;
+            }
+
+            int idx = moduleCombo.getSelectedIndex();
+            Module selectedModule = modules.get(Math.max(0, idx));
+
+            String typeStr = (String) typeCombo.getSelectedItem();
+            AssessmentType at = new AssessmentType(
+                    systemManager.generateAssessmentTypeID(),
+                    AssessmentType.Type.valueOf(typeStr),
+                    weightage,
+                    totalMarks
+            );
+
+            Date dueDate = parseDate(dueField.getText().trim()); 
+            
+
+            String assessmentID = systemManager.generateAssessmentID();
+            Assessment assessment = new Assessment(
+                    assessmentID,
+                    title,
+                    at,
+                    selectedModule,
+                    lecturer,
+                    dueDate
+            );
+
+            
+            systemManager.createAssessment(assessment);
+
             JOptionPane.showMessageDialog(this,
-                    "✓ Assessment Created!\n\nTitle: " + titleField.getText() +
-                            "\nType: " + typeCombo.getSelectedItem() +
-                            "\nTotal Marks: " + marksField.getText());
-        });
+                    "✓ Assessment saved!\n\n" +
+                    "ID: " + assessmentID +
+                    "\nModule: " + selectedModule.getModuleName() +
+                    "\nTitle: " + title +
+                    "\nType: " + typeStr +
+                    "\nTotal Marks: " + totalMarks +
+                    "\nWeightage: " + weightage
+            );
 
-        JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        btnRow.add(createBtn);
-        panel.add(btnRow);
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Marks and weightage must be numbers.");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error creating assessment: " + ex.getMessage());
+        }
+    });
 
-        contentPanel.add(panel, BorderLayout.CENTER);
+    JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    btnRow.add(createBtn);
+    panel.add(btnRow);
+
+    contentPanel.add(panel, BorderLayout.CENTER);
+}
+
+private Date parseDate(String yyyyMmDd) {
+    
+    try {
+        String[] p = yyyyMmDd.split("-");
+        int y = Integer.parseInt(p[0]);
+        int m = Integer.parseInt(p[1]) - 1; 
+        int d = Integer.parseInt(p[2]);
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, y);
+        cal.set(Calendar.MONTH, m);
+        cal.set(Calendar.DAY_OF_MONTH, d);
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
+    } catch (Exception e) {
+        return null; 
     }
+}
 
     private void showKeyInMarks(JPanel contentPanel) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
-        java.util.List<User> users = systemManager.getUsersByRole("STUDENT");
-        String[] students = users.stream().map(u -> u.getUserID() + " - " + u.getFullName()).toArray(String[]::new);
-        if (students.length == 0) students = new String[]{"No students available"};
-        JComboBox<String> studentCombo = new JComboBox<>(students);
+    java.util.List<User> users = systemManager.getUsersByRole("STUDENT");
+    java.util.List<Student> studentsList = new ArrayList<>();
+    for (User u : users) if (u instanceof Student) studentsList.add((Student) u);
 
-        java.util.List<Assessment> assessmentsList = systemManager.getAllAssessments();
-        String[] assessments = assessmentsList.stream().map(a -> a.getAssessmentID() + " - " + a.getAssessmentName()).toArray(String[]::new);
-        if (assessments.length == 0) assessments = new String[]{"No assessments available"};
-        JComboBox<String> assessmentCombo = new JComboBox<>(assessments);
+    String[] students = studentsList.stream()
+            .map(s -> s.getStudentID() + " - " + s.getFullName())
+            .toArray(String[]::new);
+    if (students.length == 0) students = new String[]{"No students available"};
+    JComboBox<String> studentCombo = new JComboBox<>(students);
 
-        JTextField marksField = new JTextField();
-
-        panel.add(createLabeledRow("Student:", studentCombo)); panel.add(Box.createVerticalStrut(8));
-        panel.add(createLabeledRow("Assessment:", assessmentCombo)); panel.add(Box.createVerticalStrut(8));
-        panel.add(createLabeledRow("Marks Obtained:", marksField)); panel.add(Box.createVerticalStrut(12));
-
-        JButton submitBtn = new JButton("Submit Marks");
-        submitBtn.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "✓ Marks recorded (UI only for now).");
-        });
-
-        JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        btnRow.add(submitBtn);
-        panel.add(btnRow);
-
-        contentPanel.add(panel, BorderLayout.CENTER);
+    java.util.List<Assessment> allAssessments = systemManager.getAllAssessments();
+    
+    java.util.List<Assessment> myAssessments = new ArrayList<>();
+    for (Assessment a : allAssessments) {
+        if (a.getCreatedBy() != null && a.getCreatedBy().getUserID().equals(lecturer.getUserID())) {
+            myAssessments.add(a);
+        }
     }
+    if (myAssessments.isEmpty()) myAssessments = allAssessments;
 
-    private void showProvideFeedback(JPanel contentPanel) {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+    String[] assessments = myAssessments.stream()
+            .map(a -> a.getAssessmentID() + " - " + a.getAssessmentName())
+            .toArray(String[]::new);
+    if (assessments.length == 0) assessments = new String[]{"No assessments available"};
+    JComboBox<String> assessmentCombo = new JComboBox<>(assessments);
 
-        java.util.List<User> users = systemManager.getUsersByRole("STUDENT");
-        String[] students = users.stream().map(u -> u.getUserID() + " - " + u.getFullName()).toArray(String[]::new);
-        if (students.length == 0) students = new String[]{"No students available"};
-        JComboBox<String> studentCombo = new JComboBox<>(students);
+    JTextField marksField = new JTextField();
 
-        JPanel topPanel = new JPanel();
-        topPanel.add(new JLabel("Select Student:"));
-        topPanel.add(studentCombo);
+    panel.add(createLabeledRow("Student:", studentCombo)); panel.add(Box.createVerticalStrut(8));
+    panel.add(createLabeledRow("Assessment:", assessmentCombo)); panel.add(Box.createVerticalStrut(8));
+    panel.add(createLabeledRow("Marks Obtained:", marksField)); panel.add(Box.createVerticalStrut(12));
 
-        JTextArea feedbackArea = new JTextArea(8, 40);
-        feedbackArea.setLineWrap(true);
-        feedbackArea.setWrapStyleWord(true);
-        JScrollPane scrollPane = new JScrollPane(feedbackArea);
+    JButton submitBtn = new JButton("Submit Marks");
+    submitBtn.addActionListener(e -> {
+        try {
+            if (studentsList.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No students exist.");
+                return;
+            }
+            if (myAssessments.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No assessments exist.");
+                return;
+            }
 
-        JButton submitBtn = new JButton("Submit Feedback");
-        submitBtn.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, "✓ Feedback submitted to " + studentCombo.getSelectedItem());
-        });
+            int sIdx = studentCombo.getSelectedIndex();
+            int aIdx = assessmentCombo.getSelectedIndex();
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.add(submitBtn);
+            Student studentObj = studentsList.get(Math.max(0, sIdx));
+            Assessment assessmentObj = myAssessments.get(Math.max(0, aIdx));
 
-        panel.add(topPanel, BorderLayout.NORTH);
-        panel.add(scrollPane, BorderLayout.CENTER);
-        panel.add(buttonPanel, BorderLayout.SOUTH);
+            double marks = Double.parseDouble(marksField.getText().trim());
 
-        contentPanel.add(panel, BorderLayout.CENTER);
-    }
+            
+            assessmentObj.recordMarks(studentObj, marks);
+            boolean ok = systemManager.updateAssessment(assessmentObj);
+
+            if (ok) {
+                JOptionPane.showMessageDialog(this,
+                        "✓ Marks saved!\n" +
+                        "Student: " + studentObj.getStudentID() +
+                        "\nAssessment: " + assessmentObj.getAssessmentName() +
+                        "\nMarks: " + marks + "/" + assessmentObj.getTotalMarks()
+                );
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to save marks (assessment not found).");
+            }
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Marks must be a number.");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error saving marks: " + ex.getMessage());
+        }
+    });
+
+    JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    btnRow.add(submitBtn);
+    panel.add(btnRow);
+
+    contentPanel.add(panel, BorderLayout.CENTER);
+}
+
+
+   private void showProvideFeedback(JPanel contentPanel) {
+    JPanel panel = new JPanel(new BorderLayout(10, 10));
+    panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+    // Students
+    java.util.List<User> users = systemManager.getUsersByRole("STUDENT");
+    java.util.List<Student> studentsList = new ArrayList<>();
+    for (User u : users) if (u instanceof Student) studentsList.add((Student) u);
+
+    String[] students = studentsList.stream()
+            .map(s -> s.getStudentID() + " - " + s.getFullName())
+            .toArray(String[]::new);
+    if (students.length == 0) students = new String[]{"No students available"};
+    JComboBox<String> studentCombo = new JComboBox<>(students);
+
+    // Assessments
+    java.util.List<Assessment> assessmentsList = systemManager.getAllAssessments();
+    String[] assessments = assessmentsList.stream()
+            .map(a -> a.getAssessmentID() + " - " + a.getAssessmentName())
+            .toArray(String[]::new);
+    if (assessments.length == 0) assessments = new String[]{"No assessments available"};
+    JComboBox<String> assessmentCombo = new JComboBox<>(assessments);
+
+    JTextField suggestedMarksField = new JTextField("0");
+
+    JPanel topPanel = new JPanel(new GridLayout(3, 2, 8, 8));
+    topPanel.add(new JLabel("Select Student:"));
+    topPanel.add(studentCombo);
+    topPanel.add(new JLabel("Assessment:"));
+    topPanel.add(assessmentCombo);
+    topPanel.add(new JLabel("Suggested Marks:"));
+    topPanel.add(suggestedMarksField);
+
+    JTextArea feedbackArea = new JTextArea(8, 40);
+    feedbackArea.setLineWrap(true);
+    feedbackArea.setWrapStyleWord(true);
+    JScrollPane scrollPane = new JScrollPane(feedbackArea);
+
+    JButton submitBtn = new JButton("Submit Feedback");
+    submitBtn.addActionListener(e -> {
+        try {
+            if (studentsList.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No students exist.");
+                return;
+            }
+            if (assessmentsList.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No assessments exist.");
+                return;
+            }
+
+            Student studentObj = studentsList.get(Math.max(0, studentCombo.getSelectedIndex()));
+            Assessment assessmentObj = assessmentsList.get(Math.max(0, assessmentCombo.getSelectedIndex()));
+
+            String content = feedbackArea.getText().trim();
+            if (content.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Feedback content cannot be empty.");
+                return;
+            }
+
+            double suggested = Double.parseDouble(suggestedMarksField.getText().trim());
+
+            Feedback fb = new Feedback(
+                    systemManager.generateFeedbackID(),
+                    assessmentObj.getAssessmentID(),
+                    studentObj.getStudentID(),
+                    lecturer.getUserID(),
+                    content,
+                    suggested
+            );
+            fb.setFeedbackDate(new Date());
+            fb.setDelivered(true);
+
+            systemManager.createFeedback(fb); 
+
+            JOptionPane.showMessageDialog(this,
+                    "✓ Feedback saved!\n" +
+                    "Student: " + studentObj.getStudentID() +
+                    "\nAssessment: " + assessmentObj.getAssessmentName()
+            );
+
+            feedbackArea.setText("");
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Suggested marks must be a number.");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error saving feedback: " + ex.getMessage());
+        }
+    });
+
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    buttonPanel.add(submitBtn);
+
+    panel.add(topPanel, BorderLayout.NORTH);
+    panel.add(scrollPane, BorderLayout.CENTER);
+    panel.add(buttonPanel, BorderLayout.SOUTH);
+
+    contentPanel.add(panel, BorderLayout.CENTER);
+}
+
 
     private void showMyModules(JPanel contentPanel) {
         JTextArea modulesArea = new JTextArea();
