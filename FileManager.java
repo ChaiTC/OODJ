@@ -488,11 +488,17 @@ public class FileManager {
         String marksCSV = parts[10];
 
         // Find module
-        Module module = null;
-        for (Module m : modules) {
-            if (m.getModuleID().equals(moduleID)) { module = m; break; }
-        }
-        if (module == null) return null;
+       // Find module (support both moduleID and moduleCode)
+Module module = null;
+for (Module m : modules) {
+    if (m.getModuleID().equalsIgnoreCase(moduleID) ||
+        m.getModuleCode().equalsIgnoreCase(moduleID)) {
+        module = m;
+        break;
+    }
+}
+if (module == null) return null;
+
 
         // Find lecturer (createdBy)
         Lecturer lecturer = null;

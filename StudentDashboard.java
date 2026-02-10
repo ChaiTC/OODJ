@@ -331,28 +331,34 @@ public class StudentDashboard extends JFrame {
                 continue;
             }
 
-            foundAny = true;
+             foundAny = true;
 
-                   sb.append("- ")
-                     .append(a.getModule() != null ? a.getModule().getModuleName() : "Module")
-                     .append(" | ")
-                     .append(a.getAssessmentName())
-                     .append(" | Status: ")
-                     .append(a.getStatus())
-                     .append(" | Due: ")
-                     .append(a.getDueDate())
-                     .append("\n");
-
-Double mark = a.getStudentMarks(sid);
-if (mark != null) {
-    sb.append("   Marks: ")
-      .append(mark)
-      .append("/")
-      .append(a.getTotalMarks())
+    sb.append("- ")
+      .append(a.getModule() != null ? a.getModule().getModuleName() : "Module")
+      .append(" | ")
+      .append(a.getAssessmentName())
+      .append(" | Due: ")
+      .append(a.getDueDate() != null ? a.getDueDate() : "N/A")
       .append("\n");
+
+    Double mark = a.getStudentMarks(sid);
+    if (mark != null) {
+        sb.append("   Marks: ")
+          .append(mark)
+          .append("/")
+          .append(a.getTotalMarks())
+          .append("\n");
+    } else {
+        sb.append("   Marks: (not released yet)\n");
+    }
+
+    sb.append("\n");
 }
 
-        }
+if (!foundAny) {
+    sb.append("No assessments found in the system.\n");
+}
+    
 
         if (!foundAny) {
             sb.append("No marks recorded yet.\n");
