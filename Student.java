@@ -176,7 +176,7 @@ class StudentDashboard extends JFrame {
         // ===== LOGOUT BUTTON =====
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         bottomPanel.setBackground(new Color(240, 240, 240));
-        JButton logoutBtn = createMenuButton("Logout", new Color(244, 67, 54)); // Red logout button
+        JButton logoutBtn = createMenuButton("Logoutm", new Color(244, 67, 54)); // Red logout button
         logoutBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
