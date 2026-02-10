@@ -61,7 +61,7 @@ class AdminDashboard extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
-                new AFSLoginFrame().setVisible(true);
+                new AFSLoginFrame(systemManager).setVisible(true);
             }
         });
         bottomPanel.add(logoutBtn);

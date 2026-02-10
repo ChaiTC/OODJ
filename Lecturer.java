@@ -112,7 +112,7 @@ public class Lecturer extends User implements Serializable {
     int totalStudents = assessment.getStudentMarks().size();
     double average = total / totalStudents;
 
-    System.out.println("=== Assessment Summary ===");
+    System.out.println("*** Assessment Summary ***");
     System.out.println("Assessment: " + assessment.getAssessmentName());
     System.out.println("Average Marks: " + average);
     System.out.println("Highest Marks: " + max);

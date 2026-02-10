@@ -4,7 +4,7 @@ public class AppBootstrap {
         SystemManager systemManager = new SystemManager();
         // Launch login frame on the EDT
         javax.swing.SwingUtilities.invokeLater(() -> {
-            AFSLoginFrame login = new AFSLoginFrame();
+            AFSLoginFrame login = new AFSLoginFrame(systemManager);
             login.setVisible(true);
         });
     }

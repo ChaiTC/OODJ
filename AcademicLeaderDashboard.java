@@ -65,7 +65,7 @@ public class AcademicLeaderDashboard extends JFrame {
 
         logoutBtn.addActionListener(e -> {
             dispose();
-            new AFSLoginFrame().setVisible(true);
+            new AFSLoginFrame(systemManager).setVisible(true);
         });
 
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
