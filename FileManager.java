@@ -207,6 +207,27 @@ public class FileManager {
     }
     
     /**
+     * Load all assessments from file
+     */
+    public static List<Assessment> loadAllAssessments(List<Module> modules, List<User> users) {
+        List<Assessment> assessments = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(ASSESSMENTS_FILE))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                Assessment assessment = deserializeAssessment(line, modules, users);
+                if (assessment != null) {
+                    assessments.add(assessment);
+                }
+            }
+        } catch (FileNotFoundException e) {
+
+        } catch (IOException e) {
+
+        }
+        return assessments;
+    }
+    
+    /**
      * Load all feedback from file
      */
     public static List<Feedback> loadAllFeedback() {
@@ -411,6 +432,41 @@ public class FileManager {
         
         return new Feedback(parts[0], parts[1], parts[2], parts[3], 
                            parts[4], Double.parseDouble(parts[5]));
+    }
+    
+    private static Assessment deserializeAssessment(String data, List<Module> modules, List<User> users) {
+        String[] parts = data.split("\\|");
+        if (parts.length < 4) return null;
+        
+        String assessmentID = parts[0];
+        String assessmentName = parts[1];
+        String moduleID = parts[2];
+        
+        // Find the module
+        Module module = null;
+        for (Module m : modules) {
+            if (m.getModuleID().equals(moduleID)) {
+                module = m;
+                break;
+            }
+        }
+        
+        if (module == null) return null;
+        
+        // Parse date if available
+        Date dueDate = null;
+        if (parts.length > 3 && !parts[3].isEmpty()) {
+            try {
+                dueDate = new Date(Long.parseLong(parts[3]));
+            } catch (Exception ignored) {}
+        }
+        
+        // Create assessment with default AssessmentType
+        Assessment assessment = new Assessment(assessmentID, assessmentName, 
+                                               new AssessmentType(assessmentID, assessmentName, 100), 
+                                               module, null, dueDate);
+        
+        return assessment;
     }
     
     private static GradingSystem deserializeGradingSystem(String data) {
