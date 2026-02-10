@@ -211,17 +211,18 @@ public class LecturerDashboard extends JFrame {
 
             Date dueDate = parseDate(dueField.getText().trim()); 
             
-
-            String assessmentID = systemManager.generateAssessmentID();
-            Assessment assessment = new Assessment(
-    assessmentID,
-    title,
-    at,
-    selectedModule,
-    lecturer,
-    "UNASSIGNED",   // or a real class ID
-    dueDate
+            String classID = ""; 
+String assessmentID = systemManager.generateAssessmentID();
+Assessment assessment = new Assessment(
+        assessmentID,
+        title,
+        at,
+        selectedModule,
+        lecturer,
+        classID,
+        dueDate
 );
+
  
             systemManager.createAssessment(assessment);
 

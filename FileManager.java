@@ -611,10 +611,13 @@ public class FileManager {
             String[] sids = studentCSV.split(",");
             for (String sid : sids) {
                 for (User u : users) {
-                    if (u instanceof Student && u.getUserID().equals(sid)) {
-                        cls.enrollStudent((Student) u);
-                        ((Student) u).registerClass(cls);
-                        break;
+                    if (u instanceof Student) {
+                        Student s = (Student) u;
+                        if (s.getStudentID().equals(sid)) {
+                            cls.enrollStudent(s);
+                            s.registerClass(cls);
+                            break;
+                        }
                     }
                 }
             }
