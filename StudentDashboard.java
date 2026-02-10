@@ -228,7 +228,7 @@ public class StudentDashboard extends JFrame {
         commentArea.setLineWrap(true);
         commentArea.setWrapStyleWord(true);
 
-        JButton addCommentBtn = new JButton("Add Comment (Additional Feature)");
+        JButton addCommentBtn = new JButton("Add Comment");
         addCommentBtn.addActionListener(e -> addCommentToSelectedFeedback());
 
         feedbackList.addListSelectionListener(e -> showSelectedFeedbackDetails());
@@ -297,7 +297,7 @@ public class StudentDashboard extends JFrame {
         sb.append("My Registered Classes\n\n");
         if (mine.isEmpty()) {
             sb.append("No classes registered yet.\n");
-            sb.append("Ask Admin/Leader to create classes, then register via the system.\n");
+            sb.append("Ask Admin or your academic leader to create classes, then register via the system.\n");
         } else {
             for (ClassModule c : mine) {
                 sb.append("- ").append(c.getClassName())
@@ -398,7 +398,7 @@ public class StudentDashboard extends JFrame {
 
         selected.addStudentComment(comment);
 
-        JOptionPane.showMessageDialog(this, "✓ Comment saved (runtime).\n(If you want persistence, extend feedback.txt format.)");
+        JOptionPane.showMessageDialog(this, "Comment saved.\n(If you want persistence, extend feedback.txt format.)");
         showSelectedFeedbackDetails();
     }
 }
