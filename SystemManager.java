@@ -400,6 +400,8 @@ public boolean updateAssessment(Assessment updated) {
         if (assessments.get(i).getAssessmentID().equals(updated.getAssessmentID())) {
             assessments.set(i, updated);
 
+            FileManager.saveAllAssessments(assessments);
+
             return true;
         }
     }

@@ -191,6 +191,20 @@ public class FileManager {
 
         }
     }
+
+    public static void saveAllAssessments(List<Assessment> assessments) {
+    try (FileWriter fw = new FileWriter(ASSESSMENTS_FILE, false);
+         BufferedWriter bw = new BufferedWriter(fw)) {
+
+        for (Assessment a : assessments) {
+            bw.write(serializeAssessment(a));
+            bw.newLine();
+        }
+
+    } catch (IOException e) {
+        System.err.println("Error saving all assessments: " + e.getMessage());
+    }
+}
     
     /**
      * Save feedback to file
@@ -688,3 +702,4 @@ public class FileManager {
         // Stub implementation
     }
 }
+

@@ -12,15 +12,14 @@ public class Assessment implements Serializable {
     private Module module;
     private Lecturer createdBy;
 
-    // NEW: to satisfy AcademicLeader dashboard
-    private String classID;          // which class this assessment is for
-    private String status;           // PENDING / GRADED / CLOSED etc.
+    private String classID;          
+    private String status;          
 
     private Date createdDate;
     private Date dueDate;
     private Map<String, Double> studentMarks;
 
-    // Updated constructor (adds classID)
+    
     public Assessment(String assessmentID,
                       String assessmentName,
                       AssessmentType assessmentType,
@@ -38,22 +37,22 @@ public class Assessment implements Serializable {
         this.createdDate = new Date();
         this.dueDate = dueDate;
 
-        this.status = "PENDING"; // default when created
+        this.status = "PENDING"; 
         this.studentMarks = new HashMap<>();
     }
 
-    // Record marks (stores by studentID)
+    // Record marks 
     public void recordMarks(Student student, double marks) {
         if (student == null) return;
         if (marks < 0 || marks > assessmentType.getTotalMarks()) return;
 
         studentMarks.put(student.getStudentID(), marks);
 
-        // If at least 1 mark exists, you can consider it graded
+       
         this.status = "GRADED";
     }
 
-    // Used by FileManager when loading marks from text file
+   
     public void addStudentMark(String studentID, double marks) {
         if (studentID == null) return;
         studentMarks.put(studentID, marks);
@@ -65,7 +64,7 @@ public class Assessment implements Serializable {
         return studentMarks.get(studentID);
     }
 
-    // ===== Getters / setters =====
+    
     public String getAssessmentID() { return assessmentID; }
     public void setAssessmentID(String assessmentID) { this.assessmentID = assessmentID; }
 
@@ -89,7 +88,7 @@ public class Assessment implements Serializable {
 
     public Map<String, Double> getStudentMarks() { return studentMarks; }
 
-    // ===== Methods AcademicLeader dashboard expects =====
+    
     public String getClassID() { return classID; }
     public void setClassID(String classID) { this.classID = classID; }
 
@@ -98,8 +97,7 @@ public class Assessment implements Serializable {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    // If AcademicLeader calls getScore(), give a meaningful value:
-    // average score (or 0 if no marks yet)
+    
     public Double getScore() {
         if (studentMarks.isEmpty()) return 0.0;
         double total = 0;

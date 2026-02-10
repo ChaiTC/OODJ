@@ -7,8 +7,6 @@ import java.util.ArrayList;
 public class StudentDashboard extends JFrame {
     private final SystemManager systemManager;
     private final Student student;
-
-    
     private JTextArea classesArea;
     private JTextArea resultsArea;
     private DefaultListModel<Feedback> feedbackModel;
@@ -333,14 +331,27 @@ public class StudentDashboard extends JFrame {
                 continue;
             }
 
-            Double mark = a.getStudentMarks(sid);
-            if (mark != null) {
-                foundAny = true;
-                sb.append("- ").append(a.getModule() != null ? a.getModule().getModuleName() : "Module")
-                  .append(" | ").append(a.getAssessmentName())
-                  .append(" | Marks: ").append(mark).append("/").append(a.getTotalMarks())
-                  .append("\n");
-            }
+            foundAny = true;
+
+                   sb.append("- ")
+                     .append(a.getModule() != null ? a.getModule().getModuleName() : "Module")
+                     .append(" | ")
+                     .append(a.getAssessmentName())
+                     .append(" | Status: ")
+                     .append(a.getStatus())
+                     .append(" | Due: ")
+                     .append(a.getDueDate())
+                     .append("\n");
+
+Double mark = a.getStudentMarks(sid);
+if (mark != null) {
+    sb.append("   Marks: ")
+      .append(mark)
+      .append("/")
+      .append(a.getTotalMarks())
+      .append("\n");
+}
+
         }
 
         if (!foundAny) {
@@ -401,5 +412,19 @@ public class StudentDashboard extends JFrame {
         JOptionPane.showMessageDialog(this, "Comment saved.\n(If you want persistence, extend feedback.txt format.)");
         showSelectedFeedbackDetails();
     }
+
+    private List<String> getMyClassIDs() {
+    List<String> ids = new ArrayList<>();
+    for (ClassModule c : systemManager.getAllClasses()) {
+        for (Student s : c.getEnrolledStudents()) {
+            if (s.getUserID().equals(student.getUserID())) {
+                ids.add(c.getClassID());
+                break;
+            }
+        }
+    }
+    return ids;
+}
+
 }
 

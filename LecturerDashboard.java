@@ -152,6 +152,23 @@ public class LecturerDashboard extends JFrame {
     panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
     panel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
 
+    java.util.List<ClassModule> myClasses = new ArrayList<>();
+for (ClassModule c : systemManager.getAllClasses()) {
+    if (c.getLecturerID() != null && c.getLecturerID().equals(lecturer.getUserID())) {
+        myClasses.add(c);
+    }
+}
+
+String[] classItems = myClasses.stream()
+        .map(c -> c.getClassID() + " - " + c.getClassName())
+        .toArray(String[]::new);
+if (classItems.length == 0) classItems = new String[]{"No classes assigned"};
+JComboBox<String> classCombo = new JComboBox<>(classItems);
+
+panel.add(createLabeledRow("Class:", classCombo));
+panel.add(Box.createVerticalStrut(6));
+
+
     // Choose module (only from modules assigned to this lecturer)
     java.util.List<Module> modules = systemManager.getAllModules();
     String[] moduleItems = modules.stream()
@@ -211,7 +228,13 @@ public class LecturerDashboard extends JFrame {
 
             Date dueDate = parseDate(dueField.getText().trim()); 
             
-            String classID = ""; 
+            if (myClasses.isEmpty()) {
+    JOptionPane.showMessageDialog(this, "No classes assigned to you. Ask admin/leader to assign you to a class.");
+    return;
+}
+int cIdx = classCombo.getSelectedIndex();
+ClassModule selectedClass = myClasses.get(Math.max(0, cIdx));
+String classID = selectedClass.getClassID();
 String assessmentID = systemManager.generateAssessmentID();
 Assessment assessment = new Assessment(
         assessmentID,
