@@ -59,6 +59,8 @@ public class SystemManager {
         // because classes reference modules and lecturers
         classes = FileManager.loadAllClasses(modules, users);
 
+        // Load assessments
+        assessments = FileManager.loadAllAssessments(modules, users);
         // Load feedback data
         feedbackList = FileManager.loadAllFeedback();
         // Load grading system if exists
