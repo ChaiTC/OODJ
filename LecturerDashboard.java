@@ -214,15 +214,15 @@ public class LecturerDashboard extends JFrame {
 
             String assessmentID = systemManager.generateAssessmentID();
             Assessment assessment = new Assessment(
-                    assessmentID,
-                    title,
-                    at,
-                    selectedModule,
-                    lecturer,
-                    dueDate
-            );
-
-            
+    assessmentID,
+    title,
+    at,
+    selectedModule,
+    lecturer,
+    "UNASSIGNED",   // or a real class ID
+    dueDate
+);
+ 
             systemManager.createAssessment(assessment);
 
             JOptionPane.showMessageDialog(this,
@@ -293,7 +293,7 @@ private Date parseDate(String yyyyMmDd) {
             myAssessments.add(a);
         }
     }
-    if (myAssessments.isEmpty()) myAssessments = allAssessments;
+    if (myAssessments.isEmpty()) myAssessments.addAll(allAssessments);
 
     String[] assessments = myAssessments.stream()
             .map(a -> a.getAssessmentID() + " - " + a.getAssessmentName())

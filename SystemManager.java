@@ -359,6 +359,53 @@ public class SystemManager {
         int next = max + 1;
         return String.format("%s%03d", prefix, next);
     }
+
+    // Generate an assessment ID like ASM001
+public String generateAssessmentID() {
+    String prefix = "ASM";
+    int max = 0;
+    for (Assessment a : assessments) {
+        if (a.getAssessmentID() != null && a.getAssessmentID().startsWith(prefix)) {
+            try {
+                int v = Integer.parseInt(a.getAssessmentID().substring(prefix.length()));
+                if (v > max) max = v;
+            } catch (Exception ignored) {}
+        }
+    }
+    return String.format("%s%03d", prefix, max + 1);
+}
+
+// Generate feedback ID like FB001
+public String generateFeedbackID() {
+    String prefix = "FB";
+    int max = 0;
+    for (Feedback f : feedbackList) {
+        if (f.getFeedbackID() != null && f.getFeedbackID().startsWith(prefix)) {
+            try {
+                int v = Integer.parseInt(f.getFeedbackID().substring(prefix.length()));
+                if (v > max) max = v;
+            } catch (Exception ignored) {}
+        }
+    }
+    return String.format("%s%03d", prefix, max + 1);
+}
+
+    /**
+     * Update an existing assessment (by assessmentID). Returns true if updated.
+     */
+public boolean updateAssessment(Assessment updated) {
+    if (updated == null) return false;
+
+    for (int i = 0; i < assessments.size(); i++) {
+        if (assessments.get(i).getAssessmentID().equals(updated.getAssessmentID())) {
+            assessments.set(i, updated);
+
+            return true;
+        }
+    }
+    return false;
+}
+
     
     /**
      * Get all lecturers

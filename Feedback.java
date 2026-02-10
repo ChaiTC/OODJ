@@ -75,4 +75,9 @@ public class Feedback implements Serializable {
                 ", isDelivered=" + isDelivered +
                 '}';
     }
+
+    public void setFeedbackDate(Date date) {
+    this.feedbackDate = date;
+}
+
 }
