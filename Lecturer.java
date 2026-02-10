@@ -85,8 +85,40 @@ public class Lecturer extends User implements Serializable {
     
     public void provideFeedback(Feedback feedback) {
         providedFeedback.add(feedback);
-        
     }
+    
+    public void viewAssessmentSummary(Assessment assessment, GradingSystem gradingSystem) {
+    if (assessment.getStudentMarks().isEmpty()) {
+        System.out.println("No marks entered yet.");
+        return;
+    }
+
+    double total = 0;
+    double max = Double.MIN_VALUE;
+    double min = Double.MAX_VALUE;
+    int passCount = 0;
+
+    for (double mark : assessment.getStudentMarks().values()) {
+        total += mark;
+        max = Math.max(max, mark);
+        min = Math.min(min, mark);
+
+        double percentage = (mark / assessment.getTotalMarks()) * 100;
+        if (percentage >= gradingSystem.getPassingPercentage()) {
+            passCount++;
+        }
+    }
+
+    int totalStudents = assessment.getStudentMarks().size();
+    double average = total / totalStudents;
+
+    System.out.println("=== Assessment Summary ===");
+    System.out.println("Assessment: " + assessment.getAssessmentName());
+    System.out.println("Average Marks: " + average);
+    System.out.println("Highest Marks: " + max);
+    System.out.println("Lowest Marks: " + min);
+System.out.println("Pass Rate: " + passCount + "/" + totalStudents);
+}
     
     public String getLecturerID() { return lecturerID; }
     public void setLecturerID(String lecturerID) { this.lecturerID = lecturerID; }
