@@ -10,9 +10,7 @@ public class SystemManager {
     private GradingSystem gradingSystem;
     private User currentUser;
 
-    // ================= CONSTRUCTOR =================
     public SystemManager() {
-
         users = new ArrayList<>();
         modules = new ArrayList<>();
         classes = new ArrayList<>();
@@ -25,48 +23,34 @@ public class SystemManager {
         loadAllData();
     }
 
-    // ================= LOAD DATA =================
     public void loadAllData() {
-
         users = FileManager.loadAllUsers();
-        if (users == null) users = new ArrayList<>();
-
         modules = FileManager.loadAllModules();
-        if (modules == null) modules = new ArrayList<>();
-
         classes = FileManager.loadAllClasses(modules, users);
-        if (classes == null) classes = new ArrayList<>();
-
         assessments = FileManager.loadAllAssessments(modules, users);
-        if (assessments == null) assessments = new ArrayList<>();
-
         feedbackList = FileManager.loadAllFeedback();
-        if (feedbackList == null) feedbackList = new ArrayList<>();
 
-        GradingSystem loadedGrading = FileManager.loadGradingSystem();
-        if (loadedGrading != null) {
-            gradingSystem = loadedGrading;
+        GradingSystem loaded = FileManager.loadGradingSystem();
+        if (loaded != null) {
+            gradingSystem = loaded;
         }
     }
 
-    // ================= USER MANAGEMENT =================
-    public boolean registerUser(User user) {
+    // ================= USERS =================
 
-        for (User existingUser : users) {
-            if (existingUser.getUsername().equals(user.getUsername())) {
+    public boolean registerUser(User user) {
+        for (User u : users) {
+            if (u.getUsername().equals(user.getUsername())) {
                 return false;
             }
         }
-
         users.add(user);
         FileManager.saveUser(user);
         return true;
     }
 
     public User authenticateUser(String username, String password) {
-
         for (User user : users) {
-
             if (user.getUsername().equals(username)
                     && user.getPassword().equals(password)) {
 
@@ -80,9 +64,23 @@ public class SystemManager {
         return null;
     }
 
-    public User findUserByID(String userID) {
+    public List<User> getAllUsers() {
+        return new ArrayList<>(users);
+    }
+
+    public List<User> getUsersByRole(String role) {
+        List<User> result = new ArrayList<>();
         for (User u : users) {
-            if (u.getUserID().equals(userID)) return u;
+            if (u.getRole().equalsIgnoreCase(role)) {
+                result.add(u);
+            }
+        }
+        return result;
+    }
+
+    public User findUserByID(String id) {
+        for (User u : users) {
+            if (u.getUserID().equals(id)) return u;
         }
         return null;
     }
@@ -98,9 +96,9 @@ public class SystemManager {
         return false;
     }
 
-    public boolean deleteUser(String userID) {
+    public boolean deleteUser(String id) {
         for (int i = 0; i < users.size(); i++) {
-            if (users.get(i).getUserID().equals(userID)) {
+            if (users.get(i).getUserID().equals(id)) {
                 users.remove(i);
                 FileManager.saveAllUsers(users);
                 return true;
@@ -109,18 +107,123 @@ public class SystemManager {
         return false;
     }
 
-    public List<User> getAllUsers() {
-        return new ArrayList<>(users);
+    public boolean approveUser(String id) {
+        User u = findUserByID(id);
+        if (u != null) {
+            u.setApproved(true);
+            FileManager.saveAllUsers(users);
+            return true;
+        }
+        return false;
     }
 
-    public List<User> getUsersByRole(String role) {
-        List<User> result = new ArrayList<>();
-        for (User user : users) {
-            if (user.getRole().equals(role)) {
-                result.add(user);
+    public boolean rejectUser(String id) {
+        User u = findUserByID(id);
+        if (u != null) {
+            u.setActive(false);
+            u.setApproved(false);
+            FileManager.saveAllUsers(users);
+            return true;
+        }
+        return false;
+    }
+
+    public List<User> getPendingUsers() {
+        List<User> list = new ArrayList<>();
+        for (User u : users) {
+            if (!u.isApproved()) list.add(u);
+        }
+        return list;
+    }
+
+    // ================= MODULES =================
+
+    public void createModule(Module m) {
+        modules.add(m);
+        FileManager.saveModule(m);
+    }
+
+    public List<Module> getAllModules() {
+        return new ArrayList<>(modules);
+    }
+
+    // ================= CLASSES =================
+
+    public void createClass(ClassModule c) {
+        classes.add(c);
+        FileManager.saveClass(c);
+    }
+
+    public List<ClassModule> getAllClasses() {
+        return new ArrayList<>(classes);
+    }
+
+    public void updateClass(ClassModule updated) {
+        for (int i = 0; i < classes.size(); i++) {
+            if (classes.get(i).getClassID().equals(updated.getClassID())) {
+                classes.set(i, updated);
+                FileManager.saveAllClasses(classes);
+                return;
             }
         }
-        return result;
+    }
+
+    public void deleteClass(String id) {
+        classes.removeIf(c -> c.getClassID().equals(id));
+        FileManager.saveAllClasses(classes);
+    }
+
+    // ================= ASSESSMENTS =================
+
+    public void createAssessment(Assessment a) {
+        assessments.add(a);
+        FileManager.saveAssessment(a);
+    }
+
+    public List<Assessment> getAllAssessments() {
+        return new ArrayList<>(assessments);
+    }
+
+    public boolean updateAssessment(Assessment updated) {
+        for (int i = 0; i < assessments.size(); i++) {
+            if (assessments.get(i).getAssessmentID()
+                    .equals(updated.getAssessmentID())) {
+
+                assessments.set(i, updated);
+                FileManager.saveAllAssessments(assessments);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // ================= FEEDBACK =================
+
+    public void createFeedback(Feedback f) {
+        feedbackList.add(f);
+        FileManager.saveFeedback(f);
+    }
+
+    public List<Feedback> getAllFeedback() {
+        return new ArrayList<>(feedbackList);
+    }
+
+    // ================= ASSIGNMENTS =================
+
+    public void assignLecturerToLeader(String lecID, String leaderID) {
+        User u = findUserByID(lecID);
+        if (u instanceof Lecturer) {
+            ((Lecturer) u).setAcademicLeaderID(leaderID);
+            updateUser(u);
+        }
+    }
+
+    public void unassignLecturerFromLeader(String lecID) {
+        User u = findUserByID(lecID);
+        if (u instanceof Lecturer) {
+            ((Lecturer) u).setAcademicLeaderID(null);
+            updateUser(u);
+        }
     }
 
     public List<User> getAllLecturers() {
@@ -135,155 +238,82 @@ public class SystemManager {
         return getUsersByRole("ACADEMIC_LEADER");
     }
 
-    // ================= MODULE MANAGEMENT =================
-    public void createModule(Module module) {
-        modules.add(module);
-        FileManager.saveModule(module);
+    // ================= ID GENERATORS =================
+
+    public String generateUserID(String role) {
+        String prefix = "USR";
+        if (role.equalsIgnoreCase("ADMIN_STAFF")) prefix = "ADM";
+        if (role.equalsIgnoreCase("ACADEMIC_LEADER")) prefix = "ACL";
+        if (role.equalsIgnoreCase("LECTURER")) prefix = "LEC";
+        if (role.equalsIgnoreCase("STUDENT")) prefix = "STU";
+
+        int max = 0;
+        for (User u : users) {
+            if (u.getUserID().startsWith(prefix)) {
+                try {
+                    int num = Integer.parseInt(
+                            u.getUserID().substring(prefix.length()));
+                    if (num > max) max = num;
+                } catch (Exception ignored) {}
+            }
+        }
+        return String.format("%s%03d", prefix, max + 1);
     }
 
-    public List<Module> getAllModules() {
-        return new ArrayList<>(modules);
+    public String generateStaffID() {
+        int max = 0;
+        for (User u : users) {
+            String id = null;
+            if (u instanceof AdminStaff)
+                id = ((AdminStaff) u).getStaffID();
+            if (u instanceof Lecturer)
+                id = ((Lecturer) u).getStaffID();
+            if (u instanceof AcademicLeader)
+                id = ((AcademicLeader) u).getStaffID();
+
+            if (id != null && id.startsWith("STF")) {
+                try {
+                    int num = Integer.parseInt(id.substring(3));
+                    if (num > max) max = num;
+                } catch (Exception ignored) {}
+            }
+        }
+        return String.format("STF%03d", max + 1);
+    }
+
+    public String generateAssessmentTypeID() {
+        return "AT" + String.format("%03d", 1);
     }
 
     public String generateModuleID() {
-        String prefix = "MOD";
         int max = 0;
-
         for (Module m : modules) {
-            if (m.getModuleID() != null && m.getModuleID().startsWith(prefix)) {
+            if (m.getModuleID().startsWith("MOD")) {
                 try {
-                    int v = Integer.parseInt(m.getModuleID().substring(prefix.length()));
-                    if (v > max) max = v;
+                    int num = Integer.parseInt(
+                            m.getModuleID().substring(3));
+                    if (num > max) max = num;
                 } catch (Exception ignored) {}
             }
         }
-        return String.format("%s%03d", prefix, max + 1);
-    }
-
-    // ================= CLASS MANAGEMENT =================
-    public void createClass(ClassModule classModule) {
-
-        if (classes == null) classes = new ArrayList<>();
-
-        classes.add(classModule);
-
-        // safer save (overwrite full list)
-        FileManager.saveAllClasses(classes);
-    }
-
-    public List<ClassModule> getAllClasses() {
-        if (classes == null) classes = new ArrayList<>();
-        return new ArrayList<>(classes);
-    }
-
-    public void updateClass(ClassModule updated) {
-        for (int i = 0; i < classes.size(); i++) {
-            if (classes.get(i).getClassID().equals(updated.getClassID())) {
-                classes.set(i, updated);
-                FileManager.saveAllClasses(classes);
-                return;
-            }
-        }
-    }
-
-    public void deleteClass(String classID) {
-        for (int i = 0; i < classes.size(); i++) {
-            if (classes.get(i).getClassID().equals(classID)) {
-                classes.remove(i);
-                FileManager.saveAllClasses(classes);
-                return;
-            }
-        }
+        return String.format("MOD%03d", max + 1);
     }
 
     public String generateClassID() {
-        String prefix = "CL";
         int max = 0;
-
         for (ClassModule c : classes) {
-            if (c.getClassID() != null && c.getClassID().startsWith(prefix)) {
+            if (c.getClassID().startsWith("CL")) {
                 try {
-                    int v = Integer.parseInt(c.getClassID().substring(prefix.length()));
-                    if (v > max) max = v;
+                    int num = Integer.parseInt(
+                            c.getClassID().substring(2));
+                    if (num > max) max = num;
                 } catch (Exception ignored) {}
             }
         }
-        return String.format("%s%03d", prefix, max + 1);
+        return String.format("CL%03d", max + 1);
     }
 
-    // ================= ASSESSMENT MANAGEMENT =================
-    public void createAssessment(Assessment assessment) {
-        assessments.add(assessment);
-        FileManager.saveAssessment(assessment);
+    public User getCurrentUser() {
+        return currentUser;
     }
-
-    public List<Assessment> getAllAssessments() {
-        return new ArrayList<>(assessments);
-    }
-
-    public boolean updateAssessment(Assessment updated) {
-        for (int i = 0; i < assessments.size(); i++) {
-            if (assessments.get(i).getAssessmentID().equals(updated.getAssessmentID())) {
-                assessments.set(i, updated);
-                FileManager.saveAllAssessments(assessments);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public String generateAssessmentID() {
-        String prefix = "ASM";
-        int max = 0;
-
-        for (Assessment a : assessments) {
-            if (a.getAssessmentID() != null && a.getAssessmentID().startsWith(prefix)) {
-                try {
-                    int v = Integer.parseInt(a.getAssessmentID().substring(prefix.length()));
-                    if (v > max) max = v;
-                } catch (Exception ignored) {}
-            }
-        }
-        return String.format("%s%03d", prefix, max + 1);
-    }
-
-    // ================= FEEDBACK =================
-    public void createFeedback(Feedback feedback) {
-        feedbackList.add(feedback);
-        FileManager.saveFeedback(feedback);
-    }
-
-    public List<Feedback> getAllFeedback() {
-        return new ArrayList<>(feedbackList);
-    }
-
-    public List<Feedback> getStudentFeedback(String studentID) {
-        List<Feedback> result = new ArrayList<>();
-        for (Feedback f : feedbackList) {
-            if (f.getStudentID().equals(studentID)) {
-                result.add(f);
-            }
-        }
-        return result;
-    }
-
-    public String generateFeedbackID() {
-        String prefix = "FB";
-        int max = 0;
-
-        for (Feedback f : feedbackList) {
-            if (f.getFeedbackID() != null && f.getFeedbackID().startsWith(prefix)) {
-                try {
-                    int v = Integer.parseInt(f.getFeedbackID().substring(prefix.length()));
-                    if (v > max) max = v;
-                } catch (Exception ignored) {}
-            }
-        }
-        return String.format("%s%03d", prefix, max + 1);
-    }
-
-    // ================= GETTERS =================
-    public User getCurrentUser() { return currentUser; }
-    public void setCurrentUser(User user) { currentUser = user; }
-    public GradingSystem getGradingSystem() { return gradingSystem; }
 }
