@@ -8,7 +8,7 @@ public class AcademicLeaderDashboard extends JFrame {
     private final AcademicLeader leader;
 
     private JLabel headerLabel;
-    private JComboBox<String> moduleBox;   // ✅ Class-level moduleBox
+    private JComboBox<String> moduleBox; // Keep for refresh
 
     public AcademicLeaderDashboard(SystemManager systemManager, AcademicLeader leader) {
         this.systemManager = systemManager;
@@ -86,6 +86,18 @@ public class AcademicLeaderDashboard extends JFrame {
         JTextField emailField = new JTextField(leader.getEmail(), 20);
         JTextField deptField = new JTextField(leader.getDepartment(), 20);
 
+        JComboBox<String> genderBox = new JComboBox<>(new String[]{"Male", "Female"});
+        if (leader.getGender() != null && !leader.getGender().isEmpty()) {
+            genderBox.setSelectedItem(leader.getGender());
+        }
+
+        JSpinner ageSpinner = new JSpinner(
+                new SpinnerNumberModel(
+                        leader.getAge() > 0 ? leader.getAge() : 20,
+                        15, 100, 1
+                )
+        );
+
         gbc.gridx = 0; gbc.gridy = 0;
         panel.add(new JLabel("Full Name:"), gbc);
         gbc.gridx = 1;
@@ -101,14 +113,31 @@ public class AcademicLeaderDashboard extends JFrame {
         gbc.gridx = 1;
         panel.add(deptField, gbc);
 
+        gbc.gridx = 0; gbc.gridy = 3;
+        panel.add(new JLabel("Gender:"), gbc);
+        gbc.gridx = 1;
+        panel.add(genderBox, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 4;
+        panel.add(new JLabel("Age:"), gbc);
+        gbc.gridx = 1;
+        panel.add(ageSpinner, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 5;
+        panel.add(new JLabel("Leader ID:"), gbc);
+        gbc.gridx = 1;
+        panel.add(new JLabel(leader.getLeaderID()), gbc);
+
         JButton saveBtn = new JButton("Save Profile");
-        gbc.gridx = 1; gbc.gridy = 3;
+        gbc.gridx = 1; gbc.gridy = 6;
         panel.add(saveBtn, gbc);
 
         saveBtn.addActionListener(e -> {
             leader.setFullName(nameField.getText());
             leader.setEmail(emailField.getText());
             leader.setDepartment(deptField.getText());
+            leader.setGender((String) genderBox.getSelectedItem());
+            leader.setAge((Integer) ageSpinner.getValue());
 
             headerLabel.setText(
                     "Welcome, " + leader.getFullName() + " (Academic Leader)"
@@ -158,7 +187,7 @@ public class AcademicLeaderDashboard extends JFrame {
                 systemManager.createModule(module);
                 leader.createModule(module);
 
-                refreshModuleBox();   // ✅ IMPORTANT FIX
+                refreshModuleBox(); // Keep refresh
 
                 JOptionPane.showMessageDialog(this,
                         "Module created successfully!");
@@ -195,7 +224,7 @@ public class AcademicLeaderDashboard extends JFrame {
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         moduleBox = new JComboBox<>();
-        refreshModuleBox();  // ✅ Load modules here
+        refreshModuleBox();
 
         JComboBox<String> lecturerBox = new JComboBox<>();
         lecturerBox.addItem("LEC001 - AIDEN");
@@ -216,13 +245,11 @@ public class AcademicLeaderDashboard extends JFrame {
         return panel;
     }
 
-    // ================= REFRESH METHOD =================
+    // ================= REFRESH MODULE BOX =================
     private void refreshModuleBox() {
-
         if (moduleBox == null) return;
 
         moduleBox.removeAllItems();
-
         java.util.List<Module> modules = systemManager.getAllModules();
 
         if (modules == null || modules.isEmpty()) {
@@ -236,12 +263,60 @@ public class AcademicLeaderDashboard extends JFrame {
         }
     }
 
-    // ================= REPORTS =================
+    // ================= REPORTS (RESTORED SIMPLE STRUCTURE) =================
     private JPanel buildReportsPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JTextArea area = new JTextArea();
-        area.setEditable(false);
-        panel.add(new JScrollPane(area), BorderLayout.CENTER);
+
+        JPanel panel = new JPanel(new BorderLayout(8, 8));
+        panel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setBorder(BorderFactory.createTitledBorder("Report Options"));
+        optionsPanel.setPreferredSize(new Dimension(170, 300));
+
+        JButton userReportBtn = new JButton("User Summary");
+        JButton classReportBtn = new JButton("Class Summary");
+        JButton moduleReportBtn = new JButton("Module Summary");
+        JButton assessmentReportBtn = new JButton("Assessment Summary");
+        JButton enrollmentReportBtn = new JButton("Enrollment Report");
+
+        optionsPanel.add(userReportBtn);
+        optionsPanel.add(Box.createVerticalStrut(8));
+        optionsPanel.add(classReportBtn);
+        optionsPanel.add(Box.createVerticalStrut(8));
+        optionsPanel.add(moduleReportBtn);
+        optionsPanel.add(Box.createVerticalStrut(8));
+        optionsPanel.add(assessmentReportBtn);
+        optionsPanel.add(Box.createVerticalStrut(8));
+        optionsPanel.add(enrollmentReportBtn);
+
+        JTextArea reportArea = new JTextArea();
+        reportArea.setEditable(false);
+        JScrollPane scroll = new JScrollPane(reportArea);
+
+        panel.add(optionsPanel, BorderLayout.WEST);
+        panel.add(scroll, BorderLayout.CENTER);
+
+        // Example: User Report
+        userReportBtn.addActionListener(e -> {
+            StringBuilder report = new StringBuilder();
+            report.append("=== USER SUMMARY REPORT ===\n\n");
+
+            java.util.List<User> users = systemManager.getAllUsers();
+            report.append("Total Users: ").append(users.size()).append("\n\n");
+
+            for (User u : users) {
+                report.append(u.getUserID())
+                        .append(" - ")
+                        .append(u.getFullName())
+                        .append(" (")
+                        .append(u.getRole())
+                        .append(")\n");
+            }
+
+            reportArea.setText(report.toString());
+        });
+
         return panel;
     }
 }
