@@ -269,39 +269,140 @@ public class AcademicLeaderDashboard extends JFrame {
     }
 
     // ================= REPORTS =================
-    private JPanel buildReportsPanel() {
+    // ================= REPORTS =================
+private JPanel buildReportsPanel() {
 
-        JPanel panel = new JPanel(new BorderLayout(8, 8));
-        panel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+    JPanel panel = new JPanel(new BorderLayout(8, 8));
+    panel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
-        JPanel optionsPanel = new JPanel();
-        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-        optionsPanel.setBorder(BorderFactory.createTitledBorder("Report Options"));
-        optionsPanel.setPreferredSize(new Dimension(170, 300));
+    JPanel optionsPanel = new JPanel();
+    optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+    optionsPanel.setBorder(BorderFactory.createTitledBorder("Report Options"));
+    optionsPanel.setPreferredSize(new Dimension(170, 300));
 
-        JButton userReportBtn = new JButton("User Summary");
-        JButton classReportBtn = new JButton("Class Summary");
-        JButton moduleReportBtn = new JButton("Module Summary");
-        JButton assessmentReportBtn = new JButton("Assessment Summary");
-        JButton enrollmentReportBtn = new JButton("Enrollment Report");
+    JButton userReportBtn = new JButton("User Summary");
+    JButton classReportBtn = new JButton("Class Summary");
+    JButton moduleReportBtn = new JButton("Module Summary");
+    JButton assessmentReportBtn = new JButton("Assessment Summary");
+    JButton enrollmentReportBtn = new JButton("Enrollment Report");
 
-        optionsPanel.add(userReportBtn);
-        optionsPanel.add(Box.createVerticalStrut(8));
-        optionsPanel.add(classReportBtn);
-        optionsPanel.add(Box.createVerticalStrut(8));
-        optionsPanel.add(moduleReportBtn);
-        optionsPanel.add(Box.createVerticalStrut(8));
-        optionsPanel.add(assessmentReportBtn);
-        optionsPanel.add(Box.createVerticalStrut(8));
-        optionsPanel.add(enrollmentReportBtn);
+    optionsPanel.add(userReportBtn);
+    optionsPanel.add(Box.createVerticalStrut(8));
+    optionsPanel.add(classReportBtn);
+    optionsPanel.add(Box.createVerticalStrut(8));
+    optionsPanel.add(moduleReportBtn);
+    optionsPanel.add(Box.createVerticalStrut(8));
+    optionsPanel.add(assessmentReportBtn);
+    optionsPanel.add(Box.createVerticalStrut(8));
+    optionsPanel.add(enrollmentReportBtn);
 
-        JTextArea reportArea = new JTextArea();
-        reportArea.setEditable(false);
-        reportArea.setFont(new Font("Monospaced", Font.PLAIN, 11));
+    JTextArea reportArea = new JTextArea();
+    reportArea.setEditable(false);
+    reportArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
 
-        panel.add(optionsPanel, BorderLayout.WEST);
-        panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
+    panel.add(optionsPanel, BorderLayout.WEST);
+    panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
 
-        return panel;
-    }
+    // ================= USER REPORT =================
+    userReportBtn.addActionListener(e -> {
+        StringBuilder report = new StringBuilder();
+        List<User> users = systemManager.getAllUsers();
+
+        report.append("=== USER SUMMARY REPORT ===\n\n");
+        report.append("Total Users: ").append(users.size()).append("\n\n");
+
+        for (User u : users) {
+            report.append(u.getUserID())
+                  .append(" - ")
+                  .append(u.getFullName())
+                  .append(" (")
+                  .append(u.getRole())
+                  .append(")\n");
+        }
+
+        reportArea.setText(report.toString());
+    });
+
+    // ================= CLASS REPORT =================
+    classReportBtn.addActionListener(e -> {
+        StringBuilder report = new StringBuilder();
+        List<ClassModule> classes = systemManager.getAllClasses();
+
+        report.append("=== CLASS SUMMARY REPORT ===\n\n");
+        report.append("Total Classes: ").append(classes.size()).append("\n\n");
+
+        for (ClassModule c : classes) {
+            report.append("Class ID: ").append(c.getClassID()).append("\n");
+            report.append("Name: ").append(c.getClassName()).append("\n");
+            report.append("Module: ").append(c.getModuleID()).append("\n");
+            report.append("Capacity: ").append(c.getCapacity()).append("\n");
+            report.append("Enrolled: ").append(c.getEnrolledStudents().size()).append("\n\n");
+        }
+
+        reportArea.setText(report.toString());
+    });
+
+    // ================= MODULE REPORT =================
+    moduleReportBtn.addActionListener(e -> {
+        StringBuilder report = new StringBuilder();
+        List<Module> modules = systemManager.getAllModules();
+
+        report.append("=== MODULE SUMMARY REPORT ===\n\n");
+        report.append("Total Modules: ").append(modules.size()).append("\n\n");
+
+        for (Module m : modules) {
+            report.append("Module ID: ").append(m.getModuleID()).append("\n");
+            report.append("Name: ").append(m.getModuleName()).append("\n");
+            report.append("Code: ").append(m.getModuleCode()).append("\n");
+            report.append("Credits: ").append(m.getCredits()).append("\n\n");
+        }
+
+        reportArea.setText(report.toString());
+    });
+
+    // ================= ASSESSMENT REPORT =================
+    assessmentReportBtn.addActionListener(e -> {
+        StringBuilder report = new StringBuilder();
+        List<Assessment> assessments = systemManager.getAllAssessments();
+
+        report.append("=== ASSESSMENT SUMMARY REPORT ===\n\n");
+        report.append("Total Assessments: ").append(assessments.size()).append("\n\n");
+
+        for (Assessment a : assessments) {
+            report.append("Assessment ID: ").append(a.getAssessmentID()).append("\n");
+            report.append("Class: ").append(a.getClassID()).append("\n");
+            report.append("Title: ").append(a.getTitle()).append("\n");
+            report.append("Type: ").append(a.getAssessmentType()).append("\n");
+            report.append("Status: ").append(a.getStatus()).append("\n\n");
+        }
+
+        reportArea.setText(report.toString());
+    });
+
+    // ================= ENROLLMENT REPORT =================
+    enrollmentReportBtn.addActionListener(e -> {
+        StringBuilder report = new StringBuilder();
+        List<ClassModule> classes = systemManager.getAllClasses();
+
+        report.append("=== ENROLLMENT REPORT ===\n\n");
+
+        int total = 0;
+        for (ClassModule c : classes) {
+            int enrolled = c.getEnrolledStudents().size();
+            report.append(c.getClassID())
+                  .append(" - ")
+                  .append(c.getClassName())
+                  .append(": ")
+                  .append(enrolled)
+                  .append(" students\n");
+            total += enrolled;
+        }
+
+        report.append("\nTotal Enrolled Students: ").append(total);
+
+        reportArea.setText(report.toString());
+    });
+
+    return panel;
 }
+

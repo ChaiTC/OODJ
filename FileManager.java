@@ -600,51 +600,71 @@ if (module == null) return null;
     }
 
     private static ClassModule deserializeClass(String data, List<Module> modules, List<User> users) {
-        String[] parts = data.split("\\|");
-        if (parts.length < 8) return null;
-        
-        String classID = parts[0];
-        String className = parts[1];
-        String moduleID = parts[2];
-        String lecturerID = parts[3];
-        String day = parts[4].isEmpty() ? null : parts[4];
-        String time = parts[5].isEmpty() ? null : parts[5];
-        String location = parts[6].isEmpty() ? null : parts[6];
-        int capacity = 50;
-        try { capacity = Integer.parseInt(parts[7]); } catch (Exception ignored) {}
-        String studentCSV = parts.length > 8 ? parts[8] : "";
 
-        // Create using new constructor
-        ClassModule cls = new ClassModule(classID, className, moduleID, capacity, day, time, location, null);
-        
-        // Set lecturer if available
-        if (lecturerID != null && !lecturerID.isEmpty()) {
-            for (User u : users) {
-                if (u instanceof Lecturer && u.getUserID().equals(lecturerID)) {
-                    cls.setLecturer((Lecturer) u);
-                    break;
-                }
+    // 🔥 CRITICAL FIX: keep empty trailing values
+    String[] parts = data.split("\\|", -1);
+
+    if (parts.length < 8) return null;
+
+    String classID = parts[0];
+    String className = parts[1];
+    String moduleID = parts[2];
+    String lecturerID = parts[3];
+
+    String day = parts[4].isEmpty() ? null : parts[4];
+    String time = parts[5].isEmpty() ? null : parts[5];
+    String location = parts[6].isEmpty() ? null : parts[6];
+
+    int capacity = 50;
+    try {
+        capacity = Integer.parseInt(parts[7]);
+    } catch (Exception ignored) {}
+
+    // This safely handles trailing |
+    String studentCSV = parts.length > 8 ? parts[8] : "";
+
+    // Create class object
+    ClassModule cls = new ClassModule(
+            classID,
+            className,
+            moduleID,
+            capacity,
+            day,
+            time,
+            location,
+            null
+    );
+
+    // Set lecturer if exists
+    if (lecturerID != null && !lecturerID.isEmpty()) {
+        for (User u : users) {
+            if (u instanceof Lecturer && u.getUserID().equals(lecturerID)) {
+                cls.setLecturer((Lecturer) u);
+                break;
             }
         }
+    }
 
-        if (studentCSV != null && !studentCSV.isEmpty()) {
-            String[] sids = studentCSV.split(",");
-            for (String sid : sids) {
-                for (User u : users) {
-                    if (u instanceof Student) {
-                        Student s = (Student) u;
-                        if (s.getStudentID().equals(sid)) {
-                            cls.enrollStudent(s);
-                            s.registerClass(cls);
-                            break;
-                        }
+    // Restore enrolled students
+    if (studentCSV != null && !studentCSV.isEmpty()) {
+        String[] sids = studentCSV.split(",");
+        for (String sid : sids) {
+            for (User u : users) {
+                if (u instanceof Student) {
+                    Student s = (Student) u;
+                    if (s.getStudentID().equals(sid)) {
+                        cls.enrollStudent(s);
+                        s.registerClass(cls);
+                        break;
                     }
                 }
             }
         }
-
-        return cls;
     }
+
+    return cls;
+}
+
     
     /**
      * Save grading system to file
