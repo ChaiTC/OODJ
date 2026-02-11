@@ -213,13 +213,16 @@ public class AcademicLeaderDashboard extends JFrame {
         JComboBox<String> moduleBox = new JComboBox<>();
         JComboBox<String> lecturerBox = new JComboBox<>();
 
-        if (leader.getManagedModules().isEmpty()) {
-            moduleBox.addItem("No modules available");
+        java.util.List<Module> modules = systemManager.getAllModules();
+
+        if (modules == null || modules.isEmpty()) {
+    moduleBox.addItem("No modules available");
         } else {
-            leader.getManagedModules().forEach(
-                    m -> moduleBox.addItem(m.getModuleCode() + " - " + m.getModuleName())
-            );
-        }
+        for (Module m : modules) {
+        moduleBox.addItem(m.getModuleCode() + " - " + m.getModuleName());
+    }
+}
+  
 
         lecturerBox.addItem("LEC001 - AIDEN");
 
