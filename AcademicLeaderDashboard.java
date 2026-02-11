@@ -178,6 +178,11 @@ public class AcademicLeaderDashboard extends JFrame {
                 );
                 systemManager.createModule(module);
                 moduleSelectBox.addItem(module.getModuleCode() + " - " + module.getModuleName());
+                // Clear fields after creation
+                codeField.setText("");
+                nameField.setText("");
+                creditField.setText("3");
+                departmentBox.setSelectedItem(leader.getDepartment());
                 JOptionPane.showMessageDialog(this, "Module created!");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this,
@@ -199,9 +204,21 @@ public class AcademicLeaderDashboard extends JFrame {
                 selected.setModuleCode(codeField.getText());
                 selected.setCreditHours(Integer.parseInt(creditField.getText()));
                 selected.setDepartment((String) departmentBox.getSelectedItem());
-                systemManager.createModule(selected); // Overwrites existing
-                moduleSelectBox.insertItemAt(selected.getModuleCode() + " - " + selected.getModuleName(), idx);
-                moduleSelectBox.removeItemAt(idx + 1);
+                // Persist all modules after update
+                systemManager.getAllModules().set(idx, selected);
+                FileManager.saveAllModules(systemManager.getAllModules());
+                // Refresh dropdown
+                moduleSelectBox.removeAllItems();
+                modules.clear();
+                modules.addAll(systemManager.getAllModules());
+                for (Module m : modules) {
+                    moduleSelectBox.addItem(m.getModuleCode() + " - " + m.getModuleName());
+                }
+                // Clear fields after update
+                codeField.setText("");
+                nameField.setText("");
+                creditField.setText("3");
+                departmentBox.setSelectedItem(leader.getDepartment());
                 JOptionPane.showMessageDialog(this, "Module updated!");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Invalid input", "Error", JOptionPane.ERROR_MESSAGE);
@@ -214,10 +231,19 @@ public class AcademicLeaderDashboard extends JFrame {
                 JOptionPane.showMessageDialog(this, "Select a module to delete.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            Module selected = modules.get(idx);
             try {
-                modules.remove(selected);
-                moduleSelectBox.removeItemAt(idx);
+                modules.remove(idx);
+                FileManager.saveAllModules(modules);
+                // Refresh dropdown
+                moduleSelectBox.removeAllItems();
+                for (Module m : modules) {
+                    moduleSelectBox.addItem(m.getModuleCode() + " - " + m.getModuleName());
+                }
+                // Clear fields after delete
+                codeField.setText("");
+                nameField.setText("");
+                creditField.setText("3");
+                departmentBox.setSelectedItem(leader.getDepartment());
                 JOptionPane.showMessageDialog(this, "Module deleted!");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Delete failed", "Error", JOptionPane.ERROR_MESSAGE);

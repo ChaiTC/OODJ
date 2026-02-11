@@ -130,6 +130,21 @@ public class FileManager {
     }
 
     /**
+     * Overwrite and save all modules
+     */
+    public static void saveAllModules(List<Module> modules) {
+        try (FileWriter fw = new FileWriter(MODULES_FILE, false);
+             BufferedWriter bw = new BufferedWriter(fw)) {
+            for (Module module : modules) {
+                bw.write(serializeModule(module));
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            // Optionally log error
+        }
+    }
+
+    /**
      * Save a single class (append)
      */
     public static void saveClass(ClassModule cls) {
