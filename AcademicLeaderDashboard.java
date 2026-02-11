@@ -142,54 +142,68 @@ public class AcademicLeaderDashboard extends JFrame {
     }
 
     // ================= MODULE MANAGEMENT =================
-    private JPanel buildModuleManagementPanel() {
+ // ================= MODULE MANAGEMENT =================
+private JPanel buildModuleManagementPanel() {
 
-        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+    JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10)); // changed 5 → 6 rows
+    panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        JTextField codeField = new JTextField();
-        JTextField nameField = new JTextField();
-        JTextField creditField = new JTextField("3");
+    JTextField codeField = new JTextField();
+    JTextField nameField = new JTextField();
+    JTextField creditField = new JTextField("3");
 
-        JButton createBtn = new JButton("Create Module");
+    // ✅ Department field added back
+    JComboBox<String> departmentBox = new JComboBox<>(
+            new String[]{"IT", "Business", "Engineering"}
+    );
+    departmentBox.setSelectedItem(leader.getDepartment());
 
-        createBtn.addActionListener(e -> {
-            try {
-                String moduleID = systemManager.generateModuleID();
+    JButton createBtn = new JButton("Create Module");
 
-                Module module = new Module(
-                        moduleID,
-                        nameField.getText(),
-                        codeField.getText(),
-                        "No description",
-                        Integer.parseInt(creditField.getText()),
-                        leader.getDepartment()
-                );
+    createBtn.addActionListener(e -> {
+        try {
+            String moduleID = systemManager.generateModuleID();
 
-                systemManager.createModule(module);
-                refreshModuleBox();
+            Module module = new Module(
+                    moduleID,
+                    nameField.getText(),
+                    codeField.getText(),
+                    "No description",
+                    Integer.parseInt(creditField.getText()),
+                    (String) departmentBox.getSelectedItem()  // ✅ use selected department
+            );
 
-                JOptionPane.showMessageDialog(this, "Module created!");
+            systemManager.createModule(module);
+            refreshModuleBox();
 
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this,
-                        "Invalid input",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        });
+            JOptionPane.showMessageDialog(this, "Module created!");
 
-        panel.add(new JLabel("Module Code:"));
-        panel.add(codeField);
-        panel.add(new JLabel("Module Name:"));
-        panel.add(nameField);
-        panel.add(new JLabel("Credits:"));
-        panel.add(creditField);
-        panel.add(new JLabel());
-        panel.add(createBtn);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Invalid input",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    });
 
-        return panel;
-    }
+    panel.add(new JLabel("Module Code:"));
+    panel.add(codeField);
+
+    panel.add(new JLabel("Module Name:"));
+    panel.add(nameField);
+
+    panel.add(new JLabel("Credits:"));
+    panel.add(creditField);
+
+    // ✅ Department UI added back
+    panel.add(new JLabel("Department:"));
+    panel.add(departmentBox);
+
+    panel.add(new JLabel());
+    panel.add(createBtn);
+
+    return panel;
+}
 
     // ================= ASSIGN LECTURERS =================
     private JPanel buildAssignLecturersPanel() {
