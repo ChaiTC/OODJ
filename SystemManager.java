@@ -1,5 +1,6 @@
 import java.util.*;
 
+
 public class SystemManager {
 
     private List<User> users;
@@ -7,6 +8,7 @@ public class SystemManager {
     private List<ClassModule> classes;
     private List<Assessment> assessments;
     private List<Feedback> feedbackList;
+    private List<Announcement> announcements;
     private GradingSystem gradingSystem;
     private User currentUser;
 
@@ -17,6 +19,7 @@ public class SystemManager {
         this.assessments = new ArrayList<>();
         this.feedbackList = new ArrayList<>();
 
+        this.announcements = new ArrayList<>();
         this.gradingSystem = new GradingSystem("GS001", "APU Grading System", 60);
         this.currentUser = null;
 
@@ -55,11 +58,20 @@ public class SystemManager {
         classes = FileManager.loadAllClasses(modules, users);
         assessments = FileManager.loadAllAssessments(modules, users);
         feedbackList = FileManager.loadAllFeedback();
+        announcements = FileManager.loadAllAnnouncements();
 
         GradingSystem loadedGrading = FileManager.loadGradingSystem();
         if (loadedGrading != null) {
             this.gradingSystem = loadedGrading;
         }
+    }
+    public List<Announcement> getAllAnnouncements() {
+        return new ArrayList<>(announcements);
+    }
+
+    public void addAnnouncement(Announcement ann) {
+        announcements.add(ann);
+        FileManager.saveAnnouncement(ann);
     }
 
     public boolean registerUser(User user) {

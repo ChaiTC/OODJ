@@ -51,6 +51,7 @@ public class AcademicLeaderDashboard extends JFrame {
         tabs.addTab("Module Management", buildModuleManagementPanel());
         tabs.addTab("Assign Lecturers", buildAssignLecturersPanel());
         tabs.addTab("View Reports", buildReportsPanel());
+        tabs.addTab("Announcements", buildAnnouncementPanel());
 
         return tabs;
     }

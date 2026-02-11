@@ -1,3 +1,81 @@
+    private static final String ANNOUNCEMENTS_FILE = "data/announcements.txt";
+    /**
+     * Save a single announcement to the announcements file (append)
+     */
+    public static void saveAnnouncement(Announcement ann) {
+        try (FileWriter fw = new FileWriter(ANNOUNCEMENTS_FILE, true);
+             BufferedWriter bw = new BufferedWriter(fw)) {
+            bw.write(serializeAnnouncement(ann));
+            bw.newLine();
+        } catch (IOException e) {
+            // Optionally log error
+        }
+    }
+
+    /**
+     * Overwrite and save all announcements
+     */
+    public static void saveAllAnnouncements(List<Announcement> announcements) {
+        try (FileWriter fw = new FileWriter(ANNOUNCEMENTS_FILE, false);
+             BufferedWriter bw = new BufferedWriter(fw)) {
+            for (Announcement ann : announcements) {
+                bw.write(serializeAnnouncement(ann));
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            // Optionally log error
+        }
+    }
+
+    /**
+     * Load all announcements from file
+     */
+    public static List<Announcement> loadAllAnnouncements() {
+        List<Announcement> announcements = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(ANNOUNCEMENTS_FILE))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                Announcement ann = deserializeAnnouncement(line);
+                if (ann != null) announcements.add(ann);
+            }
+        } catch (FileNotFoundException e) {
+            // File doesn't exist, return empty list
+        } catch (IOException e) {
+            // Optionally log error
+        }
+        return announcements;
+    }
+
+    // Serialize announcement to string
+    private static String serializeAnnouncement(Announcement ann) {
+        return ann.getAnnouncementID() + "|" +
+               ann.getTitle().replace("|", "/") + "|" +
+               ann.getContent().replace("|", "/") + "|" +
+               ann.getSenderID() + "|" +
+               ann.getTargetRole() + "|" +
+               ann.getCreatedDate().getTime();
+    }
+
+    // Deserialize announcement from string
+    private static Announcement deserializeAnnouncement(String data) {
+        try {
+            String[] parts = data.split("\\|", -1);
+            if (parts.length < 6) return null;
+            String id = parts[0];
+            String title = parts[1];
+            String content = parts[2];
+            String senderID = parts[3];
+            String target = parts[4];
+            long millis = Long.parseLong(parts[5]);
+            Announcement ann = new Announcement(id, title, content, senderID, target);
+            java.lang.reflect.Field f = ann.getClass().getDeclaredField("createdDate");
+            f.setAccessible(true);
+            f.set(ann, new java.util.Date(millis));
+            return ann;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 import java.io.*;
 import java.util.*;
 
