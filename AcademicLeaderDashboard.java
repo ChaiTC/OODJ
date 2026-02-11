@@ -405,4 +405,4 @@ private JPanel buildReportsPanel() {
 
     return panel;
 }
-
+}
