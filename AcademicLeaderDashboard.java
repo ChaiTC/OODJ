@@ -52,7 +52,13 @@ public class AcademicLeaderDashboard extends JFrame {
         tabs.addTab("Module Management", buildModuleManagementPanel());
         tabs.addTab("Assign Lecturers", buildAssignLecturersPanel());
         tabs.addTab("View Reports", buildReportsPanel());
-        tabs.addTab("Announcements", buildAnnouncementPanel());
+        
+        // Add listener to refresh module box when Assign Lecturers tab is selected
+        tabs.addChangeListener(e -> {
+            if (tabs.getSelectedIndex() == 2) { // Index 2 is Assign Lecturers tab
+                refreshModuleBox();
+            }
+        });
 
         return tabs;
     }
@@ -159,7 +165,10 @@ public class AcademicLeaderDashboard extends JFrame {
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.add(Box.createVerticalStrut(50));
-        centerPanel.add(Box.createHorizontalBox()).add(openModuleManagerBtn);
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(openModuleManagerBtn);
+        centerPanel.add(buttonPanel);
         
         panel.add(titleLabel, BorderLayout.NORTH);
         panel.add(centerPanel, BorderLayout.CENTER);
@@ -169,12 +178,8 @@ public class AcademicLeaderDashboard extends JFrame {
     
     private void showModuleManagementDialog() {
         try {
-            List<Module> modules = systemManager.getAllModules();
-            
-            if (modules == null || modules.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No modules found.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                return;
-            }
+            final List<Module> modules = systemManager.getAllModules() != null ? 
+                systemManager.getAllModules() : new java.util.ArrayList<>();
             
             JDialog dialog = new JDialog(this, "Module Management", true);
             dialog.setSize(900, 550);
@@ -268,7 +273,7 @@ public class AcademicLeaderDashboard extends JFrame {
     private void showCreateModuleDialog(JDialog parent, List<Module> modules, JTable table) {
         try {
             JDialog createDialog = new JDialog(parent, "Create New Module", true);
-            createDialog.setSize(400, 350);
+            createDialog.setSize(400, 420);
             createDialog.setLocationRelativeTo(parent);
             createDialog.setLayout(new GridBagLayout());
             
@@ -276,6 +281,7 @@ public class AcademicLeaderDashboard extends JFrame {
             gbc.insets = new Insets(8, 8, 8, 8);
             gbc.fill = GridBagConstraints.HORIZONTAL;
             
+            JTextField idField = new JTextField(20);
             JTextField nameField = new JTextField(20);
             JTextField codeField = new JTextField(20);
             JComboBox<Integer> creditBox = new JComboBox<>(new Integer[]{1, 2, 3, 4});
@@ -284,21 +290,26 @@ public class AcademicLeaderDashboard extends JFrame {
             departmentBox.setSelectedItem(leader.getDepartment());
             
             gbc.gridx = 0; gbc.gridy = 0;
+            createDialog.add(new JLabel("Module ID:"), gbc);
+            gbc.gridx = 1;
+            createDialog.add(idField, gbc);
+            
+            gbc.gridx = 0; gbc.gridy = 1;
             createDialog.add(new JLabel("Module Name:"), gbc);
             gbc.gridx = 1;
             createDialog.add(nameField, gbc);
             
-            gbc.gridx = 0; gbc.gridy = 1;
+            gbc.gridx = 0; gbc.gridy = 2;
             createDialog.add(new JLabel("Module Code:"), gbc);
             gbc.gridx = 1;
             createDialog.add(codeField, gbc);
             
-            gbc.gridx = 0; gbc.gridy = 2;
+            gbc.gridx = 0; gbc.gridy = 3;
             createDialog.add(new JLabel("Credits:"), gbc);
             gbc.gridx = 1;
             createDialog.add(creditBox, gbc);
             
-            gbc.gridx = 0; gbc.gridy = 3;
+            gbc.gridx = 0; gbc.gridy = 4;
             createDialog.add(new JLabel("Department:"), gbc);
             gbc.gridx = 1;
             createDialog.add(departmentBox, gbc);
@@ -309,9 +320,13 @@ public class AcademicLeaderDashboard extends JFrame {
             
             saveBtn.addActionListener(e -> {
                 try {
-                    String moduleID = systemManager.generateModuleID();
+                    if (idField.getText().isEmpty() || nameField.getText().isEmpty() || codeField.getText().isEmpty()) {
+                        JOptionPane.showMessageDialog(createDialog, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    
                     Module module = new Module(
-                            moduleID,
+                            idField.getText(),
                             nameField.getText(),
                             codeField.getText(),
                             "No description",
@@ -333,7 +348,7 @@ public class AcademicLeaderDashboard extends JFrame {
             buttonPanel.add(saveBtn);
             buttonPanel.add(cancelBtn);
             
-            gbc.gridx = 0; gbc.gridy = 4;
+            gbc.gridx = 0; gbc.gridy = 5;
             gbc.gridwidth = 2;
             createDialog.add(buttonPanel, gbc);
             
@@ -517,9 +532,11 @@ public class AcademicLeaderDashboard extends JFrame {
 
         moduleBox.removeAllItems();
         List<Module> modules = systemManager.getAllModules();
-
-        for (Module m : modules) {
-            moduleBox.addItem(m.getModuleCode() + " - " + m.getModuleName());
+        
+        if (modules != null) {
+            for (Module m : modules) {
+                moduleBox.addItem(m.getModuleCode() + " - " + m.getModuleName());
+            }
         }
     }
 
@@ -693,69 +710,6 @@ public class AcademicLeaderDashboard extends JFrame {
         });
 
         return panel;
-    }
-
-    // ================= ANNOUNCEMENTS PANEL =================
-    private JPanel buildAnnouncementPanel() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
-        JTextArea announcementArea = new JTextArea();
-        announcementArea.setFont(new Font("Arial", Font.PLAIN, 12));
-        announcementArea.setLineWrap(true);
-        announcementArea.setWrapStyleWord(true);
-
-        JScrollPane scrollPane = new JScrollPane(announcementArea);
-
-        // Create display area first
-        JTextArea displayArea = new JTextArea();
-        displayArea.setEditable(false);
-        displayArea.setFont(new Font("Arial", Font.PLAIN, 11));
-        JScrollPane displayScroll = new JScrollPane(displayArea);
-
-        JPanel inputPanel = new JPanel(new BorderLayout(5, 5));
-        JButton postBtn = new JButton("Post Announcement");
-
-        postBtn.addActionListener(e -> {
-            String message = announcementArea.getText().trim();
-            if (!message.isEmpty()) {
-                String annID = "ANN" + System.currentTimeMillis();
-                Announcement ann = new Announcement(annID, "Announcement", message, leader.getUserID(), "ALL");
-                systemManager.addAnnouncement(ann);
-                announcementArea.setText("");
-                JOptionPane.showMessageDialog(this, "Announcement posted successfully!");
-                // Refresh display
-                updateAnnouncementDisplay(displayArea);
-            } else {
-                JOptionPane.showMessageDialog(this, "Please enter an announcement.", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        inputPanel.add(new JLabel("Post New Announcement:"), BorderLayout.NORTH);
-        inputPanel.add(scrollPane, BorderLayout.CENTER);
-        inputPanel.add(postBtn, BorderLayout.SOUTH);
-
-        // Load and display existing announcements
-        updateAnnouncementDisplay(displayArea);
-
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, inputPanel, displayScroll);
-        splitPane.setDividerLocation(150);
-
-        panel.add(splitPane, BorderLayout.CENTER);
-
-        return panel;
-    }
-
-    private void updateAnnouncementDisplay(JTextArea displayArea) {
-        StringBuilder sb = new StringBuilder();
-        for (Announcement ann : systemManager.getAllAnnouncements()) {
-            sb.append("From: ").append(ann.getSenderID()).append("\n");
-            sb.append("Title: ").append(ann.getTitle()).append("\n");
-            sb.append("Message: ").append(ann.getContent()).append("\n");
-            sb.append("Date: ").append(ann.getCreatedDate()).append("\n");
-            sb.append("---\n");
-        }
-        displayArea.setText(sb.toString());
     }
 
 
