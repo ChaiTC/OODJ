@@ -271,14 +271,15 @@ public class SystemManager {
 
     // ======== RESTORED MISSING METHODS ========
 
-    public void deleteClass(String classID) {
+    public boolean deleteClass(String classID) {
         for (int i = 0; i < classes.size(); i++) {
             if (classes.get(i).getClassID().equals(classID)) {
                 classes.remove(i);
                 FileManager.saveAllClasses(classes);
-                return;
+                return true;
             }
         }
+        return false;
     }
 
     public boolean approveUser(String userID) {
