@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -129,29 +130,7 @@ class AcademicLeaderReportsPanel extends JPanel {
         moduleReportBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                StringBuilder report = new StringBuilder();
-                report.append("=== MODULE SUMMARY REPORT ===\n");
-                report.append("Generated: ").append(new java.util.Date()).append("\n\n");
-                
-                java.util.List<Module> modules = systemManager.getAllModules();
-                report.append("Total Modules: ").append(modules.size()).append("\n\n");
-                
-                report.append("--- Module Details ---\n");
-                for (Module m : modules) {
-                    report.append("Module ID: ").append(m.getModuleID()).append("\n");
-                    report.append("  Name: ").append(m.getModuleName()).append("\n");
-                    report.append("  Code: ").append(m.getModuleCode()).append("\n");
-                    report.append("  Credits: ").append(m.getCredits()).append("\n");
-                    report.append("  Classes: ");
-                    java.util.List<ClassModule> classes = systemManager.getAllClasses();
-                    int classCount = 0;
-                    for (ClassModule c : classes) {
-                        if (c.getModuleID().equals(m.getModuleID())) classCount++;
-                    }
-                    report.append(classCount).append("\n\n");
-                }
-                
-                reportArea.setText(report.toString());
+                showModuleManagementPanel();
             }
         });
         
@@ -214,5 +193,207 @@ class AcademicLeaderReportsPanel extends JPanel {
                 reportArea.setText(report.toString());
             }
         });
+    }
+
+    private void showModuleManagementPanel() {
+        java.util.List<Module> modules = systemManager.getAllModules();
+        
+        JDialog dialog = new JDialog(parentFrame, "Module Management", true);
+        dialog.setSize(800, 500);
+        dialog.setLocationRelativeTo(parentFrame);
+        dialog.setLayout(new BorderLayout(8, 8));
+        dialog.getRootPane().setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        
+        // Create table
+        String[] columns = {"Module ID", "Module Name", "Code", "Credits", "Assigned Lecturer", "Action"};
+        Object[][] data = new Object[modules.size()][6];
+        
+        for (int i = 0; i < modules.size(); i++) {
+            Module m = modules.get(i);
+            
+            // Find assigned lecturer
+            String lecturerName = "Not Assigned";
+            java.util.List<User> lecturers = systemManager.getAllLecturers();
+            for (User u : lecturers) {
+                if (u instanceof Lecturer) {
+                    Lecturer lec = (Lecturer) u;
+                    if (lec.getAssignedModules().contains(m)) {
+                        lecturerName = lec.getFullName();
+                        break;
+                    }
+                }
+            }
+            
+            data[i][0] = m.getModuleID();
+            data[i][1] = m.getModuleName();
+            data[i][2] = m.getModuleCode();
+            data[i][3] = m.getCreditHours();
+            data[i][4] = lecturerName;
+            data[i][5] = "Edit / Delete";
+        }
+        
+        JTable table = new JTable(data, columns) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 5; // Only Action column is "editable"
+            }
+        };
+        
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(JTable table, Object value,
+                    boolean isSelected, boolean hasFocus, int row, int column) {
+                java.awt.Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (column == 5) {
+                    JButton btn = new JButton("Edit");
+                    btn.addActionListener(e -> {
+                        showModuleEditDialog(modules.get(row), dialog);
+                    });
+                    return btn;
+                }
+                return c;
+            }
+        });
+        
+        JScrollPane scrollPane = new JScrollPane(table);
+        dialog.add(scrollPane, BorderLayout.CENTER);
+        
+        // Bottom panel
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton closeBtn = new JButton("Close");
+        closeBtn.addActionListener(e -> dialog.dispose());
+        bottomPanel.add(closeBtn);
+        dialog.add(bottomPanel, BorderLayout.SOUTH);
+        
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        dialog.setVisible(true);
+    }
+    
+    private void showModuleEditDialog(Module module, JDialog parent) {
+        JDialog editDialog = new JDialog(parent, "Edit Module - " + module.getModuleID(), true);
+        editDialog.setSize(500, 400);
+        editDialog.setLocationRelativeTo(parent);
+        editDialog.setLayout(new GridBagLayout());
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        
+        // Module ID (read-only)
+        JTextField moduleIDField = new JTextField(module.getModuleID(), 20);
+        moduleIDField.setEditable(false);
+        
+        // Module Name
+        JTextField nameField = new JTextField(module.getModuleName(), 20);
+        
+        // Module Code
+        JTextField codeField = new JTextField(module.getModuleCode(), 20);
+        
+        // Credits
+        JSpinner creditsSpinner = new JSpinner(
+            new SpinnerNumberModel(module.getCreditHours(), 1, 10, 1)
+        );
+        
+        // Assigned Lecturer
+        JComboBox<String> lecturerCombo = new JComboBox<>();
+        lecturerCombo.addItem("Not Assigned");
+        
+        java.util.List<User> lecturers = systemManager.getAllLecturers();
+        String currentLecturer = "Not Assigned";
+        
+        for (User u : lecturers) {
+            if (u instanceof Lecturer) {
+                Lecturer lec = (Lecturer) u;
+                lecturerCombo.addItem(lec.getFullName() + " (" + lec.getUserID() + ")");
+                
+                if (lec.getAssignedModules().contains(module)) {
+                    currentLecturer = lec.getFullName() + " (" + lec.getUserID() + ")";
+                }
+            }
+        }
+        
+        if (!currentLecturer.equals("Not Assigned")) {
+            lecturerCombo.setSelectedItem(currentLecturer);
+        }
+        
+        // Add components
+        gbc.gridx = 0; gbc.gridy = 0;
+        editDialog.add(new JLabel("Module ID:"), gbc);
+        gbc.gridx = 1;
+        editDialog.add(moduleIDField, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 1;
+        editDialog.add(new JLabel("Module Name:"), gbc);
+        gbc.gridx = 1;
+        editDialog.add(nameField, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 2;
+        editDialog.add(new JLabel("Module Code:"), gbc);
+        gbc.gridx = 1;
+        editDialog.add(codeField, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 3;
+        editDialog.add(new JLabel("Credits:"), gbc);
+        gbc.gridx = 1;
+        editDialog.add(creditsSpinner, gbc);
+        
+        gbc.gridx = 0; gbc.gridy = 4;
+        editDialog.add(new JLabel("Assigned Lecturer:"), gbc);
+        gbc.gridx = 1;
+        editDialog.add(lecturerCombo, gbc);
+        
+        // Buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 0));
+        
+        JButton saveBtn = new JButton("Save");
+        JButton deleteBtn = new JButton("Delete");
+        JButton cancelBtn = new JButton("Cancel");
+        
+        saveBtn.addActionListener(e -> {
+            module.setModuleName(nameField.getText());
+            module.setModuleCode(codeField.getText());
+            module.setCreditHours((Integer) creditsSpinner.getValue());
+            
+            if (systemManager.updateModule(module)) {
+                JOptionPane.showMessageDialog(editDialog, "Module updated successfully!");
+                editDialog.dispose();
+                parent.dispose();
+                showModuleManagementPanel();
+            } else {
+                JOptionPane.showMessageDialog(editDialog, "Error updating module", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        deleteBtn.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(editDialog,
+                "Are you sure you want to delete this module?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION);
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                if (systemManager.deleteModule(module.getModuleID())) {
+                    JOptionPane.showMessageDialog(editDialog, "Module deleted successfully!");
+                    editDialog.dispose();
+                    parent.dispose();
+                    showModuleManagementPanel();
+                } else {
+                    JOptionPane.showMessageDialog(editDialog, "Error deleting module", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        
+        cancelBtn.addActionListener(e -> editDialog.dispose());
+        
+        buttonPanel.add(saveBtn);
+        buttonPanel.add(deleteBtn);
+        buttonPanel.add(cancelBtn);
+        
+        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.gridwidth = 2;
+        editDialog.add(buttonPanel, gbc);
+        
+        editDialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        editDialog.setVisible(true);
     }
 }

@@ -105,6 +105,30 @@ public class SystemManager {
         FileManager.saveModule(module);
     }
 
+    public boolean updateModule(Module updated) {
+        if (updated == null) return false;
+
+        for (int i = 0; i < modules.size(); i++) {
+            if (modules.get(i).getModuleID().equals(updated.getModuleID())) {
+                modules.set(i, updated);
+                FileManager.saveAllModules(modules);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean deleteModule(String moduleID) {
+        for (int i = 0; i < modules.size(); i++) {
+            if (modules.get(i).getModuleID().equals(moduleID)) {
+                modules.remove(i);
+                FileManager.saveAllModules(modules);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void createClass(ClassModule classModule) {
         classes.add(classModule);
         FileManager.saveClass(classModule);
