@@ -97,7 +97,14 @@ public class Assessment implements Serializable {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    
+    public String getLecturerID() { 
+        return createdBy != null ? createdBy.getUserID() : null; 
+    }
+    public void setLecturerID(String lecturerID) {
+        // This will be used during user role conversion
+        // Note: The full lecturer object should be properly reconstructed by the system
+    }
+
     public Double getScore() {
         if (studentMarks.isEmpty()) return 0.0;
         double total = 0;
