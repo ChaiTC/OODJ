@@ -9,6 +9,9 @@ class AdminUserManagementPanel extends JPanel {
     private JFrame parentFrame;
     private DefaultTableModel tableModel;
     private JTable table;
+    private JTextField searchField;
+    private java.util.List<User> allUsers;
+    private java.util.List<User> filteredUsers;
     
     public AdminUserManagementPanel(SystemManager systemManager, JFrame parentFrame) {
         this.systemManager = systemManager;
@@ -36,6 +39,19 @@ class AdminUserManagementPanel extends JPanel {
         
         refreshTable();
         
+        // Search and Action buttons
+        JPanel topPanel = new JPanel(new BorderLayout());
+        
+        // Search panel
+        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        searchPanel.add(new JLabel("Search:"));
+        searchField = new JTextField(20);
+        JButton searchBtn = new JButton("Search");
+        JButton clearBtn = new JButton("Clear");
+        searchPanel.add(searchField);
+        searchPanel.add(searchBtn);
+        searchPanel.add(clearBtn);
+        
         // Action buttons
         JPanel buttonBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton createBtn = new JButton("Create User");
@@ -48,6 +64,9 @@ class AdminUserManagementPanel extends JPanel {
         buttonBar.add(deleteBtn);
         buttonBar.add(approveBtn);
         buttonBar.add(rejectBtn);
+        
+        topPanel.add(searchPanel, BorderLayout.NORTH);
+        topPanel.add(buttonBar, BorderLayout.SOUTH);
         
         // Form panel (initially hidden)
         JPanel formPanel = new JPanel();
@@ -99,9 +118,32 @@ class AdminUserManagementPanel extends JPanel {
         formBtnPanel.add(cancelBtn);
         formPanel.add(formBtnPanel);
 
-        mainPanel.add(buttonBar, BorderLayout.NORTH);
+        mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(scroll, BorderLayout.CENTER);
         add(mainPanel, BorderLayout.CENTER);
+        
+        // Search functionality
+        searchBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                performSearch();
+            }
+        });
+        
+        searchField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                performSearch();
+            }
+        });
+        
+        clearBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                searchField.setText("");
+                refreshTable();
+            }
+        });
 
         createBtn.addActionListener(new ActionListener() {
             @Override
@@ -423,9 +465,14 @@ class AdminUserManagementPanel extends JPanel {
     }
     
     private void refreshTable() {
+        allUsers = systemManager.getAllUsers();
+        filteredUsers = new ArrayList<>(allUsers);
+        updateTableDisplay();
+    }
+    
+    private void updateTableDisplay() {
         tableModel.setRowCount(0);
-        java.util.List<User> users = systemManager.getAllUsers();
-        for (User u : users) {
+        for (User u : filteredUsers) {
             String status = u.isApproved() ? "Approved" : "Pending";
             tableModel.addRow(new Object[] { 
                 u.getUserID(), 
@@ -436,6 +483,22 @@ class AdminUserManagementPanel extends JPanel {
                 status
             });
         }
+    }
+    
+    private void performSearch() {
+        String searchTerm = searchField.getText().trim().toLowerCase();
+        if (searchTerm.isEmpty()) {
+            filteredUsers = new ArrayList<>(allUsers);
+        } else {
+            filteredUsers = new ArrayList<>();
+            for (User u : allUsers) {
+                if (u.getUserID().toLowerCase().contains(searchTerm) ||
+                    u.getFullName().toLowerCase().contains(searchTerm)) {
+                    filteredUsers.add(u);
+                }
+            }
+        }
+        updateTableDisplay();
     }
     
     private JPanel createLabeledRow(String labelText, JComponent comp) {
