@@ -1,0 +1,122 @@
+@startuml
+skinparam classAttributeIconSize 0
+' --- Core domain classes
+class User {
+  -String userID
+  -String username
+  -String password
+  -String email
+  -String fullName
+  -String phoneNumber
+  -String gender
+  -int age
+  -String role
+}
+
+class AdminStaff
+class AcademicLeader {
+  -String department
+  -String leaderID
+  -List<Lecturer> assignedLecturers
+  -List<Module> managedModules
+}
+class Lecturer {
+  -String lecturerID
+  -String staffID
+  -String department
+  -String academicLeaderID
+  -List<Module> assignedModules
+}
+class Student {
+  -String studentID
+  -String enrollmentYear
+}
+
+class Module {
+  -String moduleID
+  -String moduleName
+  -String moduleCode
+  -String description
+  -int creditHours
+  -String department
+}
+
+class ClassModule {
+  -String classID
+  -String className
+  -String moduleID
+  -Lecturer lecturer
+  -List<Student> enrolledStudents
+  -int capacity
+}
+
+class Assessment {
+  -String assessmentID
+  -String assessmentName
+  -AssessmentType assessmentType
+  -Module module
+  -Lecturer createdBy
+}
+
+class AssessmentType
+class Feedback {
+  -String feedbackID
+  -String assessmentID
+  -String studentID
+  -String lecturerID
+}
+
+' --- Managers and utilities
+class SystemManager {
+  -List<User> users
+  -List<Module> modules
+  -List<ClassModule> classes
+  -List<Assessment> assessments
+}
+class FileManager
+class GradingSystem
+class GradingScale
+
+' --- GUI classes
+class AFSLoginFrame
+class AFSRegistrationFrame
+class AdminDashboard
+class AdminUserManagementPanel
+class AdminLecturerAssignmentPanel
+class AdminClassCreationPanel
+class AdminGradingSystemPanel
+class AcademicLeaderDashboard
+class AcademicLeaderReportsPanel
+class LecturerDashboard
+class StudentDashboard
+
+' --- Main
+class main
+
+' --- Relationships
+User <|-- AdminStaff
+User <|-- AcademicLeader
+User <|-- Lecturer
+User <|-- Student
+
+AcademicLeader "1" o-- "*" Lecturer : assigns
+AcademicLeader "1" o-- "*" Module : manages
+Lecturer "*" o-- "*" Module : assignedModules
+ClassModule "*" o-- "1" Module : module
+ClassModule "1" o-- "0..1" Lecturer : lecturer
+Assessment "*" o-- "1" Module : module
+Assessment "1" o-- "0..1" Lecturer : createdBy
+SystemManager "1" *-- "*" User
+SystemManager "1" *-- "*" Module
+SystemManager "1" *-- "*" ClassModule
+SystemManager "1" *-- "*" Assessment
+
+' --- GUI ownership
+AFSLoginFrame --> SystemManager
+AFSRegistrationFrame --> SystemManager
+AdminDashboard --> SystemManager
+AcademicLeaderDashboard --> SystemManager
+LecturerDashboard --> SystemManager
+StudentDashboard --> SystemManager
+
+@enduml

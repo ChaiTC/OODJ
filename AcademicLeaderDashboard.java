@@ -143,8 +143,7 @@ public class AcademicLeaderDashboard extends JFrame {
 
     // ================= MODULE MANAGEMENT =================
     private JPanel buildModuleManagementPanel() {
-
-        JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(8, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         JTextField codeField = new JTextField();
@@ -156,12 +155,19 @@ public class AcademicLeaderDashboard extends JFrame {
         );
         departmentBox.setSelectedItem(leader.getDepartment());
 
+        JComboBox<String> moduleSelectBox = new JComboBox<>();
+        List<Module> modules = systemManager.getAllModules();
+        for (Module m : modules) {
+            moduleSelectBox.addItem(m.getModuleCode() + " - " + m.getModuleName());
+        }
+
         JButton createBtn = new JButton("Create Module");
+        JButton updateBtn = new JButton("Update Module");
+        JButton deleteBtn = new JButton("Delete Module");
 
         createBtn.addActionListener(e -> {
             try {
                 String moduleID = systemManager.generateModuleID();
-
                 Module module = new Module(
                         moduleID,
                         nameField.getText(),
@@ -170,17 +176,62 @@ public class AcademicLeaderDashboard extends JFrame {
                         Integer.parseInt(creditField.getText()),
                         (String) departmentBox.getSelectedItem()
                 );
-
                 systemManager.createModule(module);
-                refreshModuleBox();
-
+                moduleSelectBox.addItem(module.getModuleCode() + " - " + module.getModuleName());
                 JOptionPane.showMessageDialog(this, "Module created!");
-
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this,
                         "Invalid input",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        updateBtn.addActionListener(e -> {
+            int idx = moduleSelectBox.getSelectedIndex();
+            if (idx < 0) {
+                JOptionPane.showMessageDialog(this, "Select a module to update.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            Module selected = modules.get(idx);
+            try {
+                selected.setModuleName(nameField.getText());
+                selected.setModuleCode(codeField.getText());
+                selected.setCreditHours(Integer.parseInt(creditField.getText()));
+                selected.setDepartment((String) departmentBox.getSelectedItem());
+                systemManager.createModule(selected); // Overwrites existing
+                moduleSelectBox.insertItemAt(selected.getModuleCode() + " - " + selected.getModuleName(), idx);
+                moduleSelectBox.removeItemAt(idx + 1);
+                JOptionPane.showMessageDialog(this, "Module updated!");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        deleteBtn.addActionListener(e -> {
+            int idx = moduleSelectBox.getSelectedIndex();
+            if (idx < 0) {
+                JOptionPane.showMessageDialog(this, "Select a module to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            Module selected = modules.get(idx);
+            try {
+                modules.remove(selected);
+                moduleSelectBox.removeItemAt(idx);
+                JOptionPane.showMessageDialog(this, "Module deleted!");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Delete failed", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        moduleSelectBox.addActionListener(e -> {
+            int idx = moduleSelectBox.getSelectedIndex();
+            if (idx >= 0 && idx < modules.size()) {
+                Module m = modules.get(idx);
+                codeField.setText(m.getModuleCode());
+                nameField.setText(m.getModuleName());
+                creditField.setText(String.valueOf(m.getCreditHours()));
+                departmentBox.setSelectedItem(m.getDepartment());
             }
         });
 
@@ -192,8 +243,14 @@ public class AcademicLeaderDashboard extends JFrame {
         panel.add(creditField);
         panel.add(new JLabel("Department:"));
         panel.add(departmentBox);
+        panel.add(new JLabel("Select Module:"));
+        panel.add(moduleSelectBox);
         panel.add(new JLabel());
         panel.add(createBtn);
+        panel.add(new JLabel());
+        panel.add(updateBtn);
+        panel.add(new JLabel());
+        panel.add(deleteBtn);
 
         return panel;
     }
@@ -215,8 +272,34 @@ public class AcademicLeaderDashboard extends JFrame {
         JButton assignBtn = new JButton("Assign Lecturer");
 
         assignBtn.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this,
-                    "Lecturer assigned (demo only)");
+            try {
+                List<Module> modules = systemManager.getAllModules();
+                List<User> lecturers = systemManager.getAllLecturers();
+
+                int modIdx = moduleBox.getSelectedIndex();
+                int lecIdx = lecturerBox.getSelectedIndex();
+
+                if (modIdx < 0 || lecIdx < 0) {
+                    JOptionPane.showMessageDialog(this, "Please select both module and lecturer", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                Module selectedModule = modules.get(modIdx);
+                Lecturer selectedLecturer = (Lecturer) lecturers.get(lecIdx);
+
+                // Add module to lecturer's assigned modules at runtime and persist
+                if (!selectedLecturer.getAssignedModules().contains(selectedModule)) {
+                    selectedLecturer.getAssignedModules().add(selectedModule);
+                    // persist change to users file
+                    systemManager.updateUser(selectedLecturer);
+                    JOptionPane.showMessageDialog(this, "Lecturer assigned to module (saved)");
+                } else {
+                    JOptionPane.showMessageDialog(this, "Lecturer is already assigned to this module");
+                }
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Failed to assign lecturer: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         panel.add(new JLabel("Select Module:"));
@@ -306,11 +389,31 @@ public class AcademicLeaderDashboard extends JFrame {
 
             sb.append("=== MODULE SUMMARY REPORT ===\n\n");
 
+            // For each module, also show any lecturers assigned to it
+            List<User> allLecturers = systemManager.getAllLecturers();
+
             for (Module m : modules) {
                 sb.append("Module ID: ").append(m.getModuleID()).append("\n");
                 sb.append("Name: ").append(m.getModuleName()).append("\n");
                 sb.append("Code: ").append(m.getModuleCode()).append("\n");
-                sb.append("Credits: ").append(m.getCreditHours()).append("\n\n");
+                sb.append("Credits: ").append(m.getCreditHours()).append("\n");
+
+                // find lecturers assigned to this module
+                StringBuilder lecNames = new StringBuilder();
+                for (User u : allLecturers) {
+                    if (u instanceof Lecturer) {
+                        Lecturer L = (Lecturer) u;
+                        for (Module am : L.getAssignedModules()) {
+                            if (am != null && (am.getModuleID().equalsIgnoreCase(m.getModuleID()) || am.getModuleCode().equalsIgnoreCase(m.getModuleCode()))) {
+                                if (lecNames.length() > 0) lecNames.append(", ");
+                                lecNames.append(L.getFullName()).append(" (").append(L.getUserID()).append(")");
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                sb.append("Assigned Lecturer(s): ").append(lecNames.length() > 0 ? lecNames.toString() : "Unassigned").append("\n\n");
             }
 
             reportArea.setText(sb.toString());

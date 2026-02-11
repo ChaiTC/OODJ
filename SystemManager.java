@@ -23,9 +23,35 @@ public class SystemManager {
         loadAllData();
     }
 
+    private void reconcileLecturerAssignedModules() {
+        if (users == null || modules == null) return;
+
+        for (User u : users) {
+            if (u instanceof Lecturer) {
+                Lecturer lec = (Lecturer) u;
+                List<Module> resolved = new ArrayList<>();
+                for (Module m : lec.getAssignedModules()) {
+                    if (m == null) continue;
+                    String mid = m.getModuleID();
+                    if (mid == null) continue;
+                    for (Module real : modules) {
+                        if (mid.equalsIgnoreCase(real.getModuleID()) || mid.equalsIgnoreCase(real.getModuleCode())) {
+                            resolved.add(real);
+                            break;
+                        }
+                    }
+                }
+                lec.getAssignedModules().clear();
+                lec.getAssignedModules().addAll(resolved);
+            }
+        }
+    }
+
     public void loadAllData() {
         users = FileManager.loadAllUsers();
         modules = FileManager.loadAllModules();
+        // reconcile lecturer assigned modules (placeholders -> actual Module objects)
+        reconcileLecturerAssignedModules();
         classes = FileManager.loadAllClasses(modules, users);
         assessments = FileManager.loadAllAssessments(modules, users);
         feedbackList = FileManager.loadAllFeedback();

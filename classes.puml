@@ -1,0 +1,87 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class User {
+  +String userID
+  +String username
+  +String password
+  +String email
+  +String fullName
+  +String phoneNumber
+  +String gender
+  +int age
+  +boolean active
+  +boolean approved
+}
+
+class AdminStaff
+class AcademicLeader {
+  +String department
+  +String leaderID
+  +List<Lecturer> assignedLecturers
+  +List<Module> managedModules
+}
+class Lecturer {
+  +String lecturerID
+  +String department
+  +List<Module> assignedModules
+  +List<Assessment> createdAssessments
+}
+class Student
+class Module {
+  +String moduleID
+  +String moduleName
+  +String moduleCode
+  +int creditHours
+}
+class ClassModule {
+  +String classID
+  +String className
+  +String moduleID
+  +Lecturer lecturer
+  +List<Student> enrolledStudents
+}
+class Assessment {
+  +String assessmentID
+  +String assessmentName
+  +AssessmentType assessmentType
+  +Module module
+  +Lecturer createdBy
+}
+class AssessmentType
+class Feedback {
+  +String feedbackID
+  +String assessmentID
+  +String studentID
+  +String lecturerID
+}
+class SystemManager {
+  +List<User> users
+  +List<Module> modules
+  +List<ClassModule> classes
+  +List<Assessment> assessments
+}
+class FileManager
+class GradingSystem
+class GradingScale
+
+User <|-- AdminStaff
+User <|-- AcademicLeader
+User <|-- Lecturer
+User <|-- Student
+
+AcademicLeader "1" o-- "*" Lecturer : assigns
+AcademicLeader "1" o-- "*" Module : manages
+Lecturer "*" o-- "*" Module : assignedModules
+ClassModule "*" o-- "1" Module : module
+ClassModule "1" o-- "0..1" Lecturer : lecturer
+Assessment "*" o-- "1" Module : module
+Assessment "1" o-- "0..1" Lecturer : createdBy
+GradingSystem "1" *-- "*" GradingScale
+
+SystemManager "1" *-- "*" User
+SystemManager "1" *-- "*" Module
+SystemManager "1" *-- "*" ClassModule
+SystemManager "1" *-- "*" Assessment
+
+@enduml

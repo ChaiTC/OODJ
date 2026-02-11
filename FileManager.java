@@ -306,6 +306,15 @@ public class FileManager {
             sb.append("|").append(lecturer.getDepartment()).append("|").append(lecturer.getStaffID() != null ? lecturer.getStaffID() : lecturer.getLecturerID());
             String leaderID = lecturer.getAcademicLeaderID();
             sb.append("|").append(leaderID != null ? leaderID : "UNASSIGNED");
+            // append assigned module IDs (comma separated)
+            List<Module> assigned = lecturer.getAssignedModules();
+            sb.append("|");
+            if (assigned != null && !assigned.isEmpty()) {
+                for (int i = 0; i < assigned.size(); i++) {
+                    if (i > 0) sb.append(",");
+                    sb.append(assigned.get(i).getModuleID());
+                }
+            }
         } else if (user instanceof Student) {
             Student student = (Student) user;
             sb.append("|").append(student.getStudentID()).append("|").append(student.getEnrollmentYear());
@@ -451,6 +460,17 @@ public class FileManager {
                     // Handle academicLeaderID field (backward compatible)
                     if (parts.length >= idx + 3 && !parts[idx + 2].equals("UNASSIGNED")) {
                         lec.setAcademicLeaderID(parts[idx + 2]);
+                    }
+                    // Handle assigned module IDs (optional, backward compatible)
+                    if (parts.length >= idx + 4 && parts[idx + 3] != null && !parts[idx + 3].isEmpty()) {
+                        String mods = parts[idx + 3];
+                        String[] mids = mods.split(",");
+                        for (String mid : mids) {
+                            if (mid != null && !mid.trim().isEmpty()) {
+                                // create placeholder Module with only ID; will be reconciled later
+                                lec.getAssignedModules().add(new Module(mid.trim(), "Unknown Module", "", "Unknown", 0, ""));
+                            }
+                        }
                     }
                     return lec;
                 }
