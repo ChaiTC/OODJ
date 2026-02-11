@@ -324,4 +324,153 @@ public class SystemManager {
         }
         return pending;
     }
+
+    public List<User> getAllLecturers() {
+        return getUsersByRole("LECTURER");
+    }
+
+    public List<User> getAllStudents() {
+        return getUsersByRole("STUDENT");
+    }
+
+    public List<User> getAllAcademicLeaders() {
+        return getUsersByRole("ACADEMIC_LEADER");
+    }
+
+    public boolean assignLecturerToLeader(String lecturerID, String leaderID) {
+        User lecturer = findUserByID(lecturerID);
+        User leader = findUserByID(leaderID);
+
+        if (lecturer instanceof Lecturer && leader instanceof AcademicLeader) {
+            ((Lecturer) lecturer).setAcademicLeaderID(leaderID);
+            FileManager.saveAllUsers(users);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean unassignLecturerFromLeader(String lecturerID) {
+        User lecturer = findUserByID(lecturerID);
+
+        if (lecturer instanceof Lecturer) {
+            ((Lecturer) lecturer).setAcademicLeaderID(null);
+            FileManager.saveAllUsers(users);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean updateAssessment(Assessment updated) {
+        if (updated == null) return false;
+
+        for (int i = 0; i < assessments.size(); i++) {
+            if (assessments.get(i).getAssessmentID()
+                    .equals(updated.getAssessmentID())) {
+
+                assessments.set(i, updated);
+                FileManager.saveAllAssessments(assessments);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Convert a user from one role to another with new userID
+     * Updates all references in assessments, feedback, and classes
+     */
+    public boolean convertUserRole(String oldUserID, String newRole, String department, String staffID) {
+        User existingUser = findUserByID(oldUserID);
+        if (existingUser == null) {
+            return false;
+        }
+
+        // Generate new userID with correct prefix for new role
+        String newUserID = generateUserID(newRole);
+
+        try {
+            User newUser = null;
+
+            // Create new user object based on new role
+            if (newRole.equals("Student")) {
+                newUser = new Student(newUserID, existingUser.getUsername(),
+                        existingUser.getPassword(), existingUser.getEmail(),
+                        existingUser.getFullName(), existingUser.getPhoneNumber(),
+                        newUserID, "2026");
+            } else if (newRole.equals("Lecturer")) {
+                Lecturer lec = new Lecturer(newUserID, existingUser.getUsername(),
+                        existingUser.getPassword(), existingUser.getEmail(),
+                        existingUser.getFullName(), existingUser.getPhoneNumber(),
+                        newUserID, department);
+                lec.setStaffID(staffID);
+                newUser = lec;
+            } else if (newRole.equals("Academic Leader")) {
+                AcademicLeader leader = new AcademicLeader(newUserID,
+                        existingUser.getUsername(), existingUser.getPassword(),
+                        existingUser.getEmail(), existingUser.getFullName(),
+                        existingUser.getPhoneNumber(), department, newUserID);
+                leader.setStaffID(staffID);
+                newUser = leader;
+            } else if (newRole.equals("Admin Staff")) {
+                newUser = new AdminStaff(newUserID, existingUser.getUsername(),
+                        existingUser.getPassword(), existingUser.getEmail(),
+                        existingUser.getFullName(), existingUser.getPhoneNumber(),
+                        department, staffID);
+            }
+
+            // Copy properties from existing user
+            if (newUser != null) {
+                newUser.setGender(existingUser.getGender());
+                newUser.setAge(existingUser.getAge());
+                newUser.setActive(existingUser.isActive());
+                newUser.setApproved(existingUser.isApproved());
+
+                // Update all assessments that reference this user
+                for (Assessment a : assessments) {
+                    // If lecturer created this assessment, update lecturer ID
+                    if (a.getLecturerID() != null && a.getLecturerID().equals(oldUserID)) {
+                        a.setLecturerID(newUserID);
+                    }
+                }
+
+                // Update all feedback that references this user
+                for (Feedback f : feedbackList) {
+                    // If this user gave feedback, update their ID
+                    if (f.getLecturerID() != null && f.getLecturerID().equals(oldUserID)) {
+                        f.setLecturerID(newUserID);
+                    }
+                    // If this user received feedback (as student), update their ID
+                    if (f.getStudentID() != null && f.getStudentID().equals(oldUserID)) {
+                        f.setStudentID(newUserID);
+                    }
+                }
+
+                // Update all classes that reference this lecturer
+                for (ClassModule c : classes) {
+                    if (c.getLecturerID() != null && c.getLecturerID().equals(oldUserID)) {
+                        c.setLecturerID(newUserID);
+                    }
+                }
+
+                // Replace user in list and save
+                for (int i = 0; i < users.size(); i++) {
+                    if (users.get(i).getUserID().equals(oldUserID)) {
+                        users.set(i, newUser);
+                        break;
+                    }
+                }
+
+                // Save all changes to files
+                FileManager.saveAllUsers(users);
+                FileManager.saveAllAssessments(assessments);
+                FileManager.saveAllClasses(classes);
+
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+
+        return false;
+    }
 }
