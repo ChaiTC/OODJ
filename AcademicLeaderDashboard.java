@@ -7,6 +7,7 @@ public class AcademicLeaderDashboard extends JFrame {
     private final SystemManager systemManager;
     private final AcademicLeader leader;
 
+    private JLabel headerLabel;
     private JComboBox<String> moduleBox;
 
     public AcademicLeaderDashboard(SystemManager systemManager, AcademicLeader leader) {
@@ -17,10 +18,9 @@ public class AcademicLeaderDashboard extends JFrame {
 
     private void initUI() {
         setTitle("Academic Leader Dashboard - " + leader.getFullName());
-        setSize(900, 550);
+        setSize(950, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
         setLayout(new BorderLayout());
 
         add(buildHeader(), BorderLayout.NORTH);
@@ -30,17 +30,17 @@ public class AcademicLeaderDashboard extends JFrame {
 
     // ================= HEADER =================
     private JPanel buildHeader() {
-        JPanel panel = new JPanel();
-        panel.setBackground(new Color(56, 142, 60));
+        JPanel header = new JPanel();
+        header.setBackground(new Color(56, 142, 60));
 
-        JLabel label = new JLabel(
+        headerLabel = new JLabel(
                 "Welcome, " + leader.getFullName() + " (Academic Leader)"
         );
-        label.setForeground(Color.WHITE);
-        label.setFont(new Font("Arial", Font.BOLD, 18));
+        headerLabel.setForeground(Color.WHITE);
+        headerLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-        panel.add(label);
-        return panel;
+        header.add(headerLabel);
+        return header;
     }
 
     // ================= TABS =================
@@ -57,51 +57,86 @@ public class AcademicLeaderDashboard extends JFrame {
 
     // ================= FOOTER =================
     private JPanel buildFooter() {
-        JButton logout = new JButton("Logout");
-        logout.setBackground(new Color(244, 67, 54));
-        logout.setForeground(Color.WHITE);
+        JButton logoutBtn = new JButton("Logout");
+        logoutBtn.setBackground(new Color(244, 67, 54));
+        logoutBtn.setForeground(Color.WHITE);
+        logoutBtn.setOpaque(true);
+        logoutBtn.setBorderPainted(false);
+        logoutBtn.setPreferredSize(new Dimension(120, 35));
 
-        logout.addActionListener(e -> {
+        logoutBtn.addActionListener(e -> {
             dispose();
             new AFSLoginFrame(systemManager).setVisible(true);
         });
 
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        panel.add(logout);
-        return panel;
+        JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        footer.add(logoutBtn);
+        return footer;
     }
 
     // ================= EDIT PROFILE =================
     private JPanel buildEditProfilePanel() {
 
-        JPanel panel = new JPanel(new GridLayout(4, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 80, 30, 80));
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        JTextField nameField = new JTextField(leader.getFullName());
-        JTextField emailField = new JTextField(leader.getEmail());
-        JTextField phoneField = new JTextField(leader.getPhoneNumber());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JButton saveBtn = new JButton("Save Changes");
+        JTextField nameField = new JTextField(leader.getFullName(), 20);
+        JTextField emailField = new JTextField(leader.getEmail(), 20);
+        JTextField deptField = new JTextField(leader.getDepartment(), 20);
+
+        JComboBox<String> genderBox = new JComboBox<>(new String[]{"Male", "Female"});
+        genderBox.setSelectedItem(leader.getGender());
+
+        JSpinner ageSpinner = new JSpinner(
+                new SpinnerNumberModel(leader.getAge(), 18, 100, 1)
+        );
+
+        gbc.gridx = 0; gbc.gridy = 0;
+        panel.add(new JLabel("Full Name:"), gbc);
+        gbc.gridx = 1;
+        panel.add(nameField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1;
+        panel.add(new JLabel("Email:"), gbc);
+        gbc.gridx = 1;
+        panel.add(emailField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2;
+        panel.add(new JLabel("Department:"), gbc);
+        gbc.gridx = 1;
+        panel.add(deptField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3;
+        panel.add(new JLabel("Gender:"), gbc);
+        gbc.gridx = 1;
+        panel.add(genderBox, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 4;
+        panel.add(new JLabel("Age:"), gbc);
+        gbc.gridx = 1;
+        panel.add(ageSpinner, gbc);
+
+        JButton saveBtn = new JButton("Save Profile");
+        gbc.gridx = 1; gbc.gridy = 5;
+        panel.add(saveBtn, gbc);
 
         saveBtn.addActionListener(e -> {
             leader.setFullName(nameField.getText());
             leader.setEmail(emailField.getText());
-            leader.setPhoneNumber(phoneField.getText());
+            leader.setDepartment(deptField.getText());
+            leader.setGender((String) genderBox.getSelectedItem());
+            leader.setAge((Integer) ageSpinner.getValue());
 
-            systemManager.updateUser(leader);
+            headerLabel.setText(
+                    "Welcome, " + leader.getFullName() + " (Academic Leader)"
+            );
 
-            JOptionPane.showMessageDialog(this,
-                    "Profile updated successfully!");
+            JOptionPane.showMessageDialog(this, "Profile updated successfully!");
         });
-
-        panel.add(new JLabel("Full Name:"));
-        panel.add(nameField);
-        panel.add(new JLabel("Email:"));
-        panel.add(emailField);
-        panel.add(new JLabel("Phone:"));
-        panel.add(phoneField);
-        panel.add(new JLabel());
-        panel.add(saveBtn);
 
         return panel;
     }
@@ -110,41 +145,38 @@ public class AcademicLeaderDashboard extends JFrame {
     private JPanel buildModuleManagementPanel() {
 
         JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 80, 30, 80));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         JTextField codeField = new JTextField();
         JTextField nameField = new JTextField();
         JTextField creditField = new JTextField("3");
-        JTextField deptField = new JTextField(leader.getDepartment());
 
         JButton createBtn = new JButton("Create Module");
 
         createBtn.addActionListener(e -> {
+            try {
+                String moduleID = systemManager.generateModuleID();
 
-            if (codeField.getText().trim().isEmpty() ||
-                    nameField.getText().trim().isEmpty()) {
+                Module module = new Module(
+                        moduleID,
+                        nameField.getText(),
+                        codeField.getText(),
+                        "No description",
+                        Integer.parseInt(creditField.getText()),
+                        leader.getDepartment()
+                );
+
+                systemManager.createModule(module);
+                refreshModuleBox();
+
+                JOptionPane.showMessageDialog(this, "Module created!");
+
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this,
-                        "Module Code and Name required!");
-                return;
+                        "Invalid input",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
-
-            Module module = new Module(
-                    systemManager.generateModuleID(),
-                    nameField.getText(),
-                    codeField.getText(),
-                    "UNASSIGNED",
-                    Integer.parseInt(creditField.getText()),
-                    deptField.getText()
-            );
-
-            systemManager.createModule(module);
-
-            JOptionPane.showMessageDialog(this,
-                    "Module created successfully!");
-
-            codeField.setText("");
-            nameField.setText("");
-            creditField.setText("3");
         });
 
         panel.add(new JLabel("Module Code:"));
@@ -153,8 +185,6 @@ public class AcademicLeaderDashboard extends JFrame {
         panel.add(nameField);
         panel.add(new JLabel("Credits:"));
         panel.add(creditField);
-        panel.add(new JLabel("Department:"));
-        panel.add(deptField);
         panel.add(new JLabel());
         panel.add(createBtn);
 
@@ -165,24 +195,22 @@ public class AcademicLeaderDashboard extends JFrame {
     private JPanel buildAssignLecturersPanel() {
 
         JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 80, 30, 80));
+        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
         moduleBox = new JComboBox<>();
         refreshModuleBox();
 
         JComboBox<String> lecturerBox = new JComboBox<>();
-
-        List<User> lecturers = systemManager.getAllLecturers();
-        for (User u : lecturers) {
+        for (User u : systemManager.getAllLecturers()) {
             lecturerBox.addItem(u.getUserID() + " - " + u.getFullName());
         }
 
         JButton assignBtn = new JButton("Assign Lecturer");
 
-        assignBtn.addActionListener(e ->
-                JOptionPane.showMessageDialog(this,
-                        "Lecturer assigned successfully!")
-        );
+        assignBtn.addActionListener(e -> {
+            JOptionPane.showMessageDialog(this,
+                    "Lecturer assigned (demo only)");
+        });
 
         panel.add(new JLabel("Select Module:"));
         panel.add(moduleBox);
@@ -205,13 +233,18 @@ public class AcademicLeaderDashboard extends JFrame {
         }
     }
 
-    // ================= REPORTS =================
+    // ================= REPORTS PANEL =================
     private JPanel buildReportsPanel() {
 
         JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        JPanel left = new JPanel(new GridLayout(5, 1, 5, 5));
-        left.setBorder(BorderFactory.createTitledBorder("Report Options"));
+        JPanel optionsPanel = new JPanel();
+        optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
+        optionsPanel.setPreferredSize(new Dimension(180, 400));
+        optionsPanel.setBorder(BorderFactory.createTitledBorder("Report Options"));
+
+        Dimension buttonSize = new Dimension(160, 35);
 
         JButton userBtn = new JButton("User Summary");
         JButton classBtn = new JButton("Class Summary");
@@ -219,23 +252,30 @@ public class AcademicLeaderDashboard extends JFrame {
         JButton assessBtn = new JButton("Assessment Summary");
         JButton enrollBtn = new JButton("Enrollment Report");
 
-        left.add(userBtn);
-        left.add(classBtn);
-        left.add(moduleBtn);
-        left.add(assessBtn);
-        left.add(enrollBtn);
+        JButton[] buttons = {userBtn, classBtn, moduleBtn, assessBtn, enrollBtn};
+
+        for (JButton btn : buttons) {
+            btn.setMaximumSize(buttonSize);
+            btn.setMinimumSize(buttonSize);
+            btn.setPreferredSize(buttonSize);
+            btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+            optionsPanel.add(btn);
+            optionsPanel.add(Box.createVerticalStrut(10));
+        }
 
         JTextArea reportArea = new JTextArea();
-        reportArea.setEditable(false);
         reportArea.setFont(new Font("Monospaced", Font.PLAIN, 13));
+        reportArea.setEditable(false);
 
-        panel.add(left, BorderLayout.WEST);
-        panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
+        JScrollPane scrollPane = new JScrollPane(reportArea);
 
-        // USER REPORT
+        panel.add(optionsPanel, BorderLayout.WEST);
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        // ========== USER REPORT ==========
         userBtn.addActionListener(e -> {
-            List<User> users = systemManager.getAllUsers();
             StringBuilder sb = new StringBuilder();
+            List<User> users = systemManager.getAllUsers();
 
             sb.append("=== USER SUMMARY REPORT ===\n\n");
             sb.append("Total Users: ").append(users.size()).append("\n\n");
@@ -252,42 +292,35 @@ public class AcademicLeaderDashboard extends JFrame {
             reportArea.setText(sb.toString());
         });
 
-        // CLASS REPORT
-        classBtn.addActionListener(e -> {
-            List<ClassModule> classes = systemManager.getAllClasses();
+        // ========== MODULE REPORT ==========
+        moduleBtn.addActionListener(e -> {
             StringBuilder sb = new StringBuilder();
+            List<Module> modules = systemManager.getAllModules();
 
-            sb.append("=== CLASS SUMMARY REPORT ===\n\n");
-            sb.append("Total Classes: ").append(classes.size()).append("\n\n");
+            sb.append("=== MODULE SUMMARY REPORT ===\n\n");
 
-            for (ClassModule c : classes) {
-                sb.append("Class ID: ").append(c.getClassID()).append("\n");
-                sb.append("Name: ").append(c.getClassName()).append("\n");
-                sb.append("Capacity: ").append(c.getCapacity()).append("\n\n");
+            for (Module m : modules) {
+                sb.append("Module ID: ").append(m.getModuleID()).append("\n");
+                sb.append("Name: ").append(m.getModuleName()).append("\n");
+                sb.append("Code: ").append(m.getModuleCode()).append("\n");
+                sb.append("Credits: ").append(m.getCreditHours()).append("\n\n");
             }
 
             reportArea.setText(sb.toString());
         });
 
-        // ENROLLMENT REPORT
-        enrollBtn.addActionListener(e -> {
-            List<ClassModule> classes = systemManager.getAllClasses();
+        // ========== ASSESSMENT REPORT ==========
+        assessBtn.addActionListener(e -> {
             StringBuilder sb = new StringBuilder();
-            int total = 0;
+            List<Assessment> assessments = systemManager.getAllAssessments();
 
-            sb.append("=== ENROLLMENT REPORT ===\n\n");
+            sb.append("=== ASSESSMENT SUMMARY REPORT ===\n\n");
 
-            for (ClassModule c : classes) {
-                int count = c.getEnrolledStudents().size();
-                sb.append(c.getClassID())
-                        .append(" - ")
-                        .append(count)
-                        .append(" students\n");
-
-                total += count;
+            for (Assessment a : assessments) {
+                sb.append("Assessment ID: ").append(a.getAssessmentID()).append("\n");
+                sb.append("Title: ").append(a.getAssessmentName()).append("\n");
+                sb.append("Type: ").append(a.getAssessmentType().getAssessmentType()).append("\n\n");
             }
-
-            sb.append("\nTotal Enrolled Students: ").append(total);
 
             reportArea.setText(sb.toString());
         });
