@@ -1,19 +1,7 @@
 import java.util.*;
 
-/**
- * SystemManager class - manages overall system operations
- *
- * This is like the "brain" of our application. It handles:
- * - User accounts (students, lecturers, admins)
- * - Course modules and classes
- * - Assessments and feedback
- * - Data loading and saving
- *
- * Think of it as a central manager that coordinates everything!
- */
 public class SystemManager {
 
-    // Storage
     private List<User> users;
     private List<Module> modules;
     private List<ClassModule> classes;
@@ -22,9 +10,6 @@ public class SystemManager {
     private GradingSystem gradingSystem;
     private User currentUser;
 
-    /**
-     * Constructor
-     */
     public SystemManager() {
         this.users = new ArrayList<>();
         this.modules = new ArrayList<>();
@@ -38,9 +23,6 @@ public class SystemManager {
         loadAllData();
     }
 
-    /**
-     * Load all data from files
-     */
     public void loadAllData() {
         users = FileManager.loadAllUsers();
         modules = FileManager.loadAllModules();
@@ -54,40 +36,27 @@ public class SystemManager {
         }
     }
 
-    /**
-     * Register user
-     */
     public boolean registerUser(User user) {
         for (User existingUser : users) {
             if (existingUser.getUsername().equals(user.getUsername())) {
                 return false;
             }
         }
-
         users.add(user);
         FileManager.saveUser(user);
         return true;
     }
 
-    /**
-     * Authenticate user
-     */
     public User authenticateUser(String username, String password) {
         for (User user : users) {
-
             if (user.getUsername().equals(username) &&
                 user.getPassword().equals(password)) {
 
-                if (!user.isApproved()) {
-                    return null;
-                }
+                if (!user.isApproved()) return null;
+                if (!user.isActive()) return null;
 
-                if (user.isActive()) {
-                    currentUser = user;
-                    return user;
-                } else {
-                    return null;
-                }
+                currentUser = user;
+                return user;
             }
         }
         return null;
@@ -300,49 +269,49 @@ public class SystemManager {
         return String.format("%s%03d", prefix, max + 1);
     }
 
-    public boolean updateAssessment(Assessment updated) {
-        if (updated == null) return false;
+    // ======== RESTORED MISSING METHODS ========
 
-        for (int i = 0; i < assessments.size(); i++) {
-            if (assessments.get(i).getAssessmentID()
-                    .equals(updated.getAssessmentID())) {
-
-                assessments.set(i, updated);
-                FileManager.saveAllAssessments(assessments);
-                return true;
+    public void deleteClass(String classID) {
+        for (int i = 0; i < classes.size(); i++) {
+            if (classes.get(i).getClassID().equals(classID)) {
+                classes.remove(i);
+                FileManager.saveAllClasses(classes);
+                return;
             }
+        }
+    }
+
+    public boolean approveUser(String userID) {
+        User user = findUserByID(userID);
+        if (user != null) {
+            user.setApproved(true);
+            FileManager.saveAllUsers(users);
+            return true;
         }
         return false;
     }
 
-    public List<User> getAllLecturers() {
-        return getUsersByRole("LECTURER");
-    }
-
-    public List<User> getAllStudents() {
-        return getUsersByRole("STUDENT");
-    }
-
-    public List<User> getAllAcademicLeaders() {
-        return getUsersByRole("ACADEMIC_LEADER");
-    }
-
-    public void assignLecturerToLeader(String lecturerID, String leaderID) {
-        User user = findUserByID(lecturerID);
-        if (user instanceof Lecturer) {
-            Lecturer lec = (Lecturer) user;
-            lec.setAcademicLeaderID(leaderID);
-            updateUser(lec);
+    public boolean rejectUser(String userID) {
+        User user = findUserByID(userID);
+        if (user != null) {
+            user.setActive(false);
+            user.setApproved(false);
+            FileManager.saveAllUsers(users);
+            return true;
         }
+        return false;
     }
 
-    public void unassignLecturerFromLeader(String lecturerID) {
-        User user = findUserByID(lecturerID);
-        if (user instanceof Lecturer) {
-            Lecturer lec = (Lecturer) user;
-            lec.setAcademicLeaderID(null);
-            updateUser(lec);
-        }
+    public String generateAssessmentTypeID() {
+        return "AT" + String.format("%03d", getAllAssessmentTypes().size() + 1);
+    }
+
+    public List<AssessmentType> getAllAssessmentTypes() {
+        List<AssessmentType> types = new ArrayList<>();
+        types.add(new AssessmentType("AT001", AssessmentType.Type.ASSIGNMENT, 20, 100));
+        types.add(new AssessmentType("AT002", AssessmentType.Type.CLASS_TEST, 30, 100));
+        types.add(new AssessmentType("AT003", AssessmentType.Type.FINAL_EXAM, 50, 100));
+        return types;
     }
 
     public List<User> getPendingUsers() {
