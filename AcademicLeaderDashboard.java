@@ -28,7 +28,6 @@ public class AcademicLeaderDashboard extends JFrame {
         add(buildFooter(), BorderLayout.SOUTH);
     }
 
-    // ================= HEADER =================
     private JPanel buildHeader() {
         JPanel header = new JPanel();
         header.setBackground(new Color(56, 142, 60));
@@ -43,7 +42,6 @@ public class AcademicLeaderDashboard extends JFrame {
         return header;
     }
 
-    // ================= TABS =================
     private JTabbedPane buildTabs() {
         JTabbedPane tabs = new JTabbedPane();
 
@@ -55,7 +53,6 @@ public class AcademicLeaderDashboard extends JFrame {
         return tabs;
     }
 
-    // ================= FOOTER =================
     private JPanel buildFooter() {
         JButton logoutBtn = new JButton("Logout");
         logoutBtn.setBackground(new Color(244, 67, 54));
@@ -74,164 +71,59 @@ public class AcademicLeaderDashboard extends JFrame {
         return footer;
     }
 
-    // ================= EDIT PROFILE =================
-    private JPanel buildEditProfilePanel() {
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        JTextField nameField = new JTextField(leader.getFullName(), 20);
-        JTextField emailField = new JTextField(leader.getEmail(), 20);
-        JTextField deptField = new JTextField(leader.getDepartment(), 20);
-
-        JComboBox<String> genderBox = new JComboBox<>(new String[]{"Male", "Female"});
-        genderBox.setSelectedItem(leader.getGender());
-
-        JSpinner ageSpinner = new JSpinner(
-                new SpinnerNumberModel(leader.getAge(), 18, 100, 1)
-        );
-
-        gbc.gridx = 0; gbc.gridy = 0;
-        panel.add(new JLabel("Full Name:"), gbc);
-        gbc.gridx = 1;
-        panel.add(nameField, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 1;
-        panel.add(new JLabel("Email:"), gbc);
-        gbc.gridx = 1;
-        panel.add(emailField, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 2;
-        panel.add(new JLabel("Department:"), gbc);
-        gbc.gridx = 1;
-        panel.add(deptField, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 3;
-        panel.add(new JLabel("Gender:"), gbc);
-        gbc.gridx = 1;
-        panel.add(genderBox, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 4;
-        panel.add(new JLabel("Age:"), gbc);
-        gbc.gridx = 1;
-        panel.add(ageSpinner, gbc);
-
-        JButton saveBtn = new JButton("Save Profile");
-        gbc.gridx = 1; gbc.gridy = 5;
-        panel.add(saveBtn, gbc);
-
-        saveBtn.addActionListener(e -> {
-            leader.setFullName(nameField.getText());
-            leader.setEmail(emailField.getText());
-            leader.setDepartment(deptField.getText());
-            leader.setGender((String) genderBox.getSelectedItem());
-            leader.setAge((Integer) ageSpinner.getValue());
-
-            headerLabel.setText(
-                    "Welcome, " + leader.getFullName() + " (Academic Leader)"
-            );
-
-            JOptionPane.showMessageDialog(this, "Profile updated successfully!");
-        });
-
-        return panel;
-    }
-
     // ================= MODULE MANAGEMENT =================
- // ================= MODULE MANAGEMENT =================
-private JPanel buildModuleManagementPanel() {
+    private JPanel buildModuleManagementPanel() {
 
-    JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10)); // changed 5 → 6 rows
-    panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
-
-    JTextField codeField = new JTextField();
-    JTextField nameField = new JTextField();
-    JTextField creditField = new JTextField("3");
-
-    // ✅ Department field added back
-    JComboBox<String> departmentBox = new JComboBox<>(
-            new String[]{"IT", "Business", "Engineering"}
-    );
-    departmentBox.setSelectedItem(leader.getDepartment());
-
-    JButton createBtn = new JButton("Create Module");
-
-    createBtn.addActionListener(e -> {
-        try {
-            String moduleID = systemManager.generateModuleID();
-
-            Module module = new Module(
-                    moduleID,
-                    nameField.getText(),
-                    codeField.getText(),
-                    "No description",
-                    Integer.parseInt(creditField.getText()),
-                    (String) departmentBox.getSelectedItem()  // ✅ use selected department
-            );
-
-            systemManager.createModule(module);
-            refreshModuleBox();
-
-            JOptionPane.showMessageDialog(this, "Module created!");
-
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Invalid input",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    });
-
-    panel.add(new JLabel("Module Code:"));
-    panel.add(codeField);
-
-    panel.add(new JLabel("Module Name:"));
-    panel.add(nameField);
-
-    panel.add(new JLabel("Credits:"));
-    panel.add(creditField);
-
-    // ✅ Department UI added back
-    panel.add(new JLabel("Department:"));
-    panel.add(departmentBox);
-
-    panel.add(new JLabel());
-    panel.add(createBtn);
-
-    return panel;
-}
-
-    // ================= ASSIGN LECTURERS =================
-    private JPanel buildAssignLecturersPanel() {
-
-        JPanel panel = new JPanel(new GridLayout(3, 2, 10, 10));
+        JPanel panel = new JPanel(new GridLayout(6, 2, 10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
 
-        moduleBox = new JComboBox<>();
-        refreshModuleBox();
+        JTextField codeField = new JTextField();
+        JTextField nameField = new JTextField();
+        JTextField creditField = new JTextField("3");
 
-        JComboBox<String> lecturerBox = new JComboBox<>();
-        for (User u : systemManager.getAllLecturers()) {
-            lecturerBox.addItem(u.getUserID() + " - " + u.getFullName());
-        }
+        JComboBox<String> departmentBox = new JComboBox<>(
+                new String[]{"IT", "Business", "Engineering"}
+        );
+        departmentBox.setSelectedItem(leader.getDepartment());
 
-        JButton assignBtn = new JButton("Assign Lecturer");
+        JButton createBtn = new JButton("Create Module");
 
-        assignBtn.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this,
-                    "Lecturer assigned (demo only)");
+        createBtn.addActionListener(e -> {
+            try {
+                String moduleID = systemManager.generateModuleID();
+
+                Module module = new Module(
+                        moduleID,
+                        nameField.getText(),
+                        codeField.getText(),
+                        "No description",
+                        Integer.parseInt(creditField.getText()),
+                        (String) departmentBox.getSelectedItem()
+                );
+
+                systemManager.createModule(module);
+                refreshModuleBox();
+
+                JOptionPane.showMessageDialog(this, "Module created!");
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this,
+                        "Invalid input",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         });
 
-        panel.add(new JLabel("Select Module:"));
-        panel.add(moduleBox);
-        panel.add(new JLabel("Select Lecturer:"));
-        panel.add(lecturerBox);
+        panel.add(new JLabel("Module Code:"));
+        panel.add(codeField);
+        panel.add(new JLabel("Module Name:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Credits:"));
+        panel.add(creditField);
+        panel.add(new JLabel("Department:"));
+        panel.add(departmentBox);
         panel.add(new JLabel());
-        panel.add(assignBtn);
+        panel.add(createBtn);
 
         return panel;
     }
@@ -270,7 +162,6 @@ private JPanel buildModuleManagementPanel() {
 
         for (JButton btn : buttons) {
             btn.setMaximumSize(buttonSize);
-            btn.setMinimumSize(buttonSize);
             btn.setPreferredSize(buttonSize);
             btn.setAlignmentX(Component.CENTER_ALIGNMENT);
             optionsPanel.add(btn);
@@ -286,7 +177,7 @@ private JPanel buildModuleManagementPanel() {
         panel.add(optionsPanel, BorderLayout.WEST);
         panel.add(scrollPane, BorderLayout.CENTER);
 
-        // ========== USER REPORT ==========
+        // USER REPORT
         userBtn.addActionListener(e -> {
             StringBuilder sb = new StringBuilder();
             List<User> users = systemManager.getAllUsers();
@@ -306,7 +197,7 @@ private JPanel buildModuleManagementPanel() {
             reportArea.setText(sb.toString());
         });
 
-        // ========== MODULE REPORT ==========
+        // MODULE REPORT
         moduleBtn.addActionListener(e -> {
             StringBuilder sb = new StringBuilder();
             List<Module> modules = systemManager.getAllModules();
@@ -323,17 +214,58 @@ private JPanel buildModuleManagementPanel() {
             reportArea.setText(sb.toString());
         });
 
-        // ========== ASSESSMENT REPORT ==========
-        assessBtn.addActionListener(e -> {
+        // CLASS REPORT
+        classBtn.addActionListener(e -> {
             StringBuilder sb = new StringBuilder();
-            List<Assessment> assessments = systemManager.getAllAssessments();
+            List<ClassModule> classes = systemManager.getAllClasses();
 
-            sb.append("=== ASSESSMENT SUMMARY REPORT ===\n\n");
+            sb.append("=== CLASS SUMMARY REPORT ===\n\n");
 
-            for (Assessment a : assessments) {
-                sb.append("Assessment ID: ").append(a.getAssessmentID()).append("\n");
-                sb.append("Title: ").append(a.getAssessmentName()).append("\n");
-                sb.append("Type: ").append(a.getAssessmentType().getAssessmentType()).append("\n\n");
+            if (classes.isEmpty()) {
+                sb.append("No classes available.\n");
+            } else {
+                for (ClassModule c : classes) {
+                    sb.append("Class ID: ").append(c.getClassID()).append("\n");
+                    sb.append("Class Name: ").append(c.getClassName()).append("\n");
+                    sb.append("Module: ").append(c.getModule().getModuleName()).append("\n");
+                    sb.append("Lecturer: ")
+                      .append(c.getLecturer() != null ? c.getLecturer().getFullName() : "UNASSIGNED")
+                      .append("\n");
+                    sb.append("Capacity: ").append(c.getCapacity()).append("\n");
+                    sb.append("Enrolled Students: ").append(c.getEnrolledStudents().size()).append("\n\n");
+                }
+            }
+
+            reportArea.setText(sb.toString());
+        });
+
+        // ENROLLMENT REPORT
+        enrollBtn.addActionListener(e -> {
+            StringBuilder sb = new StringBuilder();
+            List<ClassModule> classes = systemManager.getAllClasses();
+
+            sb.append("=== ENROLLMENT REPORT ===\n\n");
+
+            if (classes.isEmpty()) {
+                sb.append("No classes found.\n");
+            } else {
+                for (ClassModule c : classes) {
+                    sb.append("Class: ").append(c.getClassName())
+                      .append(" (").append(c.getClassID()).append(")\n");
+
+                    if (c.getEnrolledStudents().isEmpty()) {
+                        sb.append("   No students enrolled.\n");
+                    } else {
+                        for (Student s : c.getEnrolledStudents()) {
+                            sb.append("   - ")
+                              .append(s.getStudentID())
+                              .append(" | ")
+                              .append(s.getFullName())
+                              .append("\n");
+                        }
+                    }
+                    sb.append("\n");
+                }
             }
 
             reportArea.setText(sb.toString());
