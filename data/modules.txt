@@ -1,1 +1,1 @@
-MOD001|System development method|SDM|No description|3|IT
+MD001|System Development Method|SDM|No description|3|IT

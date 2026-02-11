@@ -281,7 +281,13 @@ public class AcademicLeaderDashboard extends JFrame {
             gbc.insets = new Insets(8, 8, 8, 8);
             gbc.fill = GridBagConstraints.HORIZONTAL;
             
-            JTextField idField = new JTextField(20);
+            // Auto-generate Module ID
+            String nextModuleID = FileManager.generateNextModuleID();
+            JTextField idField = new JTextField(nextModuleID, 20);
+            idField.setEditable(false);
+            idField.setBackground(new Color(220, 220, 220));
+            idField.setForeground(new Color(100, 100, 100));
+            
             JTextField nameField = new JTextField(20);
             JTextField codeField = new JTextField(20);
             JComboBox<Integer> creditBox = new JComboBox<>(new Integer[]{1, 2, 3, 4});
@@ -293,6 +299,14 @@ public class AcademicLeaderDashboard extends JFrame {
             createDialog.add(new JLabel("Module ID:"), gbc);
             gbc.gridx = 1;
             createDialog.add(idField, gbc);
+            
+            JLabel autoGenLabel = new JLabel("(Auto-generated)");
+            autoGenLabel.setFont(new Font("Arial", Font.ITALIC, 10));
+            autoGenLabel.setForeground(new Color(100, 100, 100));
+            gbc.gridx = 1; gbc.gridy = 0;
+            gbc.anchor = GridBagConstraints.SOUTH;
+            createDialog.add(autoGenLabel, gbc);
+            gbc.anchor = GridBagConstraints.CENTER;
             
             gbc.gridx = 0; gbc.gridy = 1;
             createDialog.add(new JLabel("Module Name:"), gbc);
@@ -320,8 +334,8 @@ public class AcademicLeaderDashboard extends JFrame {
             
             saveBtn.addActionListener(e -> {
                 try {
-                    if (idField.getText().isEmpty() || nameField.getText().isEmpty() || codeField.getText().isEmpty()) {
-                        JOptionPane.showMessageDialog(createDialog, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                    if (nameField.getText().isEmpty() || codeField.getText().isEmpty()) {
+                        JOptionPane.showMessageDialog(createDialog, "Please fill in all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     
@@ -334,7 +348,7 @@ public class AcademicLeaderDashboard extends JFrame {
                             (String) departmentBox.getSelectedItem()
                     );
                     systemManager.createModule(module);
-                    JOptionPane.showMessageDialog(createDialog, "Module created successfully!");
+                    JOptionPane.showMessageDialog(createDialog, "Module created successfully with ID: " + idField.getText());
                     createDialog.dispose();
                     parent.dispose();
                     showModuleManagementDialog();

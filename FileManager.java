@@ -131,6 +131,39 @@ public class FileManager {
     }
 
     /**
+     * Generate next Module ID automatically
+     * Reads all existing modules from file and generates next ID in sequence
+     * Format: MD001, MD002, MD003, etc.
+     */
+    public static String generateNextModuleID() {
+        List<Module> modules = loadAllModules();
+        
+        if (modules == null || modules.isEmpty()) {
+            return "MD001";
+        }
+        
+        // Find the highest number in existing module IDs
+        int maxNumber = 0;
+        for (Module module : modules) {
+            String moduleID = module.getModuleID();
+            if (moduleID != null && moduleID.startsWith("MD")) {
+                try {
+                    String numberPart = moduleID.substring(2); // Remove "MD" prefix
+                    int number = Integer.parseInt(numberPart);
+                    if (number > maxNumber) {
+                        maxNumber = number;
+                    }
+                } catch (NumberFormatException e) {
+                    // Skip if not in expected format
+                }
+            }
+        }
+        
+        // Generate next ID
+        return String.format("MD%03d", maxNumber + 1);
+    }
+
+    /**
      * Overwrite and save all modules
      */
     public static void saveAllModules(List<Module> modules) {
