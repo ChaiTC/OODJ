@@ -75,59 +75,81 @@ public class AcademicLeaderDashboard extends JFrame {
     // ================= MODULE MANAGEMENT (RESTORED ORIGINAL LOOK) =================
     private JPanel buildModuleManagementPanel() {
 
-        JPanel panel = new JPanel(new GridLayout(5, 2, 10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(30, 30, 30, 30));
+    JPanel panel = new JPanel(new GridBagLayout());
+    panel.setBorder(BorderFactory.createEmptyBorder(40, 60, 40, 60));
 
-        JTextField codeField = new JTextField();
-        JTextField nameField = new JTextField();
-        JTextField creditField = new JTextField("3");
-        JTextField deptField = new JTextField(leader.getDepartment());
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(15, 20, 15, 20);
+    gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JButton createBtn = new JButton("Create Module");
+    JTextField codeField = new JTextField(20);
+    JTextField nameField = new JTextField(20);
+    JTextField creditField = new JTextField("3", 20);
+    JTextField deptField = new JTextField(leader.getDepartment(), 20);
 
-        createBtn.addActionListener(e -> {
+    JButton createBtn = new JButton("Create Module");
+    createBtn.setPreferredSize(new Dimension(200, 40));
 
-            if (codeField.getText().trim().isEmpty() ||
-                    nameField.getText().trim().isEmpty()) {
+    // Row 1
+    gbc.gridx = 0; gbc.gridy = 0;
+    panel.add(new JLabel("Module Code:"), gbc);
+    gbc.gridx = 1;
+    panel.add(codeField, gbc);
 
-                JOptionPane.showMessageDialog(this,
-                        "Module Code and Name are required.");
-                return;
-            }
+    // Row 2
+    gbc.gridx = 0; gbc.gridy = 1;
+    panel.add(new JLabel("Module Name:"), gbc);
+    gbc.gridx = 1;
+    panel.add(nameField, gbc);
 
-            Module module = new Module(
-                    systemManager.generateModuleID(),
-                    nameField.getText(),
-                    codeField.getText(),
-                    "UNASSIGNED",
-                    Integer.parseInt(creditField.getText()),
-                    deptField.getText()
-            );
+    // Row 3
+    gbc.gridx = 0; gbc.gridy = 2;
+    panel.add(new JLabel("Credits:"), gbc);
+    gbc.gridx = 1;
+    panel.add(creditField, gbc);
 
-            systemManager.createModule(module);
-            refreshModuleBox();
+    // Row 4
+    gbc.gridx = 0; gbc.gridy = 3;
+    panel.add(new JLabel("Department:"), gbc);
+    gbc.gridx = 1;
+    panel.add(deptField, gbc);
 
+    // Row 5
+    gbc.gridx = 1; gbc.gridy = 4;
+    panel.add(createBtn, gbc);
+
+    createBtn.addActionListener(e -> {
+
+        if (codeField.getText().trim().isEmpty() ||
+                nameField.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this,
-                    "Module created successfully!");
+                    "Module Code and Name are required.");
+            return;
+        }
 
-            codeField.setText("");
-            nameField.setText("");
-            creditField.setText("3");
-        });
+        Module module = new Module(
+                systemManager.generateModuleID(),
+                nameField.getText(),
+                codeField.getText(),
+                "UNASSIGNED",
+                Integer.parseInt(creditField.getText()),
+                deptField.getText()
+        );
 
-        panel.add(new JLabel("Module Code:"));
-        panel.add(codeField);
-        panel.add(new JLabel("Module Name:"));
-        panel.add(nameField);
-        panel.add(new JLabel("Credits:"));
-        panel.add(creditField);
-        panel.add(new JLabel("Department:"));
-        panel.add(deptField);
-        panel.add(new JLabel());
-        panel.add(createBtn);
+        systemManager.createModule(module);
+        refreshModuleBox();
 
-        return panel;
-    }
+        JOptionPane.showMessageDialog(this,
+                "Module created successfully!");
+
+        codeField.setText("");
+        nameField.setText("");
+        creditField.setText("3");
+    });
+
+    return panel;
+}
+
 
     // ================= ASSIGN LECTURERS =================
     private JPanel buildAssignLecturersPanel() {

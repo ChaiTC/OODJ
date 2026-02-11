@@ -599,71 +599,60 @@ if (module == null) return null;
         return sb.toString();
     }
 
-    private static ClassModule deserializeClass(String data, List<Module> modules, List<User> users) {
-
-    // 🔥 CRITICAL FIX: keep empty trailing values
-    String[] parts = data.split("\\|", -1);
-
-    if (parts.length < 8) return null;
-
-    String classID = parts[0];
-    String className = parts[1];
-    String moduleID = parts[2];
-    String lecturerID = parts[3];
-
-    String day = parts[4].isEmpty() ? null : parts[4];
-    String time = parts[5].isEmpty() ? null : parts[5];
-    String location = parts[6].isEmpty() ? null : parts[6];
-
-    int capacity = 50;
+   private static ClassModule deserializeClass(String data, List<Module> modules, List<User> users) {
     try {
-        capacity = Integer.parseInt(parts[7]);
-    } catch (Exception ignored) {}
+        String[] parts = data.split("\\|", -1);
+        if (parts.length < 8) return null;
 
-    // This safely handles trailing |
-    String studentCSV = parts.length > 8 ? parts[8] : "";
+        String classID = parts[0];
+        String className = parts[1];
+        String moduleID = parts[2];
+        String lecturerID = parts[3];
+        String day = parts[4];
+        String time = parts[5];
+        String location = parts[6];
+        int capacity = Integer.parseInt(parts[7]);
+        String studentCSV = parts.length > 8 ? parts[8] : "";
 
-    // Create class object
-    ClassModule cls = new ClassModule(
-            classID,
-            className,
-            moduleID,
-            capacity,
-            day,
-            time,
-            location,
-            null
-    );
+        ClassModule cls = new ClassModule(
+                classID, className, moduleID,
+                capacity, day, time, location, null
+        );
 
-    // Set lecturer if exists
-    if (lecturerID != null && !lecturerID.isEmpty()) {
-        for (User u : users) {
-            if (u instanceof Lecturer && u.getUserID().equals(lecturerID)) {
-                cls.setLecturer((Lecturer) u);
-                break;
+        // assign lecturer
+        if (lecturerID != null && !lecturerID.isEmpty()) {
+            for (User u : users) {
+                if (u instanceof Lecturer &&
+                        u.getUserID().equals(lecturerID)) {
+                    cls.setLecturer((Lecturer) u);
+                    break;
+                }
             }
         }
-    }
 
-    // Restore enrolled students
-    if (studentCSV != null && !studentCSV.isEmpty()) {
-        String[] sids = studentCSV.split(",");
-        for (String sid : sids) {
-            for (User u : users) {
-                if (u instanceof Student) {
-                    Student s = (Student) u;
-                    if (s.getStudentID().equals(sid)) {
-                        cls.enrollStudent(s);
-                        s.registerClass(cls);
-                        break;
+        // enrolled students
+        if (studentCSV != null && !studentCSV.isEmpty()) {
+            String[] ids = studentCSV.split(",");
+            for (String sid : ids) {
+                for (User u : users) {
+                    if (u instanceof Student) {
+                        Student s = (Student) u;
+                        if (s.getStudentID().equals(sid)) {
+                            cls.enrollStudent(s);
+                            break;
+                        }
                     }
                 }
             }
         }
-    }
 
-    return cls;
+        return cls;
+
+    } catch (Exception e) {
+        return null;
+    }
 }
+
 
     
     /**
