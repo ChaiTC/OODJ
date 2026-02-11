@@ -44,15 +44,26 @@ public class AcademicLeaderDashboard extends JFrame {
 
     // ================= TABS =================
     private JTabbedPane buildTabs() {
-        JTabbedPane tabs = new JTabbedPane();
+    JTabbedPane tabs = new JTabbedPane();
 
-        tabs.addTab("Edit Profile", buildEditProfilePanel());
-        tabs.addTab("Module Management", buildModuleManagementPanel());
-        tabs.addTab("Assign Lecturers", buildAssignLecturersPanel());
-        tabs.addTab("View Reports", buildReportsPanel());
+    tabs.addTab("Edit Profile", buildEditProfilePanel());
+    tabs.addTab("Module Management", buildModuleManagementPanel());
 
-        return tabs;
-    }
+    // Create assign panel separately
+    JPanel assignPanel = buildAssignLecturersPanel();
+    tabs.addTab("Assign Lecturers", assignPanel);
+
+    tabs.addTab("View Reports", buildReportsPanel());
+
+    // Refresh Assign tab whenever selected
+    tabs.addChangeListener(e -> {
+        if (tabs.getSelectedIndex() == 2) { // Assign tab index
+            tabs.setComponentAt(2, buildAssignLecturersPanel());
+        }
+    });
+
+    return tabs;
+}
 
     // ================= FOOTER =================
     private JPanel buildFooter() {
