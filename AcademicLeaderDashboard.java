@@ -18,7 +18,7 @@ public class AcademicLeaderDashboard extends JFrame {
 
     private void initUI() {
         setTitle("Academic Leader Dashboard - " + leader.getFullName());
-        setSize(950, 600);
+        setSize(1000, 600);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -72,84 +72,113 @@ public class AcademicLeaderDashboard extends JFrame {
         return footer;
     }
 
-    // ================= MODULE MANAGEMENT (RESTORED ORIGINAL LOOK) =================
+    // ================= EDIT PROFILE =================
+    private JPanel buildEditProfilePanel() {
+
+        JPanel panel = new JPanel(new GridLayout(6, 2, 15, 15));
+        panel.setBorder(BorderFactory.createEmptyBorder(40, 120, 40, 120));
+
+        JTextField nameField = new JTextField(leader.getFullName());
+        JTextField emailField = new JTextField(leader.getEmail());
+        JTextField phoneField = new JTextField(leader.getPhoneNumber());
+
+        JButton saveBtn = new JButton("Save Changes");
+
+        saveBtn.addActionListener(e -> {
+            leader.setFullName(nameField.getText());
+            leader.setEmail(emailField.getText());
+            leader.setPhoneNumber(phoneField.getText());
+
+            systemManager.updateUser(leader);
+
+            JOptionPane.showMessageDialog(this,
+                    "Profile updated successfully!");
+        });
+
+        panel.add(new JLabel("Full Name:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Email:"));
+        panel.add(emailField);
+        panel.add(new JLabel("Phone:"));
+        panel.add(phoneField);
+        panel.add(new JLabel());
+        panel.add(saveBtn);
+
+        return panel;
+    }
+
+    // ================= MODULE MANAGEMENT (RESTORED LOOK) =================
     private JPanel buildModuleManagementPanel() {
 
-    JPanel panel = new JPanel(new GridBagLayout());
-    panel.setBorder(BorderFactory.createEmptyBorder(40, 60, 40, 60));
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder(40, 120, 40, 120));
 
-    GridBagConstraints gbc = new GridBagConstraints();
-    gbc.insets = new Insets(15, 20, 15, 20);
-    gbc.fill = GridBagConstraints.HORIZONTAL;
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(20, 20, 20, 20);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-    JTextField codeField = new JTextField(20);
-    JTextField nameField = new JTextField(20);
-    JTextField creditField = new JTextField("3", 20);
-    JTextField deptField = new JTextField(leader.getDepartment(), 20);
+        JTextField codeField = new JTextField(25);
+        JTextField nameField = new JTextField(25);
+        JTextField creditField = new JTextField("3", 25);
+        JTextField deptField = new JTextField(leader.getDepartment(), 25);
 
-    JButton createBtn = new JButton("Create Module");
-    createBtn.setPreferredSize(new Dimension(200, 40));
+        JButton createBtn = new JButton("Create Module");
+        createBtn.setPreferredSize(new Dimension(250, 45));
 
-    // Row 1
-    gbc.gridx = 0; gbc.gridy = 0;
-    panel.add(new JLabel("Module Code:"), gbc);
-    gbc.gridx = 1;
-    panel.add(codeField, gbc);
+        gbc.gridx = 0; gbc.gridy = 0;
+        panel.add(new JLabel("Module Code:"), gbc);
+        gbc.gridx = 1;
+        panel.add(codeField, gbc);
 
-    // Row 2
-    gbc.gridx = 0; gbc.gridy = 1;
-    panel.add(new JLabel("Module Name:"), gbc);
-    gbc.gridx = 1;
-    panel.add(nameField, gbc);
+        gbc.gridx = 0; gbc.gridy = 1;
+        panel.add(new JLabel("Module Name:"), gbc);
+        gbc.gridx = 1;
+        panel.add(nameField, gbc);
 
-    // Row 3
-    gbc.gridx = 0; gbc.gridy = 2;
-    panel.add(new JLabel("Credits:"), gbc);
-    gbc.gridx = 1;
-    panel.add(creditField, gbc);
+        gbc.gridx = 0; gbc.gridy = 2;
+        panel.add(new JLabel("Credits:"), gbc);
+        gbc.gridx = 1;
+        panel.add(creditField, gbc);
 
-    // Row 4
-    gbc.gridx = 0; gbc.gridy = 3;
-    panel.add(new JLabel("Department:"), gbc);
-    gbc.gridx = 1;
-    panel.add(deptField, gbc);
+        gbc.gridx = 0; gbc.gridy = 3;
+        panel.add(new JLabel("Department:"), gbc);
+        gbc.gridx = 1;
+        panel.add(deptField, gbc);
 
-    // Row 5
-    gbc.gridx = 1; gbc.gridy = 4;
-    panel.add(createBtn, gbc);
+        gbc.gridx = 1; gbc.gridy = 4;
+        panel.add(createBtn, gbc);
 
-    createBtn.addActionListener(e -> {
+        createBtn.addActionListener(e -> {
 
-        if (codeField.getText().trim().isEmpty() ||
-                nameField.getText().trim().isEmpty()) {
+            if (codeField.getText().trim().isEmpty() ||
+                    nameField.getText().trim().isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                        "Module Code and Name are required.");
+                return;
+            }
+
+            Module module = new Module(
+                    systemManager.generateModuleID(),
+                    nameField.getText(),
+                    codeField.getText(),
+                    "UNASSIGNED",
+                    Integer.parseInt(creditField.getText()),
+                    deptField.getText()
+            );
+
+            systemManager.createModule(module);
+            refreshModuleBox();
+
             JOptionPane.showMessageDialog(this,
-                    "Module Code and Name are required.");
-            return;
-        }
+                    "Module created successfully!");
 
-        Module module = new Module(
-                systemManager.generateModuleID(),
-                nameField.getText(),
-                codeField.getText(),
-                "UNASSIGNED",
-                Integer.parseInt(creditField.getText()),
-                deptField.getText()
-        );
+            codeField.setText("");
+            nameField.setText("");
+            creditField.setText("3");
+        });
 
-        systemManager.createModule(module);
-        refreshModuleBox();
-
-        JOptionPane.showMessageDialog(this,
-                "Module created successfully!");
-
-        codeField.setText("");
-        nameField.setText("");
-        creditField.setText("3");
-    });
-
-    return panel;
-}
-
+        return panel;
+    }
 
     // ================= ASSIGN LECTURERS =================
     private JPanel buildAssignLecturersPanel() {
@@ -200,13 +229,12 @@ public class AcademicLeaderDashboard extends JFrame {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // LEFT SIDE BUTTON PANEL
         JPanel optionsPanel = new JPanel();
         optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
-        optionsPanel.setPreferredSize(new Dimension(200, 400));
+        optionsPanel.setPreferredSize(new Dimension(220, 400));
         optionsPanel.setBorder(BorderFactory.createTitledBorder("Report Options"));
 
-        Dimension buttonSize = new Dimension(180, 40);
+        Dimension buttonSize = new Dimension(190, 45);
 
         JButton userBtn = createReportButton("User Summary", buttonSize);
         JButton classBtn = createReportButton("Class Summary", buttonSize);
@@ -215,13 +243,13 @@ public class AcademicLeaderDashboard extends JFrame {
         JButton enrollBtn = createReportButton("Enrollment Report", buttonSize);
 
         optionsPanel.add(userBtn);
-        optionsPanel.add(Box.createVerticalStrut(10));
+        optionsPanel.add(Box.createVerticalStrut(12));
         optionsPanel.add(classBtn);
-        optionsPanel.add(Box.createVerticalStrut(10));
+        optionsPanel.add(Box.createVerticalStrut(12));
         optionsPanel.add(moduleBtn);
-        optionsPanel.add(Box.createVerticalStrut(10));
+        optionsPanel.add(Box.createVerticalStrut(12));
         optionsPanel.add(assessBtn);
-        optionsPanel.add(Box.createVerticalStrut(10));
+        optionsPanel.add(Box.createVerticalStrut(12));
         optionsPanel.add(enrollBtn);
 
         JTextArea reportArea = new JTextArea();
@@ -231,7 +259,7 @@ public class AcademicLeaderDashboard extends JFrame {
         panel.add(optionsPanel, BorderLayout.WEST);
         panel.add(new JScrollPane(reportArea), BorderLayout.CENTER);
 
-        // ================= USER REPORT =================
+        // ===== USER =====
         userBtn.addActionListener(e -> {
             List<User> users = systemManager.getAllUsers();
             StringBuilder sb = new StringBuilder();
@@ -251,60 +279,28 @@ public class AcademicLeaderDashboard extends JFrame {
             reportArea.setText(sb.toString());
         });
 
-        // ================= CLASS REPORT =================
+        // ===== CLASS =====
         classBtn.addActionListener(e -> {
             List<ClassModule> classes = systemManager.getAllClasses();
             StringBuilder sb = new StringBuilder();
 
             sb.append("=== CLASS SUMMARY REPORT ===\n\n");
-            sb.append("Total Classes: ").append(classes.size()).append("\n\n");
 
-            for (ClassModule c : classes) {
-                sb.append("Class ID: ").append(c.getClassID()).append("\n");
-                sb.append("Name: ").append(c.getClassName()).append("\n");
-                sb.append("Module: ").append(c.getModuleID()).append("\n");
-                sb.append("Capacity: ").append(c.getCapacity()).append("\n");
-                sb.append("Enrolled: ").append(c.getEnrolledStudents().size()).append("\n\n");
+            if (classes.isEmpty()) {
+                sb.append("No classes found.\n");
+            } else {
+                for (ClassModule c : classes) {
+                    sb.append("Class ID: ").append(c.getClassID()).append("\n");
+                    sb.append("Name: ").append(c.getClassName()).append("\n");
+                    sb.append("Capacity: ").append(c.getCapacity()).append("\n");
+                    sb.append("Enrolled: ").append(c.getEnrolledStudents().size()).append("\n\n");
+                }
             }
 
             reportArea.setText(sb.toString());
         });
 
-        // ================= MODULE REPORT =================
-        moduleBtn.addActionListener(e -> {
-            List<Module> modules = systemManager.getAllModules();
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("=== MODULE SUMMARY REPORT ===\n\n");
-
-            for (Module m : modules) {
-                sb.append("Module ID: ").append(m.getModuleID()).append("\n");
-                sb.append("Name: ").append(m.getModuleName()).append("\n");
-                sb.append("Code: ").append(m.getModuleCode()).append("\n");
-                sb.append("Credits: ").append(m.getCreditHours()).append("\n\n");
-            }
-
-            reportArea.setText(sb.toString());
-        });
-
-        // ================= ASSESSMENT REPORT =================
-        assessBtn.addActionListener(e -> {
-            List<Assessment> assessments = systemManager.getAllAssessments();
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("=== ASSESSMENT SUMMARY REPORT ===\n\n");
-
-            for (Assessment a : assessments) {
-                sb.append("Assessment ID: ").append(a.getAssessmentID()).append("\n");
-                sb.append("Title: ").append(a.getAssessmentName()).append("\n");
-                sb.append("Type: ").append(a.getAssessmentType().getAssessmentType()).append("\n");
-                sb.append("Module: ").append(a.getModule().getModuleCode()).append("\n\n");
-            }
-
-            reportArea.setText(sb.toString());
-        });
-
-        // ================= ENROLLMENT REPORT =================
+        // ===== ENROLLMENT =====
         enrollBtn.addActionListener(e -> {
             List<ClassModule> classes = systemManager.getAllClasses();
             StringBuilder sb = new StringBuilder();
@@ -312,19 +308,21 @@ public class AcademicLeaderDashboard extends JFrame {
 
             sb.append("=== ENROLLMENT REPORT ===\n\n");
 
-            for (ClassModule c : classes) {
-                int enrolled = c.getEnrolledStudents().size();
-                sb.append(c.getClassID())
-                        .append(" - ")
-                        .append(c.getClassName())
-                        .append(": ")
-                        .append(enrolled)
-                        .append(" students\n");
+            if (classes.isEmpty()) {
+                sb.append("No enrollment data available.\n");
+            } else {
+                for (ClassModule c : classes) {
+                    int enrolled = c.getEnrolledStudents().size();
+                    sb.append(c.getClassName())
+                            .append(": ")
+                            .append(enrolled)
+                            .append(" students\n");
 
-                total += enrolled;
+                    total += enrolled;
+                }
+
+                sb.append("\nTotal Enrolled Students: ").append(total);
             }
-
-            sb.append("\nTotal Enrolled Students: ").append(total);
 
             reportArea.setText(sb.toString());
         });
