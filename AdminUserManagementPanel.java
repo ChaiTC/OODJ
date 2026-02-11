@@ -59,6 +59,22 @@ class AdminUserManagementPanel extends JPanel {
         JButton deleteBtn = new JButton("Delete User");
         JButton approveBtn = new JButton("Approve User");
         JButton rejectBtn = new JButton("Reject User");
+        JButton[] allButtons = new JButton[] {
+            searchBtn, clearBtn, createBtn, editBtn, deleteBtn, approveBtn, rejectBtn
+        };
+        Dimension uniformSize = new Dimension(0, 0);
+        for (JButton btn : allButtons) {
+            Dimension pref = btn.getPreferredSize();
+            if (pref.width > uniformSize.width) {
+                uniformSize.width = pref.width;
+            }
+            if (pref.height > uniformSize.height) {
+                uniformSize.height = pref.height;
+            }
+        }
+        for (JButton btn : allButtons) {
+            btn.setPreferredSize(new Dimension(uniformSize));
+        }
         buttonBar.add(createBtn);
         buttonBar.add(editBtn);
         buttonBar.add(deleteBtn);
