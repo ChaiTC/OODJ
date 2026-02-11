@@ -201,17 +201,22 @@ class AdminUserManagementPanel extends JPanel {
                     return; 
                 }
                 
+                // Store current role for later comparison
+                String currentRole = null;
+                String currentDept = null;
+                String currentStaffID = "";
+                
                 if (u instanceof Student) {
-                    typeBox.setSelectedItem("Student");
-                    userIdField.setText(u.getUserID());
+                    currentRole = "Student";
                     departmentBox.removeAllItems();
                     departmentBox.addItem("IT");
                     departmentBox.setSelectedItem("IT");
                     staffIdField.setText("N/A");
                 } else if (u instanceof Lecturer) {
-                    typeBox.setSelectedItem("Lecturer");
+                    currentRole = "Lecturer";
                     Lecturer lec = (Lecturer) u;
-                    userIdField.setText(u.getUserID());
+                    currentDept = lec.getDepartment();
+                    currentStaffID = lec.getStaffID();
                     departmentBox.removeAllItems();
                     departmentBox.addItem("IT");
                     departmentBox.addItem("Business");
@@ -219,9 +224,10 @@ class AdminUserManagementPanel extends JPanel {
                     departmentBox.setSelectedItem(lec.getDepartment());
                     staffIdField.setText(lec.getStaffID());
                 } else if (u instanceof AcademicLeader) {
-                    typeBox.setSelectedItem("Academic Leader");
+                    currentRole = "Academic Leader";
                     AcademicLeader leader = (AcademicLeader) u;
-                    userIdField.setText(u.getUserID());
+                    currentDept = leader.getDepartment();
+                    currentStaffID = leader.getStaffID();
                     departmentBox.removeAllItems();
                     departmentBox.addItem("IT");
                     departmentBox.addItem("Business");
@@ -229,15 +235,24 @@ class AdminUserManagementPanel extends JPanel {
                     departmentBox.setSelectedItem(leader.getDepartment());
                     staffIdField.setText(leader.getStaffID());
                 } else if (u instanceof AdminStaff) {
-                    typeBox.setSelectedItem("Admin Staff");
+                    currentRole = "Admin Staff";
                     AdminStaff staff = (AdminStaff) u;
-                    userIdField.setText(u.getUserID());
+                    currentDept = staff.getDepartment();
+                    currentStaffID = staff.getStaffID();
                     departmentBox.removeAllItems();
                     departmentBox.addItem("Administration");
                     departmentBox.setSelectedItem(staff.getDepartment());
                     staffIdField.setText(staff.getStaffID());
                 }
                 
+                // Store original role as tag to detect changes
+                typeBox.putClientProperty("originalRole", currentRole);
+                typeBox.setSelectedItem(currentRole);
+                
+                // Allow typeBox to be changed (all options available)
+                typeBox.setEnabled(true);
+                
+                userIdField.setText(u.getUserID());
                 username.setText(u.getUsername());
                 password.setText("");
                 email.setText(u.getEmail());
@@ -403,6 +418,46 @@ class AdminUserManagementPanel extends JPanel {
                         if (existingUser == null) {
                             JOptionPane.showMessageDialog(parentFrame, "User not found");
                             return;
+                        }
+                        
+                        String originalRole = (String) typeBox.getClientProperty("originalRole");
+                        String newRole = (String) typeBox.getSelectedItem();
+                        String oldUserId = userId;
+                        
+                        // Check if role has been changed
+                        if (originalRole != null && !originalRole.equals(newRole)) {
+                            // Role conversion needed
+                            String staffId = staffIdField.getText().trim();
+                            
+                            if (systemManager.convertUserRole(userId, newRole, dept, staffId)) {
+                                // Get the converted user (which now has a new ID)
+                                // Search for the newly created user
+                                java.util.List<User> allUsers = systemManager.getAllUsers();
+                                User convertedUser = null;
+                                for (User u : allUsers) {
+                                    if (u.getUsername().equals(usern) && !u.getUserID().equals(oldUserId)) {
+                                        convertedUser = u;
+                                        break;
+                                    }
+                                }
+                                
+                                if (convertedUser != null) {
+                                    existingUser = convertedUser;
+                                    userId = convertedUser.getUserID();
+                                    
+                                    JOptionPane.showMessageDialog(parentFrame, 
+                                        "Role conversion successful!\n\n" +
+                                        "Old User ID: " + oldUserId + "\n" +
+                                        "New User ID: " + userId + "\n" +
+                                        "Role: " + newRole);
+                                } else {
+                                    JOptionPane.showMessageDialog(parentFrame, "Failed to convert user role");
+                                    return;
+                                }
+                            } else {
+                                JOptionPane.showMessageDialog(parentFrame, "Failed to convert user role");
+                                return;
+                            }
                         }
                         
                         // Update common fields

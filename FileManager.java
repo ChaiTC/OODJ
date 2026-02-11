@@ -219,6 +219,23 @@ public class FileManager {
 
         }
     }
+
+    /**
+     * Save all feedback to file (overwrite)
+     */
+    public static void saveAllFeedback(List<Feedback> feedbackList) {
+        try (FileWriter fw = new FileWriter(FEEDBACK_FILE, false);
+             BufferedWriter bw = new BufferedWriter(fw)) {
+
+            for (Feedback f : feedbackList) {
+                bw.write(serializeFeedback(f));
+                bw.newLine();
+            }
+
+        } catch (IOException e) {
+            System.err.println("Error saving all feedback: " + e.getMessage());
+        }
+    }
     
     /**
      * Load all assessments from file
