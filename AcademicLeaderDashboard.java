@@ -332,6 +332,67 @@ public class AcademicLeaderDashboard extends JFrame {
             reportArea.setText(sb.toString());
         });
 
+        // ========== CLASS REPORT ==========
+        classBtn.addActionListener(e -> {
+            StringBuilder sb = new StringBuilder();
+            List<ClassModule> classes = systemManager.getAllClasses();
+
+            sb.append("=== CLASS SUMMARY REPORT ===\n\n");
+            sb.append("Total Classes: ").append(classes.size()).append("\n\n");
+
+            for (ClassModule c : classes) {
+                sb.append("Class ID: ").append(c.getClassID()).append("\n");
+                sb.append("  Name: ").append(c.getClassName()).append("\n");
+                sb.append("  Module: ").append(c.getModuleID()).append("\n");
+                sb.append("  Capacity: ").append(c.getCapacity()).append("\n");
+                sb.append("  Enrolled: ").append(c.getEnrolledStudents().size()).append(" students\n");
+                sb.append("  Schedule: ").append(c.getDay() != null ? c.getDay() : "N/A").append(" at ")
+                        .append(c.getTime() != null ? c.getTime() : "N/A").append("\n");
+                sb.append("  Location: ").append(c.getLocation() != null ? c.getLocation() : "N/A").append("\n");
+                sb.append("  Lecturer: ");
+                if (c.getLecturerID() != null) {
+                    User u = systemManager.findUserByID(c.getLecturerID());
+                    sb.append(u != null ? u.getUsername() : "Not found");
+                } else {
+                    sb.append("Unassigned");
+                }
+                sb.append("\n\n");
+            }
+
+            reportArea.setText(sb.toString());
+        });
+
+        // ========== ENROLLMENT REPORT ==========
+        enrollBtn.addActionListener(e -> {
+            StringBuilder sb = new StringBuilder();
+            List<ClassModule> classes = systemManager.getAllClasses();
+            int totalEnrolled = 0;
+
+            sb.append("=== ENROLLMENT REPORT ===\n\n");
+            sb.append("--- Enrollment by Class ---\n");
+            for (ClassModule c : classes) {
+                int enrolled = c.getEnrolledStudents().size();
+                sb.append(c.getClassID()).append(" (").append(c.getClassName()).append("): ")
+                        .append(enrolled).append(" / ").append(c.getCapacity()).append(" students\n");
+                totalEnrolled += enrolled;
+            }
+
+            sb.append("\nTotal Enrolled: ").append(totalEnrolled).append("\n\n");
+
+            sb.append("--- Enrollment by Student ---\n");
+            List<User> students = systemManager.getAllStudents();
+            for (User u : students) {
+                int classCount = 0;
+                for (ClassModule c : classes) {
+                    if (c.getEnrolledStudents().contains(u.getUserID())) classCount++;
+                }
+                sb.append(u.getUsername()).append(" (").append(u.getUserID()).append("): ")
+                        .append(classCount).append(" classes\n");
+            }
+
+            reportArea.setText(sb.toString());
+        });
+
         return panel;
     }
 }
