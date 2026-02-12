@@ -134,6 +134,19 @@ public class SystemManager {
         FileManager.saveClass(classModule);
     }
 
+    public boolean updateClass(ClassModule updated) {
+    if (updated == null) return false;
+
+    for (int i = 0; i < classes.size(); i++) {
+        if (classes.get(i).getClassID().equals(updated.getClassID())) {
+            classes.set(i, updated);
+            FileManager.saveAllClasses(classes);
+            return true;
+        }
+    }
+    return false;
+}
+
     public void saveAllClasses() {
         FileManager.saveAllClasses(this.classes);
     }

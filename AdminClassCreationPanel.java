@@ -38,6 +38,13 @@ class AdminClassCreationPanel extends JPanel {
             moduleBox.addItem(m.getModuleID() + " (" + m.getModuleName() + ")");
         }
         
+        JComboBox<String> lecturerBox = new JComboBox<>();
+        java.util.List<User> lecturers = systemManager.getAllLecturers();
+        for (User u : lecturers) {
+           if (u instanceof Lecturer) {
+             lecturerBox.addItem(u.getUserID() + " - " + u.getFullName());
+    }
+}
         JSpinner capacitySpinner = new JSpinner(new SpinnerNumberModel(30, 1, 200, 5));
         
         // Schedule Type Selection
@@ -79,6 +86,8 @@ class AdminClassCreationPanel extends JPanel {
         createPanel.add(createLabeledRow("Class Name:", classNameField));
         createPanel.add(Box.createVerticalStrut(4));
         createPanel.add(createLabeledRow("Module:", moduleBox));
+        createPanel.add(Box.createVerticalStrut(4));
+        createPanel.add(createLabeledRow("Lecturer:", lecturerBox));
         createPanel.add(Box.createVerticalStrut(4));
         createPanel.add(createLabeledRow("Capacity:", capacitySpinner));
         createPanel.add(Box.createVerticalStrut(8));
@@ -191,6 +200,15 @@ class AdminClassCreationPanel extends JPanel {
                     time = timeFormat.format(timeValue);
                 }
                 
+                Lecturer selectedLecturer = null;
+                if (lecturerBox.getSelectedIndex() >= 0 && lecturerBox.getItemCount() > 0) {
+                    String selected = (String) lecturerBox.getSelectedItem();
+                    String selectedLecturerID = selected.split(" - ")[0];
+                    User u = systemManager.findUserByID(selectedLecturerID);
+                    if (u instanceof Lecturer) {
+                        selectedLecturer = (Lecturer) u;
+                    }
+                }
                 ClassModule newClass = new ClassModule(
                     classId, 
                     className, 
@@ -199,7 +217,7 @@ class AdminClassCreationPanel extends JPanel {
                     day,
                     time,
                     location.isEmpty() ? null : location,
-                    null
+                    selectedLecturer
                 );
                 
                 systemManager.createClass(newClass);

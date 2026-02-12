@@ -9,7 +9,15 @@ public class LecturerDashboard extends JFrame {
 
     public LecturerDashboard(SystemManager systemManager, Lecturer lecturer) {
         this.systemManager = systemManager;
-        this.lecturer = lecturer;
+        
+        User refreshed = systemManager.findUserByID(lecturer.getUserID());
+          if (refreshed instanceof Lecturer) {
+          this.lecturer = (Lecturer) refreshed;
+
+}   else {
+    this.lecturer = lecturer;
+}
+
         initializeFrame();
     }
 
@@ -169,8 +177,8 @@ panel.add(createLabeledRow("Class:", classCombo));
 panel.add(Box.createVerticalStrut(6));
 
 
-    // Choose module (only from modules assigned to this lecturer)
-    java.util.List<Module> modules = systemManager.getAllModules();
+    java.util.List<Module> modules = lecturer.getAssignedModules();
+
     String[] moduleItems = modules.stream()
             .map(m -> m.getModuleID() + " - " + m.getModuleName())
             .toArray(String[]::new);
@@ -198,7 +206,7 @@ panel.add(Box.createVerticalStrut(6));
     createBtn.addActionListener(e -> {
         try {
             if (modules.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No modules exist. Admin/Leader must create modules first.");
+                JOptionPane.showMessageDialog(this, "No modules assigned yet. Academic Leader must assign modules first.");
                 return;
             }
 
