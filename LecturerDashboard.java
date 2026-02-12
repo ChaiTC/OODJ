@@ -82,6 +82,13 @@ public class LecturerDashboard extends JFrame {
         mainPanel.add(bottomPanel, BorderLayout.SOUTH);
 
         add(mainPanel);
+
+        JPanel viewFeedbackPanel = new JPanel(new BorderLayout());
+        viewFeedbackPanel.setBackground(Color.WHITE);
+        showViewFeedback(viewFeedbackPanel);
+
+tabbedPane.addTab("View Feedback", viewFeedbackPanel);
+
     }
 
     private JButton createMenuButton(String text, Color baseColor) {
@@ -487,6 +494,72 @@ private Date parseDate(String yyyyMmDd) {
 
     contentPanel.add(panel, BorderLayout.CENTER);
 }
+
+private void showViewFeedback(JPanel contentPanel) {
+    JPanel panel = new JPanel(new BorderLayout(10, 10));
+    panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+    DefaultListModel<Feedback> model = new DefaultListModel<>();
+    JList<Feedback> list = new JList<>(model);
+    list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+    JTextArea details = new JTextArea();
+    details.setEditable(false);
+    details.setLineWrap(true);
+    details.setWrapStyleWord(true);
+
+    JButton refreshBtn = new JButton("Refresh");
+    refreshBtn.addActionListener(e -> {
+        model.clear();
+        details.setText("");
+
+
+        for (Feedback f : systemManager.getAllFeedback()) {
+            
+            if (f.getLecturerID() != null && f.getLecturerID().equals(lecturer.getUserID())) {
+                model.addElement(f);
+            }
+        }
+
+        if (!model.isEmpty()) list.setSelectedIndex(0);
+        else details.setText("No feedback available for you yet.");
+    });
+
+    list.addListSelectionListener(e -> {
+        Feedback f = list.getSelectedValue();
+        if (f == null) return;
+
+        String comment = (f.getComments() == null || f.getComments().trim().isEmpty())
+                ? "(none yet)"
+                : f.getComments();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Feedback ID: ").append(f.getFeedbackID()).append("\n");
+        sb.append("Assessment ID: ").append(f.getAssessmentID()).append("\n");
+        sb.append("Student ID: ").append(f.getStudentID()).append("\n");
+        sb.append("Suggested Marks: ").append(f.getSuggestedMarks()).append("\n\n");
+
+        sb.append("Feedback Content:\n").append(f.getFeedbackContent()).append("\n\n");
+
+        sb.append("Student Comment:\n").append(comment).append("\n");
+
+        details.setText(sb.toString());
+    });
+
+    JPanel top = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    top.add(refreshBtn);
+
+    panel.add(top, BorderLayout.NORTH);
+    panel.add(new JScrollPane(list), BorderLayout.WEST);
+    panel.add(new JScrollPane(details), BorderLayout.CENTER);
+
+    panel.getComponent(1).setPreferredSize(new Dimension(280, 0));
+
+    contentPanel.add(panel, BorderLayout.CENTER);
+
+    refreshBtn.doClick();
+}
+
 
 
     private void showMyModules(JPanel contentPanel) {
