@@ -169,8 +169,8 @@ panel.add(createLabeledRow("Class:", classCombo));
 panel.add(Box.createVerticalStrut(6));
 
 
-    // Choose module (only from modules assigned to this lecturer)
-    java.util.List<Module> modules = systemManager.getAllModules();
+    java.util.List<Module> modules = lecturer.getAssignedModules();
+
     String[] moduleItems = modules.stream()
             .map(m -> m.getModuleID() + " - " + m.getModuleName())
             .toArray(String[]::new);
@@ -198,7 +198,7 @@ panel.add(Box.createVerticalStrut(6));
     createBtn.addActionListener(e -> {
         try {
             if (modules.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "No modules exist. Admin/Leader must create modules first.");
+                JOptionPane.showMessageDialog(this, "No modules assigned yet. Academic Leader must assign modules first.");
                 return;
             }
 
