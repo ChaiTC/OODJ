@@ -57,6 +57,7 @@ public class StudentDashboard extends JFrame {
         JTabbedPane tabs = new JTabbedPane();
         tabs.addTab("Edit Profile", buildEditProfileTab());
         tabs.addTab("My Classes", buildMyClassesTab());
+        tabs.addTab("Register Classes", buildRegisterTab());
         tabs.addTab("Results", buildResultsTab());
         tabs.addTab("Feedback", buildFeedbackTab());
 
@@ -183,6 +184,62 @@ public class StudentDashboard extends JFrame {
 
         return panel;
     }
+
+    private JPanel buildRegisterTab() {
+    JPanel panel = new JPanel(new BorderLayout(10, 10));
+    panel.setBackground(Color.WHITE);
+    panel.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
+
+    DefaultListModel<ClassModule> model = new DefaultListModel<>();
+    JList<ClassModule> classList = new JList<>(model);
+
+    // show all available classes
+    for (ClassModule c : systemManager.getAllClasses()) {
+        model.addElement(c);
+    }
+
+    JButton registerBtn = new JButton("Register Selected Class");
+    registerBtn.addActionListener(e -> {
+        ClassModule selected = classList.getSelectedValue();
+        if (selected == null) {
+            JOptionPane.showMessageDialog(this, "Select a class first.");
+            return;
+        }
+
+       
+        for (Student s : selected.getEnrolledStudents()) {
+            if (s.getStudentID().equals(student.getStudentID())) {
+                JOptionPane.showMessageDialog(this, "Already registered in this class.");
+                return;
+            }
+        }
+
+        // capacity check 
+        if (selected.getEnrolledStudents().size() >= selected.getCapacity()) {
+            JOptionPane.showMessageDialog(this, "Class is full.");
+            return;
+        }
+
+       
+        selected.enrollStudent(student);
+
+        
+        systemManager.updateClass(selected);
+
+        JOptionPane.showMessageDialog(this, "Registered successfully!");
+        refreshAll();
+    });
+
+    panel.add(new JScrollPane(classList), BorderLayout.CENTER);
+
+    JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    bottom.setOpaque(false);
+    bottom.add(registerBtn);
+    panel.add(bottom, BorderLayout.SOUTH);
+
+    return panel;
+}
+
 
     private JPanel buildResultsTab() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));

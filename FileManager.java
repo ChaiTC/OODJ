@@ -742,7 +742,7 @@ if (module == null) return null;
     }
 
     private static String serializeClass(ClassModule cls) {
-        // Format: classID|className|moduleID|lecturerID|day|time|location|capacity|studentIDs(comma)
+       
         StringBuilder sb = new StringBuilder();
         sb.append(cls.getClassID()).append("|")
           .append(cls.getClassName()).append("|")
@@ -752,11 +752,9 @@ if (module == null) return null;
           .append(cls.getTime() != null ? cls.getTime() : "").append("|")
           .append(cls.getLocation() != null ? cls.getLocation() : "").append("|")
           .append(cls.getCapacity()).append("|");
-        // enrolled students
-        List<Student> enrolled = cls.getEnrolledStudents();
-        for (int i = 0; i < enrolled.size(); i++) {
-            if (i > 0) sb.append(",");
-            sb.append(enrolled.get(i).getStudentID());
+        
+          for (Student s : cls.getEnrolledStudents()) {
+        sb.append(s.getStudentID()).append(",");
         }
         return sb.toString();
     }
