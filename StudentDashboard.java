@@ -214,7 +214,7 @@ public class StudentDashboard extends JFrame {
             }
         }
 
-        // capacity check 
+       
         if (selected.getEnrolledStudents().size() >= selected.getCapacity()) {
             JOptionPane.showMessageDialog(this, "Class is full.");
             return;
