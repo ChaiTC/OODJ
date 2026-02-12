@@ -1,1 +1,2 @@
 MD001|System Development Method|SDM|No description|3|IT
+MD002|Probability statistics|PSMOD|No description|2|IT
