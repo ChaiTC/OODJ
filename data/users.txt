@@ -1,7 +1,7 @@
 ADMIN_STAFF|ADM001|Admin|123|admin@mail.apu.edu.my|ADMIN|0122156762|Male|32|true|true|Administration|STF001
 ACADEMIC_LEADER|ACL001|CTC|123|ctc@gmail.com|CHAI TIAN CHENG|0182098311|Male|20|true|true|IT|STF002
 LECTURER|LEC001|Aiden|123|aiden@mail.apu.edu.my|AIDEN|0182098211|Male|35|true|true|IT|STF003|ACL001|
-STUDENT|STU001|Roy|12345678/|roy@gmail.com|Dibyajoti Roy|0122348213|Male|21|true|true|STU001|2024
+STUDENT|STU001|Roy|12345678/|roy@gmail.com|Dibyajoti Roy|0122348213|Male|22|true|true|STU001|2024
 LECTURER|LEC002|Kelwin Tan|KelwinTan/|kelwin.tan@mail.apu.edu.my|KELWIN TAN|0179077322|Male|30|true|true|Engineering|STF004|ACL002|
 ACADEMIC_LEADER|ACL003|Troye|Troye123/|troye.sivan@gmail.com|Troye Sivan|0182098423|Male|30|true|true|IT|STF009
 LECTURER|LEC003|Kanagi|Kanagi123/|kanagi.rajandran@apu.edu.my|DR. KANAGI A/P RAJANDRAN|013472912|Female|24|false|true|Business|STF006|ACL002|
@@ -9,6 +9,3 @@ LECTURER|LEC003|Kanagi|Kanagi123/|kanagi.rajandran@apu.edu.my|DR. KANAGI A/P RAJ
 STUDENT|STU003|Eow|Eow12345/|eow@mail.apu.edu.my|Eow Wei Chuan|0127309128|Male|22|true|true|STU003|2026
 ACADEMIC_LEADER|ACL002|Mr.Kau|Kauguankiat/|kau.guankiat@mail.apu.edu.my|Kau Guan Kiat|0129203781|Male|34|false|false|IT|STF007
 LECTURER|LEC004|Yoshi|Yoshi@123|Yoshi@mail.apu.edu.my|Yoshi|0178306745|Female|25|true|true|IT|STF008|ACL002|MD001
-
-
-
