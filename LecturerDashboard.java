@@ -9,7 +9,15 @@ public class LecturerDashboard extends JFrame {
 
     public LecturerDashboard(SystemManager systemManager, Lecturer lecturer) {
         this.systemManager = systemManager;
-        this.lecturer = lecturer;
+        
+        User refreshed = systemManager.findUserByID(lecturer.getUserID());
+          if (refreshed instanceof Lecturer) {
+          this.lecturer = (Lecturer) refreshed;
+
+}   else {
+    this.lecturer = lecturer;
+}
+
         initializeFrame();
     }
 
