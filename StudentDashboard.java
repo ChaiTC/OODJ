@@ -280,7 +280,7 @@ public class StudentDashboard extends JFrame {
         for (ClassModule c : systemManager.getAllClasses()) {
             
             for (Student s : c.getEnrolledStudents()) {
-                if (s.getUserID().equals(student.getUserID())) {
+                if (s.getStudentID().equals(student.getStudentID())){
                     mine.add(c);
                     break;
                 }
@@ -307,31 +307,30 @@ public class StudentDashboard extends JFrame {
         classesArea.setText(sb.toString());
     }
 
-    private void refreshResults() {
-        String sid = student.getStudentID();
-        List<ClassModule> mine = getMyClasses();
+private void refreshResults() {
+    String sid = student.getStudentID();
+    List<ClassModule> mine = getMyClasses();
+     
+    List<String> myClassIDs = new ArrayList<>();
+    for (ClassModule c : mine) {
+        myClassIDs.add(c.getClassID());
+    }
 
-        List<String> myModuleIDs = new ArrayList<>();
-        for (ClassModule c : mine) {
-            if (c.getModule() != null) myModuleIDs.add(c.getModule().getModuleID());
-            else if (c.getModuleID() != null) myModuleIDs.add(c.getModuleID());
-        }
-
-        StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder();
         sb.append("Assessment Results\n\n");
         sb.append("Student: ").append(student.getFullName()).append("\n");
         sb.append("Student ID: ").append(sid).append("\n\n");
 
         boolean foundAny = false;
 
-        for (Assessment a : systemManager.getAllAssessments()) {
-            
-            String aModuleId = (a.getModule() != null) ? a.getModule().getModuleID() : null;
-            if (!myModuleIDs.isEmpty() && aModuleId != null && !myModuleIDs.contains(aModuleId)) {
-                continue;
-            }
+for (Assessment a : systemManager.getAllAssessments()) {
+    
+    String aClassId = a.getClassID();
+    if (!myClassIDs.isEmpty() && aClassId != null && !myClassIDs.contains(aClassId)) {
+        continue;
+    }
 
-             foundAny = true;
+    foundAny = true;
 
     sb.append("- ")
       .append(a.getModule() != null ? a.getModule().getModuleName() : "Module")
@@ -353,11 +352,8 @@ public class StudentDashboard extends JFrame {
     }
 
     sb.append("\n");
-}
 
-if (!foundAny) {
-    sb.append("No assessments found in the system.\n");
-}
+        }
     
 
         if (!foundAny) {
@@ -367,6 +363,7 @@ if (!foundAny) {
 
         resultsArea.setText(sb.toString());
     }
+
 
     private void refreshFeedback() {
         feedbackModel.clear();
@@ -418,19 +415,6 @@ if (!foundAny) {
         JOptionPane.showMessageDialog(this, "Comment saved.\n(If you want persistence, extend feedback.txt format.)");
         showSelectedFeedbackDetails();
     }
-
-    private List<String> getMyClassIDs() {
-    List<String> ids = new ArrayList<>();
-    for (ClassModule c : systemManager.getAllClasses()) {
-        for (Student s : c.getEnrolledStudents()) {
-            if (s.getUserID().equals(student.getUserID())) {
-                ids.add(c.getClassID());
-                break;
-            }
-        }
-    }
-    return ids;
-}
 
 }
 

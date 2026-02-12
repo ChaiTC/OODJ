@@ -780,7 +780,7 @@ if (module == null) return null;
                 classID, className, moduleID,
                 capacity, day, time, location, null
         );
-        
+
         cls.setLecturerID(lecturerID);
 
         // assign lecturer
@@ -858,6 +858,7 @@ if (module == null) return null;
         try {
             new FileWriter(USERS_FILE).close();
             new FileWriter(MODULES_FILE).close();
+            new FileWriter(CLASSES_FILE).close();
             new FileWriter(ASSESSMENTS_FILE).close();
             new FileWriter(FEEDBACK_FILE).close();
             new FileWriter(GRADING_FILE).close();
