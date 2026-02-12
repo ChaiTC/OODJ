@@ -454,15 +454,22 @@ public class FileManager {
 
     return sb.toString();
 }
-
+private static String safe(String s) {
+    if (s == null) return "";
+    return s.replace("\n", "\\n").replace("|", "/");
+}
     
     private static String serializeFeedback(Feedback feedback) {
         return feedback.getFeedbackID() + "|" +
                feedback.getAssessmentID() + "|" +
                feedback.getStudentID() + "|" +
                feedback.getLecturerID() + "|" +
+                 safe(feedback.getFeedbackContent()) + "|" +
                feedback.getFeedbackContent() + "|" +
-               feedback.getSuggestedMarks();
+               feedback.getSuggestedMarks() + "|" +
+               (feedback.getFeedbackDate() != null ? feedback.getFeedbackDate().getTime() : 0) + "|" +
+               feedback.isDelivered() + "|" +
+               safe(feedback.getComments());
     }
     
     private static String serializeAnnouncement(Announcement ann) {
@@ -604,13 +611,41 @@ public class FileManager {
                          Integer.parseInt(parts[4]), parts[5]);
     }
     
-    private static Feedback deserializeFeedback(String data) {
-        String[] parts = data.split("\\|");
-        if (parts.length < 6) return null;
+    public static Feedback deserializeFeedback(String line) {
+    try {
+        String[] p = line.split("\\|", -1); 
+
+        String feedbackID = p[0];
+        String assessmentID = p[1];
+        String studentID = p[2];
+        String lecturerID = p[3];
+        String content = p[4].replace("\\n", "\n");
+        double suggestedMarks = Double.parseDouble(p[5]);
+
+        Feedback f = new Feedback(feedbackID, assessmentID, studentID, lecturerID, content, suggestedMarks);
+
+       
+        if (p.length > 6) {
+            long millis = Long.parseLong(p[6]);
+            f.setFeedbackDate(new Date(millis));
+        }
+
         
-        return new Feedback(parts[0], parts[1], parts[2], parts[3], 
-                           parts[4], Double.parseDouble(parts[5]));
+        if (p.length > 7) {
+            f.setDelivered(Boolean.parseBoolean(p[7]));
+        }
+
+      
+        if (p.length > 8) {
+            f.setComments(p[8].replace("\\n", "\n"));
+        }
+
+        return f;
+    } catch (Exception e) {
+        return null;
     }
+}
+
     
     private static Announcement deserializeAnnouncement(String data) {
         try {
@@ -879,5 +914,6 @@ if (module == null) return null;
     public static void saveAssessmentType(Object type) {
         // Stub implementation
     }
+
 }
 

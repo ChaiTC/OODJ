@@ -183,7 +183,22 @@ public class SystemManager {
             }
         }
         return studentFeedback;
+
     }
+
+    public boolean updateFeedback(Feedback updated) {
+    if (updated == null) return false;
+
+    for (int i = 0; i < feedbackList.size(); i++) {
+        if (feedbackList.get(i).getFeedbackID().equals(updated.getFeedbackID())) {
+            feedbackList.set(i, updated);
+            FileManager.saveAllFeedback(feedbackList);
+            return true;
+        }
+    }
+    return false;
+}
+
 
     public User getCurrentUser() { return currentUser; }
     public void setCurrentUser(User user) { this.currentUser = user; }

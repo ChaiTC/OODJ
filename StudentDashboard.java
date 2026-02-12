@@ -468,8 +468,9 @@ for (Assessment a : systemManager.getAllAssessments()) {
         }
 
         selected.addStudentComment(comment);
+        systemManager.updateFeedback(selected);
 
-        JOptionPane.showMessageDialog(this, "Comment saved.\n(If you want persistence, extend feedback.txt format.)");
+        JOptionPane.showMessageDialog(this, "Comment saved.\n");
         showSelectedFeedbackDetails();
     }
 
