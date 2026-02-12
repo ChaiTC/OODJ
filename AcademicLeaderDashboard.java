@@ -714,7 +714,17 @@ public class AcademicLeaderDashboard extends JFrame {
             for (User u : students) {
                 int classCount = 0;
                 for (ClassModule c : classes) {
-                    if (c.getEnrolledStudents().contains(u.getUserID())) classCount++;
+                    boolean enrolled = false;
+                    for (Student s : c.getEnrolledStudents ()) {
+                        if (s.getUserID().equals(u.getUserID())) {
+                            enrolled = true;
+                            break;
+                        }
+                    }
+
+                    if (enrolled) {
+                        classCount++;
+                    }
                 }
                 sb.append(u.getUsername()).append(" (").append(u.getUserID()).append("): ")
                         .append(classCount).append(" classes\n");

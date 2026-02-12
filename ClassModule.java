@@ -16,6 +16,7 @@ public class ClassModule implements Serializable {
     private String day;
     private String time;
     private String location;
+    private String lecturerID;
     private Module module; // For backward compatibility
     
     // Original constructor with Module object
@@ -25,6 +26,7 @@ public class ClassModule implements Serializable {
         this.className = className;
         this.moduleID = module != null ? module.getModuleID() : "";
         this.lecturer = lecturer;
+        this.lecturerID = (lecturer != null) ? lecturer.getUserID() : null;
         this.capacity = capacity;
         this.day = semester;
         this.enrolledStudents = new ArrayList<>();
@@ -42,6 +44,7 @@ public class ClassModule implements Serializable {
         this.time = time;
         this.location = location;
         this.lecturer = lecturer;
+        this.lecturerID = (lecturer != null) ? lecturer.getUserID() : null;
         this.enrolledStudents = new ArrayList<>();
     }
     
@@ -61,7 +64,9 @@ public class ClassModule implements Serializable {
     public void setClassName(String className) { this.className = className; }
     
     public Lecturer getLecturer() { return lecturer; }
-    public void setLecturer(Lecturer lecturer) { this.lecturer = lecturer; }
+    public void setLecturer(Lecturer lecturer) { this.lecturer = lecturer; 
+        this.lecturerID = (lecturer != null) ? lecturer.getUserID() : null;
+    }
     
     public List<Student> getEnrolledStudents() { return enrolledStudents; }
     
@@ -71,12 +76,18 @@ public class ClassModule implements Serializable {
     public String getModuleID() { return moduleID; }
     public String getSemester() { return day; }
     
-    public String getLecturerID() { return lecturer != null ? lecturer.getUserID() : null; }
-    public void setLecturerID(String lecturerID) { 
-        if (lecturerID == null) {
+    public String getLecturerID() { 
+        return (lecturer != null) ? lecturer.getUserID() : lecturerID;  
+        }
+            
+
+    public void setLecturerID(String lecturerID) { this.lecturerID = lecturerID;
+        if (lecturerID == null || lecturerID.isEmpty()) {
             this.lecturer = null;
         }
     }
+
+    
     public String getDay() { return day; }
     public String getTime() { return time; }
     public String getLocation() { return location; }

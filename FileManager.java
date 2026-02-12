@@ -780,6 +780,8 @@ if (module == null) return null;
                 classID, className, moduleID,
                 capacity, day, time, location, null
         );
+        
+        cls.setLecturerID(lecturerID);
 
         // assign lecturer
         if (lecturerID != null && !lecturerID.isEmpty()) {
