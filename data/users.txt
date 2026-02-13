@@ -7,7 +7,7 @@ ACADEMIC_LEADER|ACL003|Troye|Troye123/|troye.sivan@gmail.com|Troye Sivan|0182098
 LECTURER|LEC003|Kanagi|Kanagi123/|kanagi.rajandran@apu.edu.my|DR. KANAGI A/P RAJANDRAN|013472912|Female|24|false|true|Business|STF006|ACL002|MD002
 STUDENT|STU002|Eow|Eow12345/|eow@mail.apu.edu.my|Eow Wei Chuan|0127309128|Male|22|true|true|STU003|2026
 ACADEMIC_LEADER|ACL002|Mr.Kau|Kauguankiat/|kau.guankiat@mail.apu.edu.my|Kau Guan Kiat|0129203781|Male|34|false|true|IT|STF007
-LECTURER|LEC004|Yoshi|Yoshi@123|Yoshi@mail.apu.edu.my|Yoshi|0178306745|Female|25|true|true|IT|STF008|ACL002|MD001
+LECTURER|LEC004|Yoshi|Yoshi@123|Yoshi@mail.apu.edu.my|Yoshi|0178306745|Female|25|true|true|IT|STF008|ACL002|MD001,MD003
 STUDENT|STU003|Calvin|Calvin123/|calvin.giam@gmail.com|Calvin Giam Jian Tao|0123719212|Male|22|true|true|STU004|2026
 STUDENT|STU004|ChuaHF|Chf1234/|chuahf@gmail.com|Chua Hui Fong|0128320128|Male|23|true|true|STU005|2026
 STUDENT|STU005|Leon|Leon123/|leon@gmail.com|Hew Le Onn|013482012|Male|21|true|true|STU005|2026
