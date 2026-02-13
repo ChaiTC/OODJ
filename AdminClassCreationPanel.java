@@ -179,6 +179,11 @@ class AdminClassCreationPanel extends JPanel {
                 int capacity = (Integer)capacitySpinner.getValue();
                 String location = locationField.getText().trim();
                 
+                if (location.isEmpty()) {
+                    JOptionPane.showMessageDialog(parentFrame, "Please enter a location");
+                    return;
+                }
+                
                 String day = null;
                 String time = null;
                 
@@ -216,7 +221,7 @@ class AdminClassCreationPanel extends JPanel {
                     capacity, 
                     day,
                     time,
-                    location.isEmpty() ? null : location,
+                    location,
                     selectedLecturer
                 );
                 
