@@ -1,2 +1,1 @@
-CL001|Lab|DTM|LEC001|Monday|16:10|D-09-07|15|STU001,
 CL002|System Development Methods|MD001|LEC004|Monday|14:59||30|STU001,
