@@ -10,6 +10,8 @@ import java.util.*;
 
 public class AdminStaff extends User {
     private static final long serialVersionUID = 1L;
+    
+    // Department to which the admin staff belongs (e.g., "Administration")
     private String department;
     private String staffID;
     
@@ -20,6 +22,7 @@ public class AdminStaff extends User {
         this.staffID = staffID;
     }
     
+    // ==================== Getter and Setter Methods ====================
     
     public String getDepartment() { 
         return department; 
