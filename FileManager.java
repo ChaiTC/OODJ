@@ -814,6 +814,15 @@ if (module == null) return null;
                 capacity, day, time, location, null
         );
 
+                for (Module m : modules) {
+    if (m.getModuleID().equalsIgnoreCase(moduleID) ||
+        m.getModuleCode().equalsIgnoreCase(moduleID)) {
+        cls.setModule(m);
+        break;
+    }
+}
+
+
         cls.setLecturerID(lecturerID);
 
         // assign lecturer
