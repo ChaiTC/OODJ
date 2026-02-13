@@ -4,10 +4,17 @@ LECTURER|LEC001|Aiden|123|aiden@mail.apu.edu.my|AIDEN|0182098211|Male|35|true|tr
 STUDENT|STU001|Roy|12345678/|roy@gmail.com|Dibyajoti Roy|0122348212|Male|22|true|true|STU001|2024
 LECTURER|LEC002|Kelwin Tan|KelwinTan/|kelwin.tan@mail.apu.edu.my|KELWIN TAN|0179077322|Male|30|true|true|Engineering|STF004|ACL002|
 ACADEMIC_LEADER|ACL003|Troye|Troye123/|troye.sivan@gmail.com|Troye Sivan|0182098423|Male|30|true|true|IT|STF009
-LECTURER|LEC003|Kanagi|Kanagi123/|kanagi.rajandran@apu.edu.my|DR. KANAGI A/P RAJANDRAN|013472912|Female|24|false|false|Business|STF006|ACL002|
+LECTURER|LEC003|Kanagi|Kanagi123/|kanagi.rajandran@apu.edu.my|DR. KANAGI A/P RAJANDRAN|013472912|Female|24|false|true|Business|STF006|ACL002|
 STUDENT|STU002|Eow|Eow12345/|eow@mail.apu.edu.my|Eow Wei Chuan|0127309128|Male|22|true|true|STU003|2026
-ACADEMIC_LEADER|ACL002|Mr.Kau|Kauguankiat/|kau.guankiat@mail.apu.edu.my|Kau Guan Kiat|0129203781|Male|34|false|false|IT|STF007
+ACADEMIC_LEADER|ACL002|Mr.Kau|Kauguankiat/|kau.guankiat@mail.apu.edu.my|Kau Guan Kiat|0129203781|Male|34|false|true|IT|STF007
 LECTURER|LEC004|Yoshi|Yoshi@123|Yoshi@mail.apu.edu.my|Yoshi|0178306745|Female|25|true|true|IT|STF008|ACL002|MD001
-STUDENT|STU003|Calvin|Calvin123/|calvin.giam@gmail.com|Calvin Giam Jian Tao|0123719212|Male|22|true|false|STU004|2026
-STUDENT|STU004|ChuaHF|Chf1234/|chuahf@gmail.com|Chua Hui Fong|0128320128|Male|23|true|false|STU005|2026
-STUDENT|STU005|Leon|Leon123/|leon@gmail.com|Hew Le Onn|013482012|Male|21|true|false|STU005|2026
+STUDENT|STU003|Calvin|Calvin123/|calvin.giam@gmail.com|Calvin Giam Jian Tao|0123719212|Male|22|true|true|STU004|2026
+STUDENT|STU004|ChuaHF|Chf1234/|chuahf@gmail.com|Chua Hui Fong|0128320128|Male|23|true|true|STU005|2026
+STUDENT|STU005|Leon|Leon123/|leon@gmail.com|Hew Le Onn|013482012|Male|21|true|true|STU005|2026
+STUDENT|STU006|Alex|alexwarren/|alex.warren@gmail.com|Alex Warren|6821020381|Male|26|true|true|STU006|2026
+STUDENT|STU007|JF05|Jianfeng05/|jianfeng@gmail.com|Loh Jian Feng|0168202833|Male|21|true|false|STU007|2026
+STUDENT|STU008|Wh05|weihong:|weihong@gmail.com|Kan WeiHong|0192783923|Male|20|true|false|STU008|2026
+LECTURER|LEC005|Muru|Muru123/|murugananthan@apu.edu.my|DR. MURUGANANTHAN VELAYUTHAM|0128712937|Male|45|true|true|IT|STF010|UNASSIGNED|
+LECTURER|LEC006|Derrick|Derrick1234/|derrick.chow@apu.edu.my|TS. DERRICK CHOW KAM YUEN|0182362092|Male|49|true|true|IT|STF011|UNASSIGNED|
+LECTURER|LEC007|Mani|Mani9876/|manimegalai@apu.edu.my|TS. DR. MANIMEGALAI A/P RAJENDERAN|0192810289|Female|38|true|true|IT|STF012|UNASSIGNED|
+LECTURER|LEC008|cynthia|Cynthiamala.|cynthia.mala@apu.edu.my|CYNTHIA MALA A/P PAUL DORAIRAJ|0182919821|Male|39|true|false|IT|N/A|UNASSIGNED|
