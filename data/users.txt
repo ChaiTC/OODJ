@@ -5,6 +5,9 @@ STUDENT|STU001|Roy|12345678/|roy@gmail.com|Dibyajoti Roy|0122348212|Male|22|true
 LECTURER|LEC002|Kelwin Tan|KelwinTan/|kelwin.tan@mail.apu.edu.my|KELWIN TAN|0179077322|Male|30|true|true|Engineering|STF004|ACL002|
 ACADEMIC_LEADER|ACL003|Troye|Troye123/|troye.sivan@gmail.com|Troye Sivan|0182098423|Male|30|true|true|IT|STF009
 LECTURER|LEC003|Kanagi|Kanagi123/|kanagi.rajandran@apu.edu.my|DR. KANAGI A/P RAJANDRAN|013472912|Female|24|false|false|Business|STF006|ACL002|
-STUDENT|STU003|Eow|Eow12345/|eow@mail.apu.edu.my|Eow Wei Chuan|0127309128|Male|22|true|true|STU003|2026
+STUDENT|STU002|Eow|Eow12345/|eow@mail.apu.edu.my|Eow Wei Chuan|0127309128|Male|22|true|true|STU003|2026
 ACADEMIC_LEADER|ACL002|Mr.Kau|Kauguankiat/|kau.guankiat@mail.apu.edu.my|Kau Guan Kiat|0129203781|Male|34|false|false|IT|STF007
 LECTURER|LEC004|Yoshi|Yoshi@123|Yoshi@mail.apu.edu.my|Yoshi|0178306745|Female|25|true|true|IT|STF008|ACL002|MD001
+STUDENT|STU003|Calvin|Calvin123/|calvin.giam@gmail.com|Calvin Giam Jian Tao|0123719212|Male|22|true|false|STU004|2026
+STUDENT|STU004|ChuaHF|Chf1234/|chuahf@gmail.com|Chua Hui Fong|0128320128|Male|23|true|false|STU005|2026
+STUDENT|STU005|Leon|Leon123/|leon@gmail.com|Hew Le Onn|013482012|Male|21|true|false|STU005|2026

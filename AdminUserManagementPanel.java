@@ -10,6 +10,7 @@ class AdminUserManagementPanel extends JPanel {
     private DefaultTableModel tableModel;
     private JTable table;
     private JTextField searchField;
+    private JComboBox<String> roleFilter;
     private java.util.List<User> allUsers;
     private java.util.List<User> filteredUsers;
     
@@ -51,6 +52,11 @@ class AdminUserManagementPanel extends JPanel {
         searchPanel.add(searchField);
         searchPanel.add(searchBtn);
         searchPanel.add(clearBtn);
+        
+        // Role filter
+        searchPanel.add(new JLabel("  Filter by Role:"));
+        roleFilter = new JComboBox<>(new String[]{"All Roles", "STUDENT", "LECTURER", "ACADEMIC_LEADER", "ADMIN_STAFF"});
+        searchPanel.add(roleFilter);
         
         // Action buttons
         JPanel buttonBar = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -157,7 +163,15 @@ class AdminUserManagementPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 searchField.setText("");
+                roleFilter.setSelectedIndex(0);
                 refreshTable();
+            }
+        });
+        
+        roleFilter.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                performSearch();
             }
         });
 
@@ -558,15 +572,20 @@ class AdminUserManagementPanel extends JPanel {
     
     private void performSearch() {
         String searchTerm = searchField.getText().trim().toLowerCase();
-        if (searchTerm.isEmpty()) {
-            filteredUsers = new ArrayList<>(allUsers);
-        } else {
-            filteredUsers = new ArrayList<>();
-            for (User u : allUsers) {
-                if (u.getUserID().toLowerCase().contains(searchTerm) ||
-                    u.getFullName().toLowerCase().contains(searchTerm)) {
-                    filteredUsers.add(u);
-                }
+        String selectedRole = (String) roleFilter.getSelectedItem();
+        
+        filteredUsers = new ArrayList<>();
+        for (User u : allUsers) {
+            // Check search term
+            boolean matchesSearch = searchTerm.isEmpty() || 
+                                    u.getUserID().toLowerCase().contains(searchTerm) ||
+                                    u.getFullName().toLowerCase().contains(searchTerm);
+            
+            // Check role filter
+            boolean matchesRole = "All Roles".equals(selectedRole) || u.getRole().equals(selectedRole);
+            
+            if (matchesSearch && matchesRole) {
+                filteredUsers.add(u);
             }
         }
         updateTableDisplay();
