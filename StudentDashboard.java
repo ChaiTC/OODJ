@@ -185,61 +185,101 @@ public class StudentDashboard extends JFrame {
         return panel;
     }
 
-    private JPanel buildRegisterTab() {
+     private JPanel buildRegisterTab() {
+
     JPanel panel = new JPanel(new BorderLayout(10, 10));
     panel.setBackground(Color.WHITE);
     panel.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
 
-    DefaultListModel<ClassModule> model = new DefaultListModel<>();
-    JList<ClassModule> classList = new JList<>(model);
+    String[] columnNames = {
+            "Class ID",
+            "Class Name",
+            "Module",
+            "Lecturer",
+            "Day",
+            "Time",
+            "Capacity"
+    };
 
-    // show all available classes
-    for (ClassModule c : systemManager.getAllClasses()) {
-        model.addElement(c);
+    List<ClassModule> allClasses = systemManager.getAllClasses();
+
+    Object[][] data = new Object[allClasses.size()][7];
+
+    for (int i = 0; i < allClasses.size(); i++) {
+        ClassModule c = allClasses.get(i);
+
+        String moduleName = (c.getModule() != null)
+                ? c.getModule().getModuleName()
+                : c.getModuleID();
+
+        String lecturerName = "Not Assigned";
+        if (c.getLecturerID() != null) {
+            User u = systemManager.findUserByID(c.getLecturerID());
+            if (u instanceof Lecturer) {
+                lecturerName = ((Lecturer) u).getFullName();
+            } else {
+                lecturerName = c.getLecturerID();
+            }
+        }
+
+        data[i][0] = c.getClassID();
+        data[i][1] = c.getClassName();
+        data[i][2] = moduleName;
+        data[i][3] = lecturerName;
+        data[i][4] = c.getDay();
+        data[i][5] = c.getTime();
+        data[i][6] = c.getEnrolledStudents().size() + "/" + c.getCapacity();
     }
 
+    JTable table = new JTable(data, columnNames);
+    table.setRowHeight(25);
+    table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+    JScrollPane scrollPane = new JScrollPane(table);
+
     JButton registerBtn = new JButton("Register Selected Class");
+    registerBtn.setPreferredSize(new Dimension(200, 38));
+
     registerBtn.addActionListener(e -> {
-        ClassModule selected = classList.getSelectedValue();
-        if (selected == null) {
-            JOptionPane.showMessageDialog(this, "Select a class first.");
+        int selectedRow = table.getSelectedRow();
+
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a class first.");
             return;
         }
 
-       
-        for (Student s : selected.getEnrolledStudents()) {
+        ClassModule selectedClass = allClasses.get(selectedRow);
+
+        // This code is to check if the student has already been registered 
+        for (Student s : selectedClass.getEnrolledStudents()) {
             if (s.getStudentID().equals(student.getStudentID())) {
-                JOptionPane.showMessageDialog(this, "Already registered in this class.");
+                JOptionPane.showMessageDialog(this, "You are already registered in this class.");
                 return;
             }
         }
 
-       
-        if (selected.getEnrolledStudents().size() >= selected.getCapacity()) {
-            JOptionPane.showMessageDialog(this, "Class is full.");
+        
+        if (selectedClass.getEnrolledStudents().size() >= selectedClass.getCapacity()) {
+            JOptionPane.showMessageDialog(this, "This class is full.");
             return;
         }
 
-       
-        selected.enrollStudent(student);
-
-        
-        systemManager.updateClass(selected);
+        selectedClass.enrollStudent(student);
+        systemManager.updateClass(selectedClass);
 
         JOptionPane.showMessageDialog(this, "Registered successfully!");
         refreshAll();
     });
 
-    panel.add(new JScrollPane(classList), BorderLayout.CENTER);
+    JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+    bottomPanel.setOpaque(false);
+    bottomPanel.add(registerBtn);
 
-    JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    bottom.setOpaque(false);
-    bottom.add(registerBtn);
-    panel.add(bottom, BorderLayout.SOUTH);
+    panel.add(scrollPane, BorderLayout.CENTER);
+    panel.add(bottomPanel, BorderLayout.SOUTH);
 
     return panel;
 }
-
 
     private JPanel buildResultsTab() {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
