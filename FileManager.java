@@ -154,7 +154,7 @@ public class FileManager {
                         maxNumber = number;
                     }
                 } catch (NumberFormatException e) {
-                    // Skip if not in expected format
+                    
                 }
             }
         }
