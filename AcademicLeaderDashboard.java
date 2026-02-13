@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.util.List;
+import java.util.ArrayList;
 
 public class AcademicLeaderDashboard extends JFrame {
 
@@ -628,18 +629,23 @@ public class AcademicLeaderDashboard extends JFrame {
                 sb.append("  Credits: ").append(m.getCreditHours()).append("\n");
                 sb.append("  Department: ").append(m.getDepartment()).append("\n");
                 
-                // Find assigned lecturer
-                String lecturerName = "Not Assigned";
+                // Find assigned lecturers (can be multiple)
+                List<String> assignedLecturers = new ArrayList<>();
                 List<User> lecturers = systemManager.getAllLecturers();
                 for (User u : lecturers) {
                     if (u instanceof Lecturer) {
                         Lecturer lec = (Lecturer) u;
-                        if (lec.getAssignedModules() != null && lec.getAssignedModules().contains(m)) {
-                            lecturerName = lec.getFullName();
-                            break;
+                        if (lec.getAssignedModules() != null) {
+                            for (Module assignedMod : lec.getAssignedModules()) {
+                                if (assignedMod.getModuleID().equals(m.getModuleID())) {
+                                    assignedLecturers.add(lec.getFullName());
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
+                String lecturerName = assignedLecturers.isEmpty() ? "Not Assigned" : String.join(", ", assignedLecturers);
                 sb.append("  Assigned Lecturer: ").append(lecturerName).append("\n\n");
             }
 

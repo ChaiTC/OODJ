@@ -1,2 +1,5 @@
 MD001|System Development Method|SDM|No description|3|IT
 MD002|Probability statistics|PSMOD|No description|2|IT
+MD003|Philosophy|FIS|No description|2|Business
+MD004|Object Oriented Development with Java|OODJ|No description|4|IT
+MD005|System and Network Administration|SNA|No description|3|IT

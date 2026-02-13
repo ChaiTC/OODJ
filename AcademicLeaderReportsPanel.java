@@ -211,24 +211,34 @@ class AcademicLeaderReportsPanel extends JPanel {
         for (int i = 0; i < modules.size(); i++) {
             Module m = modules.get(i);
             
-            // Find assigned lecturer
-            String lecturerName = "Not Assigned";
+            // Find assigned lecturers (can be multiple)
+            StringBuilder lecturerNames = new StringBuilder();
+            lecturerNames.append("Not Assigned");
             java.util.List<User> lecturers = systemManager.getAllLecturers();
+            java.util.List<String> assignedLecturers = new ArrayList<>();
+            
             for (User u : lecturers) {
                 if (u instanceof Lecturer) {
                     Lecturer lec = (Lecturer) u;
-                    if (lec.getAssignedModules().contains(m)) {
-                        lecturerName = lec.getFullName();
-                        break;
+                    // Compare by module ID instead of object reference
+                    for (Module assignedMod : lec.getAssignedModules()) {
+                        if (assignedMod.getModuleID().equals(m.getModuleID())) {
+                            assignedLecturers.add(lec.getFullName());
+                            break;
+                        }
                     }
                 }
+            }
+            
+            if (!assignedLecturers.isEmpty()) {
+                lecturerNames = new StringBuilder(String.join(", ", assignedLecturers));
             }
             
             data[i][0] = m.getModuleID();
             data[i][1] = m.getModuleName();
             data[i][2] = m.getModuleCode();
             data[i][3] = m.getCreditHours();
-            data[i][4] = lecturerName;
+            data[i][4] = lecturerNames.toString();
             data[i][5] = "Edit / Delete";
         }
         
