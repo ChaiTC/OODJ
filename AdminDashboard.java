@@ -9,13 +9,6 @@ class AdminDashboard extends JFrame {
     
     // Reference to the currently logged-in admin user
     private AdminStaff admin;
-    
-    /**
-     * Constructs the AdminDashboard with the specified system manager and admin user.
-     * 
-     * @param systemManager The system manager instance for data operations
-     * @param admin The currently logged-in admin staff member
-     */
     public AdminDashboard(SystemManager systemManager, AdminStaff admin) {
         this.systemManager = systemManager;
         this.admin = admin;
