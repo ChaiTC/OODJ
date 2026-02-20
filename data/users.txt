@@ -17,4 +17,4 @@ STUDENT|STU008|Wh05|weihong:|weihong@gmail.com|Kan WeiHong|0192783923|Male|20|tr
 LECTURER|LEC005|Muru|Muru123/|murugananthan@apu.edu.my|DR. MURUGANANTHAN VELAYUTHAM|0128712937|Male|45|true|true|IT|STF010|ACL001|
 LECTURER|LEC006|Derrick|Derrick1234/|derrick.chow@apu.edu.my|TS. DERRICK CHOW KAM YUEN|0182362092|Male|49|true|true|IT|STF011|ACL003|MD005
 LECTURER|LEC007|Mani|Mani9876/|manimegalai@apu.edu.my|TS. DR. MANIMEGALAI A/P RAJENDERAN|0192810289|Female|38|true|true|IT|STF012|ACL003|MD003
-LECTURER|LEC008|cynthia|Cynthiamala.|cynthia.mala@apu.edu.my|CYNTHIA MALA A/P PAUL DORAIRAJ|0182919821|Male|39|true|false|IT|N/A|ACL003|MD001
+LECTURER|LEC008|cynthia|Cynthiamala.|cynthia.mala@apu.edu.my|CYNTHIA MALA A/P PAUL DORAIRAJ|0182919821|Male|39|true|false|IT|N/A|ACL002|MD001

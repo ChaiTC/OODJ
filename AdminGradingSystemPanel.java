@@ -102,10 +102,10 @@ class AdminGradingSystemPanel extends JPanel {
         editPanel.setBorder(BorderFactory.createTitledBorder("Add/Edit Grade"));
         
         // Form fields for grade configuration
-        JSpinner minSpinner = new JSpinner(new SpinnerNumberModel());
-        JSpinner maxSpinner = new JSpinner(new SpinnerNumberModel());
+        JSpinner minSpinner = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+        JSpinner maxSpinner = new JSpinner(new SpinnerNumberModel(100, 0, 100, 1));
         JTextField gradeField = new JTextField();
-        JSpinner gpaSpinner = new JSpinner(new SpinnerNumberModel());
+        JSpinner gpaSpinner = new JSpinner(new SpinnerNumberModel(4.0, 0.0, 4.0, 0.1));
         JTextField classificationField = new JTextField();
         
         editPanel.add(createLabeledRow("Min Score (%):", minSpinner));
@@ -142,7 +142,7 @@ class AdminGradingSystemPanel extends JPanel {
                     int minScore = (Integer) minSpinner.getValue();
                     int maxScore = (Integer) maxSpinner.getValue();
                     String grade = gradeField.getText().trim();
-                    double gpa = (Double) gpaSpinner.getValue();
+                    double gpa = ((Number) gpaSpinner.getValue()).doubleValue();
                     String classification = classificationField.getText().trim();
                     
                     // Validate required fields
@@ -227,9 +227,6 @@ class AdminGradingSystemPanel extends JPanel {
             GradingSystem newGradingSystem = new GradingSystem("GS001", "APU Grading System", 60.0);
             newGradingSystem.getGrades().clear();
             
-            System.out.println("\n=== SAVING GRADING SYSTEM ===");
-            System.out.println("Table has " + tableModel.getRowCount() + " rows");
-            
             // Process each table row
             for (int i = 0; i < tableModel.getRowCount(); i++) {
                 try {
@@ -274,8 +271,6 @@ class AdminGradingSystemPanel extends JPanel {
                         continue;
                     }
                     
-                    System.out.println("Row " + i + ": " + grade + " [" + minScore + "-" + maxScore + "] GPA=" + gpa + " (" + classification + ")");
-                    
                     // Create GradingScale object and add to system
                     String gradeID = "G" + (i + 1);
                     GradingScale gradingScale = new GradingScale(gradeID, grade, minScore, maxScore, classification, gpa);
@@ -291,8 +286,6 @@ class AdminGradingSystemPanel extends JPanel {
             FileManager.saveGradingSystem(newGradingSystem);
             // Update the internal reference
             this.gradingSystem = newGradingSystem;
-            
-            System.out.println("=== SAVED " + newGradingSystem.getGrades().size() + " GRADES ===\n");
             
         } catch (Exception ex) {
             System.err.println("Error saving grading system: " + ex.getMessage());
