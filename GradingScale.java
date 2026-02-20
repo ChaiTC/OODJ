@@ -49,30 +49,66 @@ public class GradingScale implements Serializable {
         return percentage >= minPercentage && percentage <= maxPercentage;
     }
     
-    public String getGradeID() { return gradeID; }
-    public void setGradeID(String gradeID) { this.gradeID = gradeID; }
+    public String getGradeID() { 
+        return gradeID; 
+    }
+    public void setGradeID(String gradeID) { 
+        this.gradeID = gradeID; 
+    }
     
-    public String getGradeLetter() { return gradeLetter; }
-    public void setGradeLetter(String gradeLetter) { this.gradeLetter = gradeLetter; }
+    public String getGradeLetter() { 
+        return gradeLetter; 
+    }
+    public void setGradeLetter(String gradeLetter) { 
+        this.gradeLetter = gradeLetter; 
+    }
     
-    public double getMinPercentage() { return minPercentage; }
-    public void setMinPercentage(double minPercentage) { this.minPercentage = minPercentage; }
+    public double getMinPercentage() { 
+        return minPercentage; 
+    }
+    public void setMinPercentage(double minPercentage) { 
+        this.minPercentage = minPercentage; 
+    }
     
-    public double getMaxPercentage() { return maxPercentage; }
-    public void setMaxPercentage(double maxPercentage) { this.maxPercentage = maxPercentage; }
+    public double getMaxPercentage() { 
+        return maxPercentage; 
+    }
+    public void setMaxPercentage(double maxPercentage) { 
+        this.maxPercentage = maxPercentage; 
+    }
     
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getDescription() { 
+        return description; 
+    }
+    public void setDescription(String description) { 
+        this.description = description; 
+    }
     
-    public double getGPA() { return gpa; }
-    public void setGPA(double gpa) { this.gpa = gpa; }
+    public double getGPA() { 
+        return gpa; 
+    }
+    public void setGPA(double gpa) { 
+        this.gpa = gpa; 
+    }
     
-    public double getAMarkPercentage() { return 80.0; }
-    public double getBMarkPercentage() { return 70.0; }
-    public double getCMarkPercentage() { return 60.0; }
-    public double getDMarkPercentage() { return 50.0; }
-    public double getFMarkPercentage() { return 0.0; }
-    public boolean isPass(double score) { return score >= 60.0; }
+    public double getAMarkPercentage() { 
+        return 80.0; 
+    }
+    public double getBMarkPercentage() { 
+        return 70.0; 
+    }
+    public double getCMarkPercentage() { 
+        return 60.0; 
+    }
+    public double getDMarkPercentage() { 
+        return 50.0; 
+    }
+    public double getFMarkPercentage() { 
+        return 0.0; 
+    }
+    public boolean isPass(double score) { 
+        return score >= 60.0; 
+    }
     
     @Override
     public String toString() {
