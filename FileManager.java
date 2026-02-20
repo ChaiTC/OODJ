@@ -914,14 +914,12 @@ if (module == null) return null;
      * Save grading scale
      */
     public static void saveGradingScale(Object scale) {
-        // Stub implementation
     }
     
     /**
      * Save assessment type
      */
     public static void saveAssessmentType(Object type) {
-        // Stub implementation
     }
 
 }
