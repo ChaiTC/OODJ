@@ -28,7 +28,6 @@ public class AcademicLeader extends User {
                           String phoneNumber,
                           String department,
                           String leaderID) {
-
         super(userID, username, password, email, fullName, phoneNumber, "ACADEMIC_LEADER");
         this.department = department;
         this.leaderID = leaderID;
