@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class AcademicLeaderDashboard extends JFrame {
+    private boolean isValidModuleCode(String moduleCode) {
+        return moduleCode != null && moduleCode.matches("[A-Za-z]{1,6}");
+    }
+
 
     private final SystemManager systemManager;
     private final AcademicLeader leader;
@@ -335,15 +339,26 @@ public class AcademicLeaderDashboard extends JFrame {
             
             saveBtn.addActionListener(e -> {
                 try {
-                    if (nameField.getText().isEmpty() || codeField.getText().isEmpty()) {
+                    String moduleName = nameField.getText().trim();
+                    String moduleCode = codeField.getText().trim();
+
+                    if (moduleName.isEmpty() || moduleCode.isEmpty()) {
                         JOptionPane.showMessageDialog(createDialog, "Please fill in all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    if (!isValidModuleCode(moduleCode)) {
+                        JOptionPane.showMessageDialog(createDialog,
+                                "Module Code must contain only letters (A-Z) and be maximum 6 characters.",
+                                "Validation Error",
+                                JOptionPane.ERROR_MESSAGE);
                         return;
                     }
                     
                     Module module = new Module(
                             idField.getText(),
-                            nameField.getText(),
-                            codeField.getText(),
+                            moduleName,
+                            moduleCode,
                             "No description",
                             (Integer) creditBox.getSelectedItem(),
                             (String) departmentBox.getSelectedItem()
@@ -427,8 +442,24 @@ public class AcademicLeaderDashboard extends JFrame {
             
             saveBtn.addActionListener(e -> {
                 try {
-                    module.setModuleName(nameField.getText());
-                    module.setModuleCode(codeField.getText());
+                    String moduleName = nameField.getText().trim();
+                    String moduleCode = codeField.getText().trim();
+
+                    if (moduleName.isEmpty() || moduleCode.isEmpty()) {
+                        JOptionPane.showMessageDialog(editDialog, "Please fill in all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    if (!isValidModuleCode(moduleCode)) {
+                        JOptionPane.showMessageDialog(editDialog,
+                                "Module Code must contain only letters (A-Z) and be maximum 6 characters.",
+                                "Validation Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    module.setModuleName(moduleName);
+                    module.setModuleCode(moduleCode);
                     module.setCreditHours((Integer) creditBox.getSelectedItem());
                     module.setDepartment((String) departmentBox.getSelectedItem());
                     
