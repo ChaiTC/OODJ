@@ -573,8 +573,11 @@ public class AcademicLeaderDashboard extends JFrame {
         JButton moduleBtn = new JButton("Module Summary");
         JButton assessBtn = new JButton("Assessment Summary");
         JButton enrollBtn = new JButton("Enrollment Report");
+        JButton refreshBtn = new JButton("Refresh");
 
-        JButton[] buttons = {userBtn, classBtn, moduleBtn, assessBtn, enrollBtn};
+        JButton[] buttons = {userBtn, classBtn, moduleBtn, assessBtn, enrollBtn, refreshBtn};
+
+        final JButton[] selectedReportButton = new JButton[1];
 
         for (JButton btn : buttons) {
             btn.setMaximumSize(buttonSize);
@@ -596,6 +599,7 @@ public class AcademicLeaderDashboard extends JFrame {
 
         // ========== USER REPORT ==========
         userBtn.addActionListener(e -> {
+            selectedReportButton[0] = userBtn;
             StringBuilder sb = new StringBuilder();
             List<User> users = systemManager.getAllUsers();
 
@@ -616,6 +620,7 @@ public class AcademicLeaderDashboard extends JFrame {
 
         // ========== MODULE REPORT ==========
         moduleBtn.addActionListener(e -> {
+            selectedReportButton[0] = moduleBtn;
             StringBuilder sb = new StringBuilder();
             List<Module> modules = systemManager.getAllModules();
 
@@ -654,6 +659,7 @@ public class AcademicLeaderDashboard extends JFrame {
 
         // ========== ASSESSMENT REPORT ==========
         assessBtn.addActionListener(e -> {
+            selectedReportButton[0] = assessBtn;
             StringBuilder sb = new StringBuilder();
             List<Assessment> assessments = systemManager.getAllAssessments();
 
@@ -670,6 +676,7 @@ public class AcademicLeaderDashboard extends JFrame {
 
         // ========== CLASS REPORT ==========
         classBtn.addActionListener(e -> {
+            selectedReportButton[0] = classBtn;
             StringBuilder sb = new StringBuilder();
             List<ClassModule> classes = systemManager.getAllClasses();
 
@@ -700,6 +707,7 @@ public class AcademicLeaderDashboard extends JFrame {
 
         // ========== ENROLLMENT REPORT ==========
         enrollBtn.addActionListener(e -> {
+            selectedReportButton[0] = enrollBtn;
             StringBuilder sb = new StringBuilder();
             List<ClassModule> classes = systemManager.getAllClasses();
             int totalEnrolled = 0;
@@ -737,6 +745,17 @@ public class AcademicLeaderDashboard extends JFrame {
             }
 
             reportArea.setText(sb.toString());
+        });
+
+        refreshBtn.addActionListener(e -> {
+            systemManager.loadAllData();
+            refreshModuleBox();
+
+            if (selectedReportButton[0] != null) {
+                selectedReportButton[0].doClick();
+            } else {
+                reportArea.setText("Data refreshed. Select a report to view latest information.");
+            }
         });
 
         return panel;

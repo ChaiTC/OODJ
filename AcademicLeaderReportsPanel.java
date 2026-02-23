@@ -48,6 +48,13 @@ class AcademicLeaderReportsPanel extends JPanel {
         enrollmentReportBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
         optionsPanel.add(enrollmentReportBtn);
         optionsPanel.add(Box.createVerticalGlue());
+
+        JButton refreshBtn = new JButton("Refresh");
+        refreshBtn.setAlignmentX(Component.CENTER_ALIGNMENT);
+        optionsPanel.add(refreshBtn);
+        optionsPanel.add(Box.createVerticalStrut(8));
+
+        final JButton[] selectedReportButton = new JButton[1];
         
         // Right section: Report display
         JPanel reportPanel = new JPanel(new BorderLayout());
@@ -65,6 +72,7 @@ class AcademicLeaderReportsPanel extends JPanel {
         userReportBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                selectedReportButton[0] = userReportBtn;
                 StringBuilder report = new StringBuilder();
                 report.append("=== USER SUMMARY REPORT ===\n");
                 report.append("Generated: ").append(new java.util.Date()).append("\n\n");
@@ -96,6 +104,7 @@ class AcademicLeaderReportsPanel extends JPanel {
         classReportBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                selectedReportButton[0] = classReportBtn;
                 StringBuilder report = new StringBuilder();
                 report.append("=== CLASS SUMMARY REPORT ===\n");
                 report.append("Generated: ").append(new java.util.Date()).append("\n\n");
@@ -130,6 +139,7 @@ class AcademicLeaderReportsPanel extends JPanel {
         moduleReportBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                selectedReportButton[0] = moduleReportBtn;
                 showModuleManagementPanel();
             }
         });
@@ -137,6 +147,7 @@ class AcademicLeaderReportsPanel extends JPanel {
         assessmentReportBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                selectedReportButton[0] = assessmentReportBtn;
                 StringBuilder report = new StringBuilder();
                 report.append("=== ASSESSMENT SUMMARY REPORT ===\n");
                 report.append("Generated: ").append(new java.util.Date()).append("\n\n");
@@ -162,6 +173,7 @@ class AcademicLeaderReportsPanel extends JPanel {
         enrollmentReportBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                selectedReportButton[0] = enrollmentReportBtn;
                 StringBuilder report = new StringBuilder();
                 report.append("=== ENROLLMENT REPORT ===\n");
                 report.append("Generated: ").append(new java.util.Date()).append("\n\n");
@@ -191,6 +203,19 @@ class AcademicLeaderReportsPanel extends JPanel {
                 }
                 
                 reportArea.setText(report.toString());
+            }
+        });
+
+        refreshBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                systemManager.loadAllData();
+
+                if (selectedReportButton[0] != null) {
+                    selectedReportButton[0].doClick();
+                } else {
+                    reportArea.setText("Data refreshed. Select a report to view latest information.");
+                }
             }
         });
     }
