@@ -432,9 +432,19 @@ public class SystemManager {
         User leader = findUserByID(leaderID);
 
         if (lecturer instanceof Lecturer && leader instanceof AcademicLeader) {
-            ((Lecturer) lecturer).setAcademicLeaderID(leaderID);
+            Lecturer lec = (Lecturer) lecturer;
+            lec.setAcademicLeaderID(leaderID);
             FileManager.saveAllUsers(users);
             return true;
+        }
+        return false;
+    }
+
+    public boolean isLecturerAlreadyAssigned(String lecturerID) {
+        User lecturer = findUserByID(lecturerID);
+        if (lecturer instanceof Lecturer) {
+            String leaderID = ((Lecturer) lecturer).getAcademicLeaderID();
+            return leaderID != null && !leaderID.isEmpty();
         }
         return false;
     }

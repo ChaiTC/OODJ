@@ -106,8 +106,23 @@ class AdminLecturerAssignmentPanel extends JPanel {
                 String lecId = lecSelection.substring(0, lecSelection.indexOf(" "));
                 String leaderId = leaderSelection.substring(0, leaderSelection.indexOf(" "));
                 
+                // Check if lecturer is already assigned
+                if (systemManager.isLecturerAlreadyAssigned(lecId)) {
+                    int confirm = JOptionPane.showConfirmDialog(parentFrame,
+                        "This lecturer is already assigned to another leader.\nDo you want to reassign them?",
+                        "Reassign Lecturer",
+                        JOptionPane.YES_NO_OPTION);
+                    if (confirm != JOptionPane.YES_OPTION) {
+                        return;
+                    }
+                }
+                
                 // Perform the assignment in the system
-                systemManager.assignLecturerToLeader(lecId, leaderId);
+                boolean assigned = systemManager.assignLecturerToLeader(lecId, leaderId);
+                if (!assigned) {
+                    JOptionPane.showMessageDialog(parentFrame, "Failed to assign lecturer. Please try again.");
+                    return;
+                }
                 JOptionPane.showMessageDialog(parentFrame, "Lecturer assigned to academic leader successfully!");
                 // Refresh table to show new assignment
                 refreshTable();
